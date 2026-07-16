@@ -1,0 +1,8 @@
+[project]
+name="six-nations-fantasy"
+version="0.1.0"
+
+dependencies = [
+	"pandas",
+	"pulp"
+]
