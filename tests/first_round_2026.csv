@@ -1,0 +1,138 @@
+1,10,9,Prop,France,Jean-Baptiste Gros
+2,13,12,Hooker,France,Julien Marchand
+3,6,6,Prop,France,Dorian Aldegheri
+4,11,23,Second-row,France,Charles Ollivon
+5,10,42,Second-row,France,Mickaël Guillard
+6,13,10,Back-row,France,Francois Cros
+7,9,31,Back-row,France,Oscar Jegou
+8,10,30,Back-row,France,Anthony Jelonch
+9,15,30,Scrum-half,France,Antoine Dupont (C)
+10,12,52,Fly-half,France,Matthieu Jalibert
+11,15,51,Back Three,France,Louis Bielle-Biarrey
+12,12,15,Centre,France,Yoram Moefana
+13,11,36,Centre,France,Nicolas Depoortère
+14,10,32,Back Three,France,Théo Attissogbe
+15,16,46,Back Three,France,Thomas Ramos
+16,11,20,Bench,France,Peato Mauvaka (H)
+17,6,5,Bench,France,Rodrigue Neti (P)
+18,7,18,Bench,France,Régis Montagne (P)
+19,7,18,Bench,France,Hugo Auradou (SR)
+20,9,11,Bench,France,Emmanuel Meafou (SR)
+21,7,17,Bench,France,Lenni Nouchi (BR)
+22,8,6,Bench,France,Baptiste Serin (SH)
+23,10,6,Bench,France,Kalvin Gourgues (C)
+101,6,14,Prop,Ireland,Jeremy Loughman
+102,16,13,Hooker,Ireland,Dan Sheehan
+103,7,8,Prop,Ireland,Thomas Clarkson
+104,11,12,Second-row,Ireland,Joe McCarthy
+105,13,39,Second-row,Ireland,Tadhg Beirne
+106,8,15,Back-row,Ireland,Cian Prendergast
+107,12,14,Back-row,Ireland,Josh van der Flier
+108,15,34,Back-row,Ireland,Caelan Doris (C)
+109,13,12,Scrum-half,Ireland,Jamison Gibson-Park
+110,11,32,Fly-half,Ireland,Sam Prendergast
+111,9,13,Back Three,Ireland,Jacob Stockdale
+112,10,27,Centre,Ireland,Stuart McCloskey
+113,11,12,Centre,Ireland,Garry Ringrose
+114,11,7,Back Three,Ireland,Tommy O'Brien
+115,9,21,Back Three,Ireland,Jamie Osborne
+116,11,4,Bench,Ireland,Rónan Kelleher (H)
+117,6,18,Bench,Ireland,Michael Milne (P)
+118,10,0,Bench,Ireland,Finlay Bealham (P)
+119,9,9,Bench,Ireland,James Ryan (SR)
+120,13,5,Bench,Ireland,Jack Conan (BR)
+121,8,33,Bench,Ireland,Nick Timoney (BR)
+122,9,1,Bench,Ireland,Craig Casey (SH)
+123,11,6,Bench,Ireland,Jack Crowley (FH)
+201,12,19,Prop,Italy,Danilo Fischetti
+202,11,20,Hooker,Italy,Giacomo Nicotera
+203,8,33,Prop,Italy,Simone Ferrari
+204,10,31,Second-row,Italy,Niccolò Cannone
+205,8,30,Second-row,Italy,Andrea Zambonin
+206,13,37,Back-row,Italy,Michele Lamaro (C)
+207,11,32,Back-row,Italy,Manuel Zuliani
+208,13,44,Back-row,Italy,Lorenzo Cannone
+209,9,11,Scrum-half,Italy,Alessandro Fusco
+210,13,15,Fly-half,Italy,Paolo Garbisi
+211,12,17,Back Three,Italy,Monty Ioane
+212,14,34,Centre,Italy,Tommaso Menoncello
+213,11,20,Centre,Italy,Nacho Brex
+214,11,17,Back Three,Italy,Louis Lynagh
+215,7,9,Back Three,Italy,Leonardo Marin
+216,8,12,Bench,Italy,Tommaso Di Bartolomeo (H)
+217,7,5,Bench,Italy,Mirco Spagnolo (P)
+218,6,7,Bench,Italy,Muhamed Hasa (P)
+219,10,8,Bench,Italy,Federico Ruzza (SR)
+220,6,13,Bench,Italy,Riccardo Favretto (SR)
+221,6,5,Bench,Italy,Alessandro Garbisi (SH)
+222,8,0,Bench,Italy,Giacomo Da Re (FH)
+223,9,2,Bench,Italy,Lorenzo Pani (BT)
+301,11,10,Prop,Scotland,Pierre Schoeman
+302,12,14,Hooker,Scotland,Ewan Ashman
+303,12,13,Prop,Scotland,Zander Fagerson
+304,9,9,Second-row,Scotland,Scott Cummings
+305,8,3,Second-row,Scotland,Grant Gilchrist
+306,13,17,Back-row,Scotland,Matt Fagerson
+307,12,22,Back-row,Scotland,Rory Darge
+308,13,40,Back-row,Scotland,Jack Dempsey
+309,11,26,Scrum-half,Scotland,Ben White
+310,13,14,Fly-half,Scotland,Finn Russell
+311,9,11,Back Three,Scotland,Jamie Dobie
+312,13,11,Centre,Scotland,Sione Tuipulotu (C)
+313,14,7,Centre,Scotland,Huw Jones
+314,10,12,Back Three,Scotland,Kyle Steyn
+315,11,6,Back Three,Scotland,Tom Jordan
+316,7,0,Bench,Scotland,George Turner (H)
+317,6,6,Bench,Scotland,Nathan McBeth (P)
+318,6,3,Bench,Scotland,Elliot Millar-Mills (P)
+319,7,3,Bench,Scotland,Max Williamson (SR)
+320,8,14,Bench,Scotland,Gregor Brown (SR)
+321,8,15,Bench,Scotland,George Horne (SH)
+322,10,0,Bench,Scotland,Adam Hastings (FH)
+323,13,1,Bench,Scotland,Darcy Graham (BT)
+401,12,11,Prop,England,Ellis Genge
+402,11,12,Hooker,England,Jamie George (C)
+403,10,9,Prop,England,Joe Heyes
+404,10,22,Second-row,England,Alex Coles
+405,11,30,Second-row,England,Ollie Chessum
+406,11,32,Back-row,England,Guy Pepper
+407,14,10,Back-row,England,Sam Underhill
+408,15,50,Back-row,England,Ben Earl
+409,11,6,Scrum-half,England,Alex Mitchell
+410,13,55,Fly-half,England,George Ford
+411,11,46,Back Three,England,Henry Arundell
+412,9,20,Centre,England,Fraser Dingwall
+413,14,50,Centre,England,Tommy Freeman
+414,9,17,Back Three,England,Tom Roebuck
+415,9,16,Back Three,England,Freddie Steward
+416,12,5,Bench,England,Luke Cowan-Dickie (H)
+417,7,17,Bench,England,Bevan Rodd (P)
+418,6,6,Bench,England,Trevor Davison (P)
+419,13,0,Bench,England,Maro Itoje (SR)
+420,14,0,Bench,England,Tom Curry (BR)
+421,13,3,Bench,England,Henry Pollock (BR)
+422,10,3,Bench,England,Ben Spencer (SH)
+423,12,9,Bench,England,Marcus Smith (FH)
+501,8,0,Prop,Wales,Nicky Smith
+502,11,6,Hooker,Wales,Dewi Lake
+503,7,14,Prop,Wales,Archie Griffin
+504,12,14,Second-row,Wales,Dafydd Jenkins
+505,9,14,Second-row,Wales,Adam Beard
+506,9,13,Back-row,Wales,Alex Mann
+507,7,18,Back-row,Wales,Josh Macleod
+508,12,24,Back-row,Wales,Aaron Wainwright
+509,11,20,Scrum-half,Wales,Tomos Williams
+510,11,17,Fly-half,Wales,Dan Edwards
+511,9,20,Back Three,Wales,Josh Adams
+512,12,0,Centre,Wales,Ben Thomas
+513,7,11,Centre,Wales,Eddie James
+514,9,8,Back Three,Wales,Ellis Mee
+515,13,21,Back Three,Wales,Louis Rees-Zammit
+516,6,4,Bench,Wales,Liam Belcher (H)
+517,7,4,Bench,Wales,Rhys Carre (P)
+518,7,5,Bench,Wales,Tomas Francis (P)
+519,8,3,Bench,Wales,Ben Carter (SR)
+520,11,0,Bench,Wales,Taine Plumtree (BR)
+521,7,13,Bench,Wales,Harri Deaves (BR)
+522,8,0,Bench,Wales,Kieran Hardy (SH)
+523,7,6,Bench,Wales,Mason Grady (C)
