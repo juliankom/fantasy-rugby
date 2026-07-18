@@ -2,7 +2,10 @@ import csv
 import re
 import pandas as pd
 import unicodedata
-from selection import *
+import datetime
+from six_nations_fantasy.ilp import *
+from six_nations_fantasy.score import score
+from six_nations_fantasy.models.weighted_mean import *
 
 # turn e.g. Mickaël into Mickael 
 def remove_accents(s):
@@ -42,7 +45,7 @@ def process_name(row):
 
         return row
 
-def read_csv(filename): 
+def read_matchday_csv(filename): 
     df = pd.read_csv(filename, \
         usecols=range(1, 6), \
         names=['cost', 'score', 'nominal_pos', 'team', 'name'])
@@ -52,7 +55,7 @@ def read_csv(filename):
 
     return df
 
-def print_problem_solution(df):
+def find_selected_team(df):
     team = df[(df['selected_var'].apply(value) == 1) 
               | (df['supersub_var'].apply(value) == 1)]
 
@@ -67,6 +70,17 @@ def print_problem_solution(df):
             + team['score'] * team['is_supersub'] * \
             (3 * team['is_sub'] + 1/2 * (1 - team['is_sub']))
 
+    return team
+
+def run_solver(matchday_data):
+    problem = setup_problem(matchday_data)
+    solver = COIN_CMD(msg=False)
+
+    status = problem.solve(solver)
+    team = find_selected_team(matchday_data)
+
+    # TODO: annoying problem: the most important data we are missing are
+    # probably breakdown steals (given for penalties also), 50-22s and kicks retained
     print(team)
     print(f'total score: {team["final_score"].sum()}')
     print(f'total cost: {team["cost"].sum()}')
@@ -76,17 +90,46 @@ if __name__ == '__main__':
     filename = sys.argv[1]
 
     # TODO: calculate scores manually using our statistics
-    df = read_csv(filename)
+    matchday_data = read_matchday_csv(filename)
 
-    # TODO: this is very ugly, since we are just assuming that we are 
-    # testing with the first matchday of 2026
-    games = ['2026_FRA_IRE', '2026_ITA_SCO', '2026_ENG_WAL']
-    
-    problem = setup_problem(df)
-    solver = COIN_CMD()
+    matches = pd.read_parquet('all_data_matches.parquet')
+    perfs = pd.read_parquet('all_data_performances.parquet')
 
-    status = problem.solve(solver)
-    
-    print_problem_solution(df)
+    # TODO: we are just assuming that we are testing with the first matchday of 2026
+    d0 = datetime.date(2026, 2, 5)
+    d1 = datetime.date(2026, 2, 7)
+    fm = matches[(d0 <= matches['date']) & (matches['date'] <= d1)]
 
+    # for the players in the matchday data, calculate the score based on the 
+    # performance states imported
+    md = pd.merge(matchday_data, perfs[perfs['match_id'].isin(fm.index)], on='name')
+    matchday_data['score'] = md.apply(score, axis=1)
 
+    #print(
+    #    matchday_data
+    #    .assign(diff=abs(matchday_data['c_score'] - matchday_data['score']))
+    #    .nlargest(20, 'diff')
+    #)
+
+    # OBSERVATION: a calculated score of 604 (574 after ignoring forward try bonus) 
+    # was optimal for the first weekend;
+    # this same team would have acheived a score of 714 using the actual
+    # weekend scores, showing by how much our scoring is off.
+    # 
+    # 45 of these points is explained by player-of-the-match bonuses, the 
+    # remaining are probably breakdown steals, 50-22s and kicks retained
+
+    run_solver(matchday_data)
+
+    merged = perfs.join(matches, on='match_id')
+    training_data = merged[merged['date'].apply(lambda d: d.year) < 2026]
+
+    # now use our naive model to calculate the scores
+    model = WeightedMean(score, training_data, datetime.date(2025, 3, 15), decay_factor=0.99)
+    matchday_data['score'] = md.apply(lambda p: model.estimate(p['name']), axis=1)
+
+    run_solver(matchday_data)
+
+    # TODO make some notebooks
+    # RESULT: weighted mean acheives 444.2 / 574 (77.4%)
+    # scaling up yield 524.9 / 714 or 554.3 / 754

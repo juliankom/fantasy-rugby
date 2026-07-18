@@ -26,6 +26,7 @@ def extract_player_data(player, substitutions, match_id, substitute):
                 'drop_goals': int(player['dropgoalsconverted']['value']),
                 'meters_carried': int(player['metres']['value']),
                 'defenders_beaten': int(player['defendersbeaten']['value']),
+                'offloads': int(player['offload']['value']),
                 'lineout_steals': int(player['lineoutwonsteal']['value']),
                 'turnovers_conceded': int(player['turnoversconceded']['value']),
                 'tackles': int(player['tackles']['value']),

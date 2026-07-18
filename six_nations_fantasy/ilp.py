@@ -45,7 +45,8 @@ def add_supersub_constraint(problem, df):
         problem += s <= 1 - x
 
 def add_budget_constraint(problem, df, budget=200):
-    problem += lpSum(df['cost'] * df['selected_var']) <= budget
+    problem += lpSum(df['cost'] * df['selected_var']) \
+            + df['cost'] * df['supersub_var'] <= budget
 
 def create_variables(df):
     # create a binary variable x_i for every player, meaning "selected"

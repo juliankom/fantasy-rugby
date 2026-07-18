@@ -17,8 +17,8 @@ def database_from_dir(directory):
     extracted_data = [dataframe_from_filename(f, directory, i) for i, f \
         in enumerate(files) if f.endswith('.json')]
     
-    matches = pd.DataFrame([m for m, ps in extracted_data])
-    players = pd.concat([ps for m, ps in extracted_data])
+    matches = pd.DataFrame([m for m, ps in extracted_data]).set_index('match_id')
+    players = pd.concat([ps for m, ps in extracted_data], ignore_index=True)
 
     return matches, players
 
