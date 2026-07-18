@@ -1,28 +1,14 @@
-import json
-import os
 import pandas as pd
 import datetime as dt
 from six_nations_fantasy.score import score
 from six_nations_fantasy.models.naive_mean import *
 from six_nations_fantasy.models.weighted_mean import *
-from tables import *
+from six_nations_fantasy.data.read_json import database_from_dir
 
 # TODO: 
-# - separate out some concerns (scoring and reading data)
 # - write entire database somewhere to a single file
 # - create separate table for matches 
-def dataframe_from_filename(filename, directory):
-    with open(directory + '/' + filename) as f:
-        json_data = json.load(f)
-    df = match_json_to_DataFrame(json_data, match_id=filename.removesuffix('.json'))
-    return df
-
-def database_from_dir(directory='training_data'):
-    dirs = os.listdir(directory)
-    return pd.concat([dataframe_from_filename(f, directory) for f in dirs], 
-                     ignore_index=True)
-
-training_data = database_from_dir()
+training_data = database_from_dir('training_data')
 
 # TODO: we need to expand the interface for estimators to include the next
 # game information, which is probably VERY important for more involved estimators

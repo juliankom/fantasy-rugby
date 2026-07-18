@@ -52,18 +52,7 @@ def read_csv(filename):
 
     return df
 
-if __name__ == '__main__':
-    # first argument is expected to be the name of a csv file containing round data
-    filename = sys.argv[1]
-
-    # TODO: calculate scores manually using our statistics
-    df = read_csv(filename)
-    
-    problem = setup_problem(df)
-    solver = COIN_CMD()
-
-    status = problem.solve(solver)
-
+def print_problem_solution(df):
     team = df[(df['selected_var'].apply(value) == 1) 
               | (df['supersub_var'].apply(value) == 1)]
 
@@ -81,5 +70,23 @@ if __name__ == '__main__':
     print(team)
     print(f'total score: {team["final_score"].sum()}')
     print(f'total cost: {team["cost"].sum()}')
+
+if __name__ == '__main__':
+    # first argument is expected to be the name of a csv file containing round data
+    filename = sys.argv[1]
+
+    # TODO: calculate scores manually using our statistics
+    df = read_csv(filename)
+
+    # TODO: this is very ugly, since we are just assuming that we are 
+    # testing with the first matchday of 2026
+    games = ['2026_FRA_IRE', '2026_ITA_SCO', '2026_ENG_WAL']
+    
+    problem = setup_problem(df)
+    solver = COIN_CMD()
+
+    status = problem.solve(solver)
+    
+    print_problem_solution(df)
 
 

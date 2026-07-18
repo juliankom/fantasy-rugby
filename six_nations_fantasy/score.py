@@ -1,5 +1,3 @@
-
-
 # TODO these should be full-format for compatibility: Second-row, ...
 
 # (FB) Fullbacks, (W)ings, (C)enters, (FH) Fly halves, (SH) Scrum halves

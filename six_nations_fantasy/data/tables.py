@@ -3,11 +3,7 @@ import datetime as dt
 import itertools
 import re
 
-# TODO: reserves have position "R", but positions here are also less relvant
-# since they are fixed by the fantasy game
-
 # TODO: create dataframe for match data
-
 def extract_player_data(player, substitutions, match_id, date, substitute):
 
     # if we have found substitution data for this player, replace with 
@@ -15,12 +11,9 @@ def extract_player_data(player, substitutions, match_id, date, substitute):
     # TODO could have more than 80 minutes if go into red; do we care?
     minutes_played = substitutions.get(player['name'], 0 if substitute else 80)
 
-    # TODO we are already assuming that player names are unique for the above
-    # substitutions solution, so we might as well get rid of player IDs
     return {
                 'match_id': match_id, 
                 'date': date,
-                #'player_id': player['id'],
                 'name': player['name'],
                 'position': player['position'],
                 'is_substitute': substitute,

@@ -1,3 +1,5 @@
+"""Clean raw ESPN html into more managable JSON files
+"""
 import json
 import re
 import sys
