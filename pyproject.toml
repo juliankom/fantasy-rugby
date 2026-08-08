@@ -7,3 +7,6 @@ dependencies = [
 	"pyarrow",
 	"pulp",
 ]
+
+[tool.setuptools]
+packages = ["six_nations_fantasy"]
