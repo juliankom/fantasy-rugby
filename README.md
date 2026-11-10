@@ -99,3 +99,100 @@ Future:
 
 ### Notes
 Make sure to ``.venv/bin/activate``.
+
+## Evaluating models
+
+The evaluation pipeline keeps **historical outcomes** separate from the
+**fixture context** passed to a model. It uses the match-safe chronological
+splits described above, and reports MAE, RMSE and signed mean error (bias).
+
+A model implements `fit(history)` and `predict(fixtures)`:
+
+- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
+  from historical performances.
+- `predict` receives only `match_id`, `player_id`, and `date`, never the actual
+  performance statistics or targets for the match being predicted.
+- `predict` must return one finite numeric `pandas.Series` prediction per input
+  row, with the same index. Unknown players use the global mean in the supplied
+  baseline models.
+
+For a **single tournament**, choose an evaluation date window, train on
+all earlier matches, and compare as many model configurations as you like.
+The evaluator fits each model on the supplied historical `RugbyDataset` and
+returns predictions and error metrics for the evaluation dataset. It does **not**
+select a winning model or automatically trigger a second evaluation.
+
+```python
+import pandas as pd
+
+from six_nations_fantasy.data import load_dataset, temporal_split
+from six_nations_fantasy.evaluation import (
+    HistoricalMean, RecencyWeightedMean, evaluate_holdout,
+)
+from six_nations_fantasy.score import score
+
+dataset = load_dataset()
+dates = dataset.matches["date"]
+ids = dataset.matches["match_id"]
+start, end = pd.Timestamp("2026-02-01"), pd.Timestamp("2026-04-01")
+
+training = dataset.select_matches(ids[dates < start])
+tournament = dataset.select_matches(ids[(dates >= start) & (dates < end)])
+tournament = tournament.filter_competitions(["Six Nations"])
+
+models = {
+    "historical_mean": HistoricalMean(scorer=score),
+    "weighted_90_days": RecencyWeightedMean(scorer=score, half_life_days=90),
+    "weighted_180_days": RecencyWeightedMean(scorer=score, half_life_days=180),
+}
+for name, model in models.items():
+    result = evaluate_holdout(model, training, tournament, scorer=score)
+    print(name, result.n, result.mae, result.rmse, result.bias)
+```
+
+The date range is **start-inclusive, end-exclusive**. Every model receives the
+same training matches and evaluation matches, making their metrics comparable.
+The evaluation scorer should use the same rules as any model that trains on
+historical fantasy points.
+
+If you want a **train/validation/test** study instead, PR #1's
+`temporal_split()` is still available. You decide when to evaluate each period:
+
+```python
+splits = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
+validation_result = evaluate_holdout(
+    HistoricalMean(scorer=score), splits.train,
+    splits.validation.filter_competitions(["Six Nations"]), scorer=score,
+)
+# You may later evaluate the final test separately, if your study calls for it.
+```
+
+A **holdout** is simply whichever set of completed matches is being used for
+an evaluation; it can be a validation set, a test set, or a chosen tournament.
+An **empty holdout** has no matches or no player-performance records. A date
+window beyond the latest recorded match, or filtering to a competition with
+no games in that window, produces an empty holdout. The evaluator raises
+`ValueError` instead of returning meaningless MAE/RMSE values. Training must
+also contain matches and performances, and every training match must precede
+every evaluation match.
+
+Run a tournament-level historical-mean evaluation from the source checkout:
+
+```bash
+python scripts/evaluate_baseline.py \
+    --evaluation-start 2026-02-01 \
+    --evaluation-end 2026-04-01 \
+    --competition 'Six Nations'
+```
+
+The script trains on all matches before the start date and evaluates on the
+chosen window. `--evaluation-end` is optional; omit it to evaluate on all
+subsequent matches. The competition filter applies only to evaluation matches.
+
+**Limitations:** The default `score()` function is the project's provisional
+fantasy scoring approximation and has not been verified against the current
+Parquet dataset in this PR. Replace it with a better scoring callable as needed.
+This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
+Predictions deliberately have a small input schema; richer pre-match features
+(such as announced lineup or opponent) must be explicitly added and validated
+rather than copied from post-match performance tables.
