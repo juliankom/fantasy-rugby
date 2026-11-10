@@ -1,12 +1,23 @@
-[project]
-name="six-nations-fantasy"
-version="0.1.0"
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
 
+[project]
+name = "six-nations-fantasy"
+version = "0.1.0"
+requires-python = ">=3.10"
 dependencies = [
-	"pandas",
-	"pyarrow",
-	"pulp",
+    "pandas",
+    "pyarrow",
+    "pulp",
 ]
 
-[tool.setuptools]
-packages = ["six_nations_fantasy"]
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["six_nations_fantasy*"]
+
+[tool.pytest.ini_options]
+# Existing tests/test_selection.py is a manual experiment, not a pytest test.
+testpaths = ["tests/unit"]
