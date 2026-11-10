@@ -9,8 +9,15 @@ etc. are tracked.
 
 ## Loading and splitting data
 
-The existing processed tables are kept in `notebooks/data/` for now; no data
-files or scraping notebooks were moved in this first cleanup.
+The authoritative processed dataset snapshots live in `data/processed/`:
+`matches.parquet`, `player_performances.parquet`, `players.parquet`, and
+`team_performances.parquet`. These are the unchanged files previously stored in
+`notebooks/data/`. Historical snapshots previously in `notebooks/old_data/`
+are preserved in `data/archive/`; they are **not** used by the default loader.
+
+The exploratory scraping notebooks are unchanged and some still use relative
+filenames for intermediate data; their working directories may need adjusting
+when rerunning those historical experiments.
 
 Install locally from the repository root:
 
@@ -24,7 +31,7 @@ with a validated `match_id` relationship, then partition by match date:
 ```python
 from six_nations_fantasy.data import load_dataset, temporal_split
 
-dataset = load_dataset()  # defaults to notebooks/data/ relative to cwd
+dataset = load_dataset()  # defaults to data/processed/ at the repository root
 # Or: dataset = load_dataset('/path/to/processed/data')
 
 splits = temporal_split(
@@ -40,6 +47,11 @@ test_rows = splits.test.player_matches()
 # Evaluate on Six Nations only while retaining all competitions for training:
 six_nations_test = splits.test.filter_competitions(['Six Nations'])
 ```
+
+The default location is resolved from the source package's location, not the
+current working directory, so it works from notebooks or scripts in the
+repository. When using an installed distribution outside the source checkout,
+pass an explicit directory to `load_dataset`.
 
 The windows are **train** (before `validation_start`), **validation** (from
 `validation_start` to before `test_start`), and **test** (from `test_start`
