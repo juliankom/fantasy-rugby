@@ -7,7 +7,15 @@ import pandas as pd
 
 
 def _require_key(frame: pd.DataFrame, key: str, table: str) -> pd.DataFrame:
-    """Accept an explicit key column or a named index, never infer row numbers."""
+    """Make sure a DataFrame has `key` as a regular column.
+
+    If the key is already a column, return a copy. If it is the name of the
+    index, move that index into a column with `reset_index()`. Otherwise,
+    raise an error rather than treating the default row index (0, 1, 2, ...)
+    as an identifier such as `match_id`.
+
+    `table` is used only to identify the DataFrame in error messages.
+    """
     if key in frame.columns:
         if frame.index.name == key:
             raise ValueError(f"{table}: {key!r} is both an index and a column")
