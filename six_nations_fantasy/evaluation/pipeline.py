@@ -17,7 +17,11 @@ class PointPredictor(Protocol):
     """A predictor of expected fantasy points for a player in a given match."""
 
     def fit(self, history: pd.DataFrame) -> None:
-        """Fit on historical context and `fantasy_points` targets."""
+        """Learn from completed historical matches and their observed fantasy points.
+
+    Currently, history has match_id, player_id, date and fantasy_points;
+    detailed historical match statistics are not passed to fit().
+    """
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
         """Predict one score per fixture row, in the original row order."""
@@ -74,11 +78,22 @@ def evaluate_holdout(
     *,
     scorer: Callable[[pd.Series], float],
 ) -> EvaluationResult:
-    """Fit on past matches and evaluate on a strictly later holdout.
+    """Fit on completed historical matches and evaluate on later matches.
 
-    The model sees only player_id, match_id and match date at prediction time.
-    The scorer is run on the holdout only **after** predict() returns.
-    The caller controls which competitions are included in each partition.
+    The model's fit() input contains historical match identifiers, player IDs,
+    dates, and observed fantasy_points calculated from training performances.
+    It does not currently include detailed historical performance statistics.
+    At prediction time, the model receives only match_id, player_id, and date;
+    the holdout outcomes are scored only after predict() returns.
+
+    Both training and holdout must contain at least one match and one player
+    performance. An empty holdout can result from selecting a date range with
+    no matches or filtering to a competition absent from that period. With no
+    observed performances to compare against predictions, error metrics cannot
+    be calculated meaningfully.
+
+    All training matches must precede all holdout matches. The caller controls
+    which competitions are included in each partition.
     """
     if training.matches.empty or training.performances.empty:
         raise ValueError("Training dataset must contain matches and performances")
