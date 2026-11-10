@@ -26,7 +26,7 @@ def main() -> None:
         test_start=args.test_start,
     )
     results = evaluate_splits(
-        HistoricalMean, split, scorer=score, competition=args.competition
+        lambda: HistoricalMean(scorer=score), split, scorer=score, competition=args.competition
     )
     for name, result in results.items():
         print(f"{name}: n={result.n} MAE={result.mae:.3f} RMSE={result.rmse:.3f} bias={result.bias:.3f}")

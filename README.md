@@ -110,21 +110,28 @@ A model implements `fit(history)` and `predict(fixtures)`. They receive
 **different information** because historical matches have already been played,
 while the matches being predicted have not:
 
-- `fit(history)` receives **completed historical observations**: one row per
-  past player-match, with `match_id`, `player_id`, `date`, and the observed
-  `fantasy_points` calculated from that match's performance statistics.
-  The model can use those past outcomes to learn player performance.
-  **Current limitation:** other historical statistics (such as tackles or
-  carries) are *not* yet included in the `fit()` input. Supporting models
-  that learn from individual statistics will require extending this interface.
+- `fit(history)` receives a **`RugbyDataset` of completed historical matches**:
+  `history.matches` contains match metadata, and `history.performances` contains
+  the full observed player statistics (such as tries, tackles, and carries).
+  The evaluator does not add a fantasy-points column or calculate historical
+  scores before fitting. Each model decides what to learn from its history:
+  a mean-based model can calculate fantasy points, while a stat-based model
+  can train directly on individual performance statistics.
 - `predict(fixtures)` receives only `match_id`, `player_id`, and `date` for
-  the matches being evaluated. It does **not** receive the actual results or
-  performance statistics of those matches, which would leak future information.
-  Later we can add pre-match features that would genuinely have been known at
-  prediction time.
+  the matches being evaluated. It does **not** receive their outcomes or
+  performance statistics, which would leak future information. Richer
+  pre-match features can be added later if they were known at prediction time.
 - `predict` must return one finite numeric `pandas.Series` prediction per input
   row, with the same index. Unknown players use the global mean in the supplied
   baseline models.
+
+Fantasy scoring remains **independent of `RugbyDataset`**. The evaluator
+uses `scorer` only to calculate the *actual* points for the evaluation
+matches, after prediction. Models such as `HistoricalMean` and
+`RecencyWeightedMean` accept their own `scorer` and use it within `fit()`
+to calculate past points. Other models need not calculate fantasy points
+during training. For comparable predictions, a model using historical
+fantasy points should use the same scoring rules as the evaluator.
 
 ```python
 from six_nations_fantasy.data import load_dataset, temporal_split
@@ -137,7 +144,10 @@ splits = temporal_split(
     test_start="2026-01-01",
 )
 results = evaluate_splits(
-    HistoricalMean, splits, scorer=score, competition="Six Nations"
+    lambda: HistoricalMean(scorer=score),
+    splits,
+    scorer=score,
+    competition="Six Nations",
 )
 for name, result in results.items():
     print(name, result.n, result.mae, result.rmse, result.bias)

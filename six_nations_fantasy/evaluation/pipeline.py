@@ -8,23 +8,24 @@ import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset, TemporalSplits
 
-# Model-facing rows deliberately do not contain any performance statistics.
+from .scoring import score_performances
+
+# The fixture rows intentionally exclude statistics observed during the match.
 CONTEXT_COLUMNS = ("match_id", "player_id", "date")
-TARGET_COLUMN = "fantasy_points"
 
 
 class PointPredictor(Protocol):
-    """A predictor of expected fantasy points for a player in a given match."""
+    """A model predicting fantasy points for players in upcoming matches."""
 
-    def fit(self, history: pd.DataFrame) -> None:
-        """Learn from completed historical matches and their observed fantasy points.
+    def fit(self, history: RugbyDataset) -> None:
+        """Learn from complete historical matches and player performances.
 
-    Currently, history has match_id, player_id, date and fantasy_points;
-    detailed historical match statistics are not passed to fit().
-    """
+        A model may calculate historical fantasy scores using its own scorer,
+        or learn directly from raw match statistics without scoring them.
+        """
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
-        """Predict one score per fixture row, in the original row order."""
+        """Predict one score per pre-match fixture row, in input row order."""
 
 
 @dataclass(frozen=True)
@@ -56,21 +57,6 @@ def _context(dataset: RugbyDataset) -> pd.DataFrame:
     return context.loc[:, list(CONTEXT_COLUMNS)]
 
 
-def _targets(dataset: RugbyDataset, scorer: Callable[[pd.Series], float]) -> pd.Series:
-    """Compute labels from outcomes; never pass these rows to predict()."""
-    try:
-        values = dataset.performances.apply(scorer, axis=1)
-    except (KeyError, TypeError, ValueError) as exc:
-        raise ValueError(f"Could not calculate fantasy points from performances: {exc}") from exc
-    try:
-        result = pd.to_numeric(values, errors="raise").to_numpy(dtype=float)
-    except (TypeError, ValueError) as exc:
-        raise ValueError("Scorer must return numerical fantasy points") from exc
-    if not np.isfinite(result).all():
-        raise ValueError("Scorer returned missing or non-finite fantasy points")
-    return pd.Series(result, name=TARGET_COLUMN)
-
-
 def evaluate_holdout(
     model: PointPredictor,
     training: RugbyDataset,
@@ -80,19 +66,20 @@ def evaluate_holdout(
 ) -> EvaluationResult:
     """Fit on completed historical matches and evaluate on later matches.
 
-    The model's fit() input contains historical match identifiers, player IDs,
-    dates, and observed fantasy_points calculated from training performances.
-    It does not currently include detailed historical performance statistics.
-    At prediction time, the model receives only match_id, player_id, and date;
-    the holdout outcomes are scored only after predict() returns.
+    fit() receives a RugbyDataset with complete historical match metadata and
+    performance statistics, without precomputed fantasy points. A model can
+    calculate scores from that history if its approach needs them.
 
-    Both training and holdout must contain at least one match and one player
-    performance. An empty holdout can result from selecting a date range with
-    no matches or filtering to a competition absent from that period. With no
-    observed performances to compare against predictions, error metrics cannot
-    be calculated meaningfully.
+    predict() receives only match_id, player_id and date for each evaluation
+    appearance. Holdout outcomes are scored by the evaluator only after
+    prediction; they are never passed into fit() or predict().
 
-    All training matches must precede all holdout matches. The caller controls
+    Both training and holdout must contain matches and player performances.
+    An empty holdout may result from a date range with no matches or from
+    filtering to a competition absent in that period. Without performances,
+    MAE and RMSE have nothing to compare against.
+
+    Training matches must precede all holdout matches. The caller controls
     which competitions are included in each partition.
     """
     if training.matches.empty or training.performances.empty:
@@ -104,11 +91,12 @@ def evaluate_holdout(
     if set(training.matches["match_id"]) & set(holdout.matches["match_id"]):
         raise ValueError("A match appears in both training and holdout")
 
-    history = _context(training)
-    history[TARGET_COLUMN] = _targets(training, scorer).to_numpy()
+    # Check player-match identity in both partitions before calling the model.
+    _context(training)
     fixtures = _context(holdout)
 
-    model.fit(history.copy())
+    # Give fit its own copy: models may transform history during training.
+    model.fit(RugbyDataset(training.matches, training.performances))
     predicted = model.predict(fixtures.copy())
     if not isinstance(predicted, pd.Series):
         raise TypeError("predict() must return a pandas Series")
@@ -121,7 +109,7 @@ def evaluate_holdout(
     if not np.isfinite(pred).all():
         raise ValueError("Predictions must be finite and non-missing")
 
-    actual = _targets(holdout, scorer).to_numpy()
+    actual = score_performances(holdout.performances, scorer).to_numpy()
     error = pred - actual
     output = fixtures.assign(actual=actual, predicted=pred, error=error)
     return EvaluationResult(
@@ -144,7 +132,8 @@ def evaluate_splits(
 
     Each period receives a fresh model instance. Training always uses every
     competition provided in the split; `competition` filters evaluation rows
-    only. No parameter tuning should be performed using the test results.
+    only. The evaluation scorer must match any scorer used by models that
+    learn directly from historical fantasy points. Do not tune on test results.
     """
     validation = (splits.validation.filter_competitions([competition])
                   if competition else splits.validation)
