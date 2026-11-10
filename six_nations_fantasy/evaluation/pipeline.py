@@ -6,7 +6,7 @@ from typing import Callable, Protocol
 import numpy as np
 import pandas as pd
 
-from six_nations_fantasy.data import RugbyDataset, TemporalSplits
+from six_nations_fantasy.data import RugbyDataset
 
 from .scoring import score_performances
 
@@ -120,34 +120,3 @@ def evaluate_holdout(
         n=len(error),
     )
 
-
-def evaluate_splits(
-    model_factory: Callable[[], PointPredictor],
-    splits: TemporalSplits,
-    *,
-    scorer: Callable[[pd.Series], float],
-    competition: str | None = None,
-) -> dict[str, EvaluationResult]:
-    """Evaluate validation, then test with history extended through validation.
-
-    Each period receives a fresh model instance. Training always uses every
-    competition provided in the split; `competition` filters evaluation rows
-    only. The evaluation scorer must match any scorer used by models that
-    learn directly from historical fantasy points. Do not tune on test results.
-    """
-    validation = (splits.validation.filter_competitions([competition])
-                  if competition else splits.validation)
-    test = splits.test.filter_competitions([competition]) if competition else splits.test
-
-    validation_result = evaluate_holdout(
-        model_factory(), splits.train, validation, scorer=scorer
-    )
-    extended_training = RugbyDataset(
-        pd.concat([splits.train.matches, splits.validation.matches], ignore_index=True),
-        pd.concat([splits.train.performances, splits.validation.performances],
-                  ignore_index=True),
-    )
-    test_result = evaluate_holdout(
-        model_factory(), extended_training, test, scorer=scorer
-    )
-    return {"validation": validation_result, "test": test_result}

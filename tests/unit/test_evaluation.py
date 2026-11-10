@@ -143,9 +143,8 @@ def test_historical_mean_requires_fit():
         HistoricalMean(scorer=fake_score).predict(pd.DataFrame({"player_id": [1]}))
 
 
-def test_evaluate_splits_retrains_on_validation_but_not_test(dataset):
-    from six_nations_fantasy.evaluation import evaluate_splits
-
+def test_validation_and_final_test_are_optional_separate_steps(dataset):
+    """Callers can choose when to evaluate validation or test, without a wrapper."""
     split = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
     seen_train_sizes = []
 
@@ -154,13 +153,39 @@ def test_evaluate_splits_retrains_on_validation_but_not_test(dataset):
             seen_train_sizes.append(len(history.performances))
             super().fit(history)
 
-    results = evaluate_splits(lambda: TrackingModel(scorer=fake_score), split,
-                              scorer=fake_score,
-                              competition="Six Nations")
-    # 3 performances before 2025; 2 more from 2025 for the 2026 retrain.
+    validation = evaluate_holdout(
+        TrackingModel(scorer=fake_score), split.train,
+        split.validation.filter_competitions(["Six Nations"]), scorer=fake_score,
+    )
+    # If desired, include validation matches in the history for a later test.
+    through_validation = dataset.select_matches(["m1", "m2", "m3"])
+    test = evaluate_holdout(
+        TrackingModel(scorer=fake_score), through_validation,
+        split.test.filter_competitions(["Six Nations"]), scorer=fake_score,
+    )
     assert seen_train_sizes == [3, 5]
-    assert results["validation"].n == 2
-    assert results["test"].n == 2  # m5 (URC) excluded
+    assert validation.n == 2
+    assert test.n == 2  # m5 (URC) excluded
+
+
+def test_multiple_models_can_be_compared_on_same_tournament(dataset):
+    split = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
+    tournament = split.test.filter_competitions(["Six Nations"])
+    history = dataset.select_matches(["m1", "m2", "m3"])
+
+    result_mean = evaluate_holdout(HistoricalMean(scorer=fake_score), history,
+                                   tournament, scorer=fake_score)
+    result_weighted = evaluate_holdout(
+        RecencyWeightedMean(scorer=fake_score, half_life_days=90),
+        history, tournament, scorer=fake_score,
+    )
+    assert result_mean.n == result_weighted.n == 2
+    assert result_mean.predictions[["match_id", "player_id"]].equals(
+        result_weighted.predictions[["match_id", "player_id"]]
+    )
+    assert result_mean.predictions["predicted"].tolist() != (
+        result_weighted.predictions["predicted"].tolist()
+    )
 
 
 def test_scorer_only_sees_holdout_after_prediction(dataset):

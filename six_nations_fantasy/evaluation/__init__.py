@@ -1,7 +1,7 @@
 """Model-independent evaluation on chronological rugby match datasets."""
 
 from .baselines import HistoricalMean, RecencyWeightedMean
-from .pipeline import EvaluationResult, PointPredictor, evaluate_holdout, evaluate_splits
+from .pipeline import EvaluationResult, PointPredictor, evaluate_holdout
 
 __all__ = [
     "EvaluationResult",
@@ -9,5 +9,4 @@ __all__ = [
     "PointPredictor",
     "RecencyWeightedMean",
     "evaluate_holdout",
-    "evaluate_splits",
 ]

@@ -106,79 +106,88 @@ The evaluation pipeline keeps **historical outcomes** separate from the
 **fixture context** passed to a model. It uses the match-safe chronological
 splits described above, and reports MAE, RMSE and signed mean error (bias).
 
-A model implements `fit(history)` and `predict(fixtures)`. They receive
-**different information** because historical matches have already been played,
-while the matches being predicted have not:
+A model implements `fit(history)` and `predict(fixtures)`:
 
-- `fit(history)` receives a **`RugbyDataset` of completed historical matches**:
-  `history.matches` contains match metadata, and `history.performances` contains
-  the full observed player statistics (such as tries, tackles, and carries).
-  The evaluator does not add a fantasy-points column or calculate historical
-  scores before fitting. Each model decides what to learn from its history:
-  a mean-based model can calculate fantasy points, while a stat-based model
-  can train directly on individual performance statistics.
-- `predict(fixtures)` receives only `match_id`, `player_id`, and `date` for
-  the matches being evaluated. It does **not** receive their outcomes or
-  performance statistics, which would leak future information. Richer
-  pre-match features can be added later if they were known at prediction time.
+- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
+  from historical performances.
+- `predict` receives only `match_id`, `player_id`, and `date`, never the actual
+  performance statistics or targets for the match being predicted.
 - `predict` must return one finite numeric `pandas.Series` prediction per input
   row, with the same index. Unknown players use the global mean in the supplied
   baseline models.
 
-Fantasy scoring remains **independent of `RugbyDataset`**. The evaluator
-uses `scorer` only to calculate the *actual* points for the evaluation
-matches, after prediction. Models such as `HistoricalMean` and
-`RecencyWeightedMean` accept their own `scorer` and use it within `fit()`
-to calculate past points. Other models need not calculate fantasy points
-during training. For comparable predictions, a model using historical
-fantasy points should use the same scoring rules as the evaluator.
+For a **single tournament**, choose an evaluation date window, train on
+all earlier matches, and compare as many model configurations as you like.
+The evaluator fits each model on the supplied historical `RugbyDataset` and
+returns predictions and error metrics for the evaluation dataset. It does **not**
+select a winning model or automatically trigger a second evaluation.
 
 ```python
+import pandas as pd
+
 from six_nations_fantasy.data import load_dataset, temporal_split
-from six_nations_fantasy.evaluation import HistoricalMean, evaluate_splits
+from six_nations_fantasy.evaluation import (
+    HistoricalMean, RecencyWeightedMean, evaluate_holdout,
+)
 from six_nations_fantasy.score import score
 
-splits = temporal_split(
-    load_dataset(),
-    validation_start="2025-01-01",
-    test_start="2026-01-01",
-)
-results = evaluate_splits(
-    lambda: HistoricalMean(scorer=score),
-    splits,
-    scorer=score,
-    competition="Six Nations",
-)
-for name, result in results.items():
+dataset = load_dataset()
+dates = dataset.matches["date"]
+ids = dataset.matches["match_id"]
+start, end = pd.Timestamp("2026-02-01"), pd.Timestamp("2026-04-01")
+
+training = dataset.select_matches(ids[dates < start])
+tournament = dataset.select_matches(ids[(dates >= start) & (dates < end)])
+tournament = tournament.filter_competitions(["Six Nations"])
+
+models = {
+    "historical_mean": HistoricalMean(scorer=score),
+    "weighted_90_days": RecencyWeightedMean(scorer=score, half_life_days=90),
+    "weighted_180_days": RecencyWeightedMean(scorer=score, half_life_days=180),
+}
+for name, model in models.items():
+    result = evaluate_holdout(model, training, tournament, scorer=score)
     print(name, result.n, result.mae, result.rmse, result.bias)
-    print(result.predictions.head())
 ```
 
-`evaluate_splits` trains on the **training** partition for validation, then
-creates a fresh model and trains on **training + validation** before evaluating
-the test partition. Optional competition filtering affects *evaluation* matches
-only; training continues to use all included competitions. Use validation for
-model choices, and inspect the held-out test only when the choices are frozen.
-The simpler `evaluate_holdout(model, training, holdout, scorer=...)` is available
-for evaluating a single strictly later holdout.
+The date range is **start-inclusive, end-exclusive**. Every model receives the
+same training matches and evaluation matches, making their metrics comparable.
+The evaluation scorer should use the same rules as any model that trains on
+historical fantasy points.
 
-A **holdout** is the set of matches reserved for evaluating predictions (the
-validation or test partition). An **empty holdout** has zero matches or zero
-player-performance records. For example, choosing `test_start='2027-01-01'`
-when all recorded matches are from before 2027 creates an empty test partition.
-Filtering an otherwise nonempty test period to `competition='Six Nations'`
-can also leave no matches. The evaluator raises `ValueError` instead of
-returning meaningless MAE/RMSE values without actual performances to compare.
-The training partition must also contain both matches and performances.
+If you want a **train/validation/test** study instead, PR #1's
+`temporal_split()` is still available. You decide when to evaluate each period:
 
-Run the historical-mean baseline from the source checkout:
+```python
+splits = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
+validation_result = evaluate_holdout(
+    HistoricalMean(scorer=score), splits.train,
+    splits.validation.filter_competitions(["Six Nations"]), scorer=score,
+)
+# You may later evaluate the final test separately, if your study calls for it.
+```
+
+A **holdout** is simply whichever set of completed matches is being used for
+an evaluation; it can be a validation set, a test set, or a chosen tournament.
+An **empty holdout** has no matches or no player-performance records. A date
+window beyond the latest recorded match, or filtering to a competition with
+no games in that window, produces an empty holdout. The evaluator raises
+`ValueError` instead of returning meaningless MAE/RMSE values. Training must
+also contain matches and performances, and every training match must precede
+every evaluation match.
+
+Run a tournament-level historical-mean evaluation from the source checkout:
 
 ```bash
 python scripts/evaluate_baseline.py \
-    --validation-start 2025-01-01 \
-    --test-start 2026-01-01 \
+    --evaluation-start 2026-02-01 \
+    --evaluation-end 2026-04-01 \
     --competition 'Six Nations'
 ```
+
+The script trains on all matches before the start date and evaluates on the
+chosen window. `--evaluation-end` is optional; omit it to evaluate on all
+subsequent matches. The competition filter applies only to evaluation matches.
 
 **Limitations:** The default `score()` function is the project's provisional
 fantasy scoring approximation and has not been verified against the current
