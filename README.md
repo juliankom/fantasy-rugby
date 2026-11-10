@@ -106,12 +106,22 @@ The evaluation pipeline keeps **historical outcomes** separate from the
 **fixture context** passed to a model. It uses the match-safe chronological
 splits described above, and reports MAE, RMSE and signed mean error (bias).
 
-A model implements `fit(history)` and `predict(fixtures)`:
+A model implements `fit(history)` and `predict(fixtures)`. They receive
+**different information** because historical matches have already been played,
+while the matches being predicted have not:
 
-- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
-  from historical performances.
-- `predict` receives only `match_id`, `player_id`, and `date`, never the actual
-  performance statistics or targets for the match being predicted.
+- `fit(history)` receives **completed historical observations**: one row per
+  past player-match, with `match_id`, `player_id`, `date`, and the observed
+  `fantasy_points` calculated from that match's performance statistics.
+  The model can use those past outcomes to learn player performance.
+  **Current limitation:** other historical statistics (such as tackles or
+  carries) are *not* yet included in the `fit()` input. Supporting models
+  that learn from individual statistics will require extending this interface.
+- `predict(fixtures)` receives only `match_id`, `player_id`, and `date` for
+  the matches being evaluated. It does **not** receive the actual results or
+  performance statistics of those matches, which would leak future information.
+  Later we can add pre-match features that would genuinely have been known at
+  prediction time.
 - `predict` must return one finite numeric `pandas.Series` prediction per input
   row, with the same index. Unknown players use the global mean in the supplied
   baseline models.
@@ -141,6 +151,15 @@ only; training continues to use all included competitions. Use validation for
 model choices, and inspect the held-out test only when the choices are frozen.
 The simpler `evaluate_holdout(model, training, holdout, scorer=...)` is available
 for evaluating a single strictly later holdout.
+
+A **holdout** is the set of matches reserved for evaluating predictions (the
+validation or test partition). An **empty holdout** has zero matches or zero
+player-performance records. For example, choosing `test_start='2027-01-01'`
+when all recorded matches are from before 2027 creates an empty test partition.
+Filtering an otherwise nonempty test period to `competition='Six Nations'`
+can also leave no matches. The evaluator raises `ValueError` instead of
+returning meaningless MAE/RMSE values without actual performances to compare.
+The training partition must also contain both matches and performances.
 
 Run the historical-mean baseline from the source checkout:
 
