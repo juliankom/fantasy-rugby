@@ -99,3 +99,62 @@ Future:
 
 ### Notes
 Make sure to ``.venv/bin/activate``.
+
+## Evaluating models
+
+The evaluation pipeline keeps **historical outcomes** separate from the
+**fixture context** passed to a model. It uses the match-safe chronological
+splits described above, and reports MAE, RMSE and signed mean error (bias).
+
+A model implements `fit(history)` and `predict(fixtures)`:
+
+- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
+  from historical performances.
+- `predict` receives only `match_id`, `player_id`, and `date`, never the actual
+  performance statistics or targets for the match being predicted.
+- `predict` must return one finite numeric `pandas.Series` prediction per input
+  row, with the same index. Unknown players use the global mean in the supplied
+  baseline models.
+
+```python
+from six_nations_fantasy.data import load_dataset, temporal_split
+from six_nations_fantasy.evaluation import HistoricalMean, evaluate_splits
+from six_nations_fantasy.score import score
+
+splits = temporal_split(
+    load_dataset(),
+    validation_start="2025-01-01",
+    test_start="2026-01-01",
+)
+results = evaluate_splits(
+    HistoricalMean, splits, scorer=score, competition="Six Nations"
+)
+for name, result in results.items():
+    print(name, result.n, result.mae, result.rmse, result.bias)
+    print(result.predictions.head())
+```
+
+`evaluate_splits` trains on the **training** partition for validation, then
+creates a fresh model and trains on **training + validation** before evaluating
+the test partition. Optional competition filtering affects *evaluation* matches
+only; training continues to use all included competitions. Use validation for
+model choices, and inspect the held-out test only when the choices are frozen.
+The simpler `evaluate_holdout(model, training, holdout, scorer=...)` is available
+for evaluating a single strictly later holdout.
+
+Run the historical-mean baseline from the source checkout:
+
+```bash
+python scripts/evaluate_baseline.py \
+    --validation-start 2025-01-01 \
+    --test-start 2026-01-01 \
+    --competition 'Six Nations'
+```
+
+**Limitations:** The default `score()` function is the project's provisional
+fantasy scoring approximation and has not been verified against the current
+Parquet dataset in this PR. Replace it with a better scoring callable as needed.
+This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
+Predictions deliberately have a small input schema; richer pre-match features
+(such as announced lineup or opponent) must be explicitly added and validated
+rather than copied from post-match performance tables.
