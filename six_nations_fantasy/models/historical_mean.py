@@ -15,7 +15,7 @@ class HistoricalMean:
     them from the observed historical performances with the supplied scorer.
     """
 
-    def __init__(self, *, scorer: Callable[[pd.Series], float]) -> None:
+    def __init__(self, *, scorer: Callable[[pd.DataFrame], pd.Series]) -> None:
         self.scorer = scorer
 
     def fit(self, history: RugbyDataset) -> None:

@@ -25,6 +25,7 @@ class PointPredictor(Protocol):
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
         """Predict one score per pre-match fixture row, in input row order."""
+        return pd.Series()
 
 
 @dataclass(frozen=True)
@@ -61,7 +62,7 @@ def evaluate_holdout(
     training: RugbyDataset,
     holdout: RugbyDataset,
     *,
-    scorer: Callable[[pd.Series], float],
+    scorer: Callable[[pd.DataFrame], pd.Series],
 ) -> EvaluationResult:
     """Fit on completed historical matches and evaluate on later matches.
 

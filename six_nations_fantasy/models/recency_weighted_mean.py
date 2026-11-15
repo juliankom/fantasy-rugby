@@ -12,7 +12,7 @@ class RecencyWeightedMean:
     """Exponentially weighted historical mean; half-life measured in days."""
 
     def __init__(
-        self, *, scorer: Callable[[pd.Series], float], half_life_days: float = 180.0
+        self, *, scorer: Callable[[pd.DataFrame], pd.Series], half_life_days: float = 180.0
     ) -> None:
         if half_life_days <= 0:
             raise ValueError("half_life_days must be positive")

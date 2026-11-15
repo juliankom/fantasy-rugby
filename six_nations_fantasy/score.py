@@ -5,32 +5,24 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-
-# TODO should try to move away from per-row operations and focus on 
-# working with the columns directly (maybe)?
-def score(player, try_points=15): 
-    return try_points * player['tries'] \
-        + 4 * player['try_assists'] \
-        + 2 * player['conversions'] \
-        + 3 * player['penalty_goals'] \
-        + 5 * player['drop_goals'] \
-        + 2 * player['defenders_beaten'] \
-        + player['carried_meters'] // 10 \
-        + player['completed_tackles'] \
-        + 5 * player['turnovers_won'] \
-        + 2 * player['offloads'] \
-        - 5 * player['yellow_cards'] \
-        - 8 * player['red_cards']
-
-def score_back(player):
-    return score(score, try_points=10)
-
-def score_forward(player):
-    return score(player)
-
+def simple_score(performances: pd.DataFrame, try_points=15): 
+    """Calculate fantasy scores from performance data.
+    """
+    return try_points * performances['tries'] \
+        + 4 * performances['try_assists'] \
+        + 2 * performances['conversions'] \
+        + 3 * performances['penalty_goals'] \
+        + 5 * performances['drop_goals'] \
+        + 2 * performances['defenders_beaten'] \
+        + performances['carried_meters'] // 10 \
+        + performances['completed_tackles'] \
+        + 5 * performances['turnovers_won'] \
+        + 2 * performances['offloads'] \
+        - 5 * performances['yellow_cards'] \
+        - 8 * performances['red_cards']
 
 def score_performances(
-    performances: pd.DataFrame, scorer: Callable[[pd.Series], float]
+    performances: pd.DataFrame, scorer: Callable[[pd.DataFrame], pd.Series]
 ) -> pd.Series:
     """Score completed performances without modifying the underlying table.
 
@@ -38,7 +30,7 @@ def score_performances(
     by models that learn from historical points. Other models need not call it.
     """
     try:
-        values = performances.apply(scorer, axis=1)
+        values = scorer(performances)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError(f"Could not calculate fantasy points from performances: {exc}") from exc
     try:
