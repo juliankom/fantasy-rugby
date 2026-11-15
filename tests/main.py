@@ -7,8 +7,8 @@ from six_nations_fantasy.data.read_json import database_from_dir
 
 # TODO: we need to expand the interface for estimators to include the next
 # game information, which is probably VERY important for more involved estimators
-matches = pd.read_parquet('all_data_matches.parquet')
-perfs = pd.read_parquet('all_data_performances.parquet')
+matches = pd.read_parquet('data/processed/matches.parquet')
+perfs = pd.read_parquet('data/processed/player_performances.parquet')
 
 merged = perfs.join(matches, on='match_id')
 
