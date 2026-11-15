@@ -14,7 +14,8 @@ from datetime import date
 import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset, load_dataset
-from six_nations_fantasy.evaluation import HistoricalMean, evaluate_holdout
+from six_nations_fantasy.evaluation import evaluate_holdout
+from six_nations_fantasy.models import HistoricalMean
 from six_nations_fantasy.score import score
 
 

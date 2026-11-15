@@ -76,9 +76,10 @@ Run the new automated data tests with:
 python -m pytest
 ```
 
-The old `tests/main.py` and `tests/test_selection.py` remain manual experiments
-and are deliberately excluded from the automated test discovery. They will be
-reorganized in a later cleanup.
+Run `python tests/main.py` from the source checkout to compare the historical
+mean and recency-weighted mean on the 2026 Six Nations. The runner loads
+`data/processed/` by default and prints MAE, RMSE, and bias for both models.
+`tests/test_selection.py` is a separate manual squad-selection experiment.
 
 # Aims
 To explore different statistical models predicting players' fantasy scores in a given
@@ -108,8 +109,8 @@ splits described above, and reports MAE, RMSE and signed mean error (bias).
 
 A model implements `fit(history)` and `predict(fixtures)`:
 
-- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
-  from historical performances.
+- `fit` receives a historical `RugbyDataset`. Models that learn from fantasy
+  points calculate them during fitting.
 - `predict` receives only `match_id`, `player_id`, and `date`, never the actual
   performance statistics or targets for the match being predicted.
 - `predict` must return one finite numeric `pandas.Series` prediction per input
@@ -126,9 +127,8 @@ select a winning model or automatically trigger a second evaluation.
 import pandas as pd
 
 from six_nations_fantasy.data import load_dataset, temporal_split
-from six_nations_fantasy.evaluation import (
-    HistoricalMean, RecencyWeightedMean, evaluate_holdout,
-)
+from six_nations_fantasy.evaluation import evaluate_holdout
+from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
 from six_nations_fantasy.score import score
 
 dataset = load_dataset()
@@ -190,8 +190,8 @@ chosen window. `--evaluation-end` is optional; omit it to evaluate on all
 subsequent matches. The competition filter applies only to evaluation matches.
 
 **Limitations:** The default `score()` function is the project's provisional
-fantasy scoring approximation and has not been verified against the current
-Parquet dataset in this PR. Replace it with a better scoring callable as needed.
+fantasy scoring approximation. Its outputs can differ from official fantasy
+points.
 This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
 Predictions deliberately have a small input schema; richer pre-match features
 (such as announced lineup or opponent) must be explicitly added and validated

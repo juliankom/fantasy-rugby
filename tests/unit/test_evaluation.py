@@ -4,11 +4,8 @@ import pandas as pd
 import pytest
 
 from six_nations_fantasy.data import RugbyDataset, temporal_split
-from six_nations_fantasy.evaluation import (
-    HistoricalMean,
-    RecencyWeightedMean,
-    evaluate_holdout,
-)
+from six_nations_fantasy.evaluation import evaluate_holdout
+from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
 
 
 def fake_score(row):

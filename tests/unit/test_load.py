@@ -71,3 +71,19 @@ def test_default_directory_is_independent_of_working_directory(tmp_path, monkeyp
         processed / "player_performances.parquet",
     ]
     assert result.performances["player_id"].tolist() == [9]
+
+
+def test_loader_resolves_processed_competition_ids(tmp_path):
+    matches = pd.DataFrame({
+        "match_id": [1, 2],
+        "date": [date(2026, 2, 1), date(2026, 2, 1)],
+        "competition_id": [0, 1],
+    })
+    performances = pd.DataFrame({"match_id": [1, 2], "player_id": [9, 10]})
+    matches.to_parquet(tmp_path / "matches.parquet")
+    performances.to_parquet(tmp_path / "player_performances.parquet")
+
+    tournament = load_dataset(tmp_path).filter_competitions(["Six Nations"])
+
+    assert tournament.matches["match_id"].tolist() == [1]
+    assert tournament.performances["player_id"].tolist() == [9]

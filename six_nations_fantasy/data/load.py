@@ -10,6 +10,16 @@ from .dataset import RugbyDataset
 _DEFAULT_DATA_DIRECTORY = Path(__file__).resolve().parents[2] / "data" / "processed"
 
 
+# Competition IDs assigned by notebooks/scraping/rugbypass_urls.ipynb.
+_RUGBYPASS_COMPETITIONS = {
+    0: "Six Nations",
+    1: "URC",
+    2: "Top 14",
+    3: "Prem",
+    4: "Champions Cup",
+}
+
+
 def load_dataset(directory: str | Path | None = None) -> RugbyDataset:
     """Read matches.parquet and player_performances.parquet from *directory*.
 
@@ -26,7 +36,13 @@ def load_dataset(directory: str | Path | None = None) -> RugbyDataset:
     if missing:
         raise FileNotFoundError("Required dataset file(s) missing: " + ", ".join(missing))
 
+    matches = pd.read_parquet(paths[0])
+    if "competition" not in matches and "competition_id" in matches:
+        matches = matches.assign(
+            competition=matches["competition_id"].map(_RUGBYPASS_COMPETITIONS)
+        )
+
     return RugbyDataset(
-        matches=pd.read_parquet(paths[0]),
+        matches=matches,
         performances=pd.read_parquet(paths[1]),
     )

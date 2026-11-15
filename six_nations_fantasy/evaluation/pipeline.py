@@ -7,8 +7,7 @@ import numpy as np
 import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset
-
-from .scoring import score_performances
+from six_nations_fantasy.score import score_performances
 
 # The fixture rows intentionally exclude statistics observed during the match.
 CONTEXT_COLUMNS = ("match_id", "player_id", "date")
