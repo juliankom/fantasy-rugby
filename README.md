@@ -76,9 +76,10 @@ Run the new automated data tests with:
 python -m pytest
 ```
 
-The old `tests/main.py` and `tests/test_selection.py` remain manual experiments
-and are deliberately excluded from the automated test discovery. They will be
-reorganized in a later cleanup.
+Run `python tests/main.py` from the source checkout to compare the historical
+mean and recency-weighted mean on the 2026 Six Nations. The runner loads
+`data/processed/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
+`tests/test_selection.py` is a separate manual squad-selection experiment.
 
 # Aims
 To explore different statistical models predicting players' fantasy scores in a given
@@ -88,8 +89,6 @@ here is the naive predictor taking the mean of all of a players previous perform
 Currently implemented are:
 - The naive mean
 - The mean weighted to favour recent performances (using exponential decay)
-- A Bayesian model assuming that fantasy scores are log-normally distributed, allowing us to calculate a shrinkage factor
-    for players with few minutes and few appearances
 
 Future: 
 - Cleaner testing pipeline 
@@ -108,8 +107,8 @@ splits described above, and reports MAE, RMSE and signed mean error (bias).
 
 A model implements `fit(history)` and `predict(fixtures)`:
 
-- `fit` receives `match_id`, `player_id`, `date`, and `fantasy_points` computed
-  from historical performances.
+- `fit` receives a historical `RugbyDataset`. Models that learn from fantasy
+  points calculate them during fitting.
 - `predict` receives only `match_id`, `player_id`, and `date`, never the actual
   performance statistics or targets for the match being predicted.
 - `predict` must return one finite numeric `pandas.Series` prediction per input
@@ -126,10 +125,9 @@ select a winning model or automatically trigger a second evaluation.
 import pandas as pd
 
 from six_nations_fantasy.data import load_dataset, temporal_split
-from six_nations_fantasy.evaluation import (
-    HistoricalMean, RecencyWeightedMean, evaluate_holdout,
-)
-from six_nations_fantasy.score import score
+from six_nations_fantasy.evaluation import evaluate_holdout
+from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
+from six_nations_fantasy.score import simple_score
 
 dataset = load_dataset()
 dates = dataset.matches["date"]
@@ -141,12 +139,12 @@ tournament = dataset.select_matches(ids[(dates >= start) & (dates < end)])
 tournament = tournament.filter_competitions(["Six Nations"])
 
 models = {
-    "historical_mean": HistoricalMean(scorer=score),
-    "weighted_90_days": RecencyWeightedMean(scorer=score, half_life_days=90),
-    "weighted_180_days": RecencyWeightedMean(scorer=score, half_life_days=180),
+    "historical_mean": HistoricalMean(scorer=simple_score),
+    "weighted_90_days": RecencyWeightedMean(scorer=simple_score, half_life_days=90),
+    "weighted_180_days": RecencyWeightedMean(scorer=simple_score, half_life_days=180),
 }
 for name, model in models.items():
-    result = evaluate_holdout(model, training, tournament, scorer=score)
+    result = evaluate_holdout(model, training, tournament, scorer=simple_score)
     print(name, result.n, result.mae, result.rmse, result.bias)
 ```
 
@@ -161,8 +159,8 @@ If you want a **train/validation/test** study instead, PR #1's
 ```python
 splits = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
 validation_result = evaluate_holdout(
-    HistoricalMean(scorer=score), splits.train,
-    splits.validation.filter_competitions(["Six Nations"]), scorer=score,
+    HistoricalMean(scorer=simple_score), splits.train,
+    splits.validation.filter_competitions(["Six Nations"]), scorer=simple_score,
 )
 # You may later evaluate the final test separately, if your study calls for it.
 ```
@@ -176,22 +174,9 @@ no games in that window, produces an empty holdout. The evaluator raises
 also contain matches and performances, and every training match must precede
 every evaluation match.
 
-Run a tournament-level historical-mean evaluation from the source checkout:
-
-```bash
-python scripts/evaluate_baseline.py \
-    --evaluation-start 2026-02-01 \
-    --evaluation-end 2026-04-01 \
-    --competition 'Six Nations'
-```
-
-The script trains on all matches before the start date and evaluates on the
-chosen window. `--evaluation-end` is optional; omit it to evaluate on all
-subsequent matches. The competition filter applies only to evaluation matches.
-
-**Limitations:** The default `score()` function is the project's provisional
-fantasy scoring approximation and has not been verified against the current
-Parquet dataset in this PR. Replace it with a better scoring callable as needed.
+**Limitations:** The `simple_score()` function is the project's provisional
+fantasy scoring approximation. Its outputs can differ from official fantasy
+points.
 This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
 Predictions deliberately have a small input schema; richer pre-match features
 (such as announced lineup or opponent) must be explicitly added and validated

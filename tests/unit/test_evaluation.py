@@ -4,11 +4,8 @@ import pandas as pd
 import pytest
 
 from six_nations_fantasy.data import RugbyDataset, temporal_split
-from six_nations_fantasy.evaluation import (
-    HistoricalMean,
-    RecencyWeightedMean,
-    evaluate_holdout,
-)
+from six_nations_fantasy.evaluation import evaluate_holdout
+from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
 
 
 def fake_score(row):
@@ -200,14 +197,15 @@ def test_scorer_only_sees_holdout_after_prediction(dataset):
             events.append("predict")
             return pd.Series([10.0] * len(fixtures), index=fixtures.index)
 
-    def score_with_order(row):
+    def score_with_order(performances):
         events.append("score")
-        return row["points"]
+        assert performances["match_id"].tolist() == ["m3", "m3"]
+        return performances["points"]
 
     evaluate_holdout(Spy(), split.train, split.validation, scorer=score_with_order)
     # The evaluator does not calculate training fantasy points. Only the
     # model decides whether historical scoring is needed during fit().
-    assert events == ["fit", "predict", "score", "score"]
+    assert events == ["fit", "predict", "score"]
 
 
 def test_model_can_train_on_raw_statistics_without_scoring_history(dataset):
@@ -224,28 +222,30 @@ def test_model_can_train_on_raw_statistics_without_scoring_history(dataset):
             events.append("predict")
             return pd.Series(self.estimate, index=fixtures.index)
 
-    def evaluate_score(row):
+    def evaluate_score(performances):
         events.append("score")
-        return row["points"]
+        return performances["points"]
 
     result = evaluate_holdout(TackleModel(), split.train, split.validation,
                               scorer=evaluate_score)
     assert result.predictions["predicted"].tolist() == pytest.approx([2 / 3] * 2)
-    assert events == ["fit", "predict", "score", "score"]
+    assert events == ["fit", "predict", "score"]
 
 
 def test_baseline_scores_training_data_inside_fit(dataset):
     split = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
     observed = []
 
-    def tracking_score(row):
-        observed.append((row["match_id"], row["points"]))
-        return row["points"]
+    def tracking_score(performances):
+        observed.append(list(zip(performances["match_id"], performances["points"])))
+        return performances["points"]
 
     result = evaluate_holdout(HistoricalMean(scorer=tracking_score), split.train,
                               split.validation, scorer=tracking_score)
-    assert observed == [("m1", 10), ("m1", 30), ("m2", 20),
-                        ("m3", 40), ("m3", 50)]
+    assert observed == [
+        [("m1", 10), ("m1", 30), ("m2", 20)],
+        [("m3", 40), ("m3", 50)],
+    ]
     assert result.predictions["predicted"].tolist() == pytest.approx([15, 20])
 
 

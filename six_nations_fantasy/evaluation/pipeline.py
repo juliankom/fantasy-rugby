@@ -7,8 +7,7 @@ import numpy as np
 import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset
-
-from .scoring import score_performances
+from six_nations_fantasy.score import score_performances
 
 # The fixture rows intentionally exclude statistics observed during the match.
 CONTEXT_COLUMNS = ("match_id", "player_id", "date")
@@ -26,6 +25,7 @@ class PointPredictor(Protocol):
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
         """Predict one score per pre-match fixture row, in input row order."""
+        return pd.Series()
 
 
 @dataclass(frozen=True)
@@ -62,7 +62,7 @@ def evaluate_holdout(
     training: RugbyDataset,
     holdout: RugbyDataset,
     *,
-    scorer: Callable[[pd.Series], float],
+    scorer: Callable[[pd.DataFrame], pd.Series],
 ) -> EvaluationResult:
     """Fit on completed historical matches and evaluate on later matches.
 
