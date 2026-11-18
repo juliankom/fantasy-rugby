@@ -34,7 +34,15 @@ def main() -> None:
             f"RMSE={result.rmse:.3f} bias={result.bias:.3f}"
         )
 
-        print(result.predictions.sort_values(by="predicted", ascending=False).head(5).join(players, on="player_id"))
+        print(
+            result.predictions
+            .drop_duplicates(subset="player_id")
+            .sort_values(by="predicted", ascending=False)
+            .nlargest(10, "predicted")
+            .join(players, on="player_id")
+            [["name", "predicted"]]
+            .to_string(index=False)
+        )
 
 if __name__ == "__main__":
     main()
