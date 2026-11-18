@@ -89,8 +89,6 @@ here is the naive predictor taking the mean of all of a players previous perform
 Currently implemented are:
 - The naive mean
 - The mean weighted to favour recent performances (using exponential decay)
-- A Bayesian model assuming that fantasy scores are log-normally distributed, allowing us to calculate a shrinkage factor
-    for players with few minutes and few appearances
 
 Future: 
 - Cleaner testing pipeline 

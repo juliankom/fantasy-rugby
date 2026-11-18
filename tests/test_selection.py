@@ -1,11 +1,16 @@
-import csv
 import re
-import pandas as pd
+import sys
 import unicodedata
-import datetime
-from six_nations_fantasy.ilp import *
-from six_nations_fantasy.score import score
-from six_nations_fantasy.models.weighted_mean import *
+from math import log
+from pathlib import Path
+
+import pandas as pd
+from pulp import COIN_CMD, value
+
+from six_nations_fantasy.data import load_dataset
+from six_nations_fantasy.ilp import setup_problem
+from six_nations_fantasy.models import RecencyWeightedMean
+from six_nations_fantasy.score import simple_score
 
 # turn e.g. Mickaël into Mickael 
 def remove_accents(s):
@@ -57,7 +62,7 @@ def read_matchday_csv(filename):
 
 def find_selected_team(df):
     team = df[(df['selected_var'].apply(value) == 1) 
-              | (df['supersub_var'].apply(value) == 1)]
+              | (df['supersub_var'].apply(value) == 1)].copy()
 
     team['is_captain'] = team.apply(lambda x: value(x['captain_var']), axis=1) 
     team['is_supersub'] = team.apply(lambda x: value(x['supersub_var']), axis=1) 
@@ -85,51 +90,41 @@ def run_solver(matchday_data):
     print(f'total score: {team["final_score"].sum()}')
     print(f'total cost: {team["cost"].sum()}')
 
-if __name__ == '__main__':
-    # first argument is expected to be the name of a csv file containing round data
-    filename = sys.argv[1]
+if __name__ == "__main__":
+    matchday_data = read_matchday_csv(sys.argv[1])
+    data_dir = Path(__file__).resolve().parents[1] / "data" / "processed"
+    dataset = load_dataset(data_dir)
+    dates = dataset.matches["date"]
+    training = dataset.select_matches(dataset.matches.loc[dates < "2026-01-01", "match_id"])
+    round_ids = dataset.matches.loc[dates.between("2026-02-05", "2026-02-07"), "match_id"]
+    first_round = dataset.select_matches(round_ids).filter_competitions(["Six Nations"])
+    fixtures = first_round.player_matches()
 
-    # TODO: calculate scores manually using our statistics
-    matchday_data = read_matchday_csv(filename)
+    # Match the previous experiment's 0.99 decay per week.
+    model = RecencyWeightedMean(
+        scorer=simple_score, half_life_days=7 * log(0.5) / log(0.99)
+    )
+    model.fit(training)
+    scores = fixtures.assign(
+        actual=simple_score(fixtures),
+        predicted=model.predict(fixtures[["match_id", "player_id", "date"]]),
+        team=fixtures["home_team"].where(fixtures["home"], fixtures["away_team"]),
+    )
+    players = pd.read_parquet(data_dir / "players.parquet")
+    scores = scores.join(players["name"], on="player_id")
+    # The roster and performance tables sometimes use different hyphenation.
+    matchday_data["name_key"] = matchday_data["name"].str.replace("-", " ")
+    scores["name_key"] = scores["name"].map(remove_accents).str.replace("-", " ")
+    matchday_data = matchday_data.merge(
+        scores[["team", "name_key", "actual", "predicted"]],
+        on=["team", "name_key"],
+        how="left",
+        validate="one_to_one",
+    )
+    if matchday_data["actual"].isna().any():
+        missing = matchday_data.loc[matchday_data["actual"].isna(), "name"]
+        raise ValueError(f"Could not match players to Round 1 data: {', '.join(missing)}")
 
-    matches = pd.read_parquet('all_data_matches.parquet')
-    perfs = pd.read_parquet('all_data_performances.parquet')
-
-    # TODO: we are just assuming that we are testing with the first matchday of 2026
-    d0 = datetime.date(2026, 2, 5)
-    d1 = datetime.date(2026, 2, 7)
-    fm = matches[(d0 <= matches['date']) & (matches['date'] <= d1)]
-
-    # for the players in the matchday data, calculate the score based on the 
-    # performance states imported
-    md = pd.merge(matchday_data, perfs[perfs['match_id'].isin(fm.index)], on='name')
-    matchday_data['score'] = md.apply(score, axis=1)
-
-    #print(
-    #    matchday_data
-    #    .assign(diff=abs(matchday_data['c_score'] - matchday_data['score']))
-    #    .nlargest(20, 'diff')
-    #)
-
-    # OBSERVATION: a calculated score of 604 (574 after ignoring forward try bonus) 
-    # was optimal for the first weekend;
-    # this same team would have acheived a score of 714 using the actual
-    # weekend scores, showing by how much our scoring is off.
-    # 
-    # 45 of these points is explained by player-of-the-match bonuses, the 
-    # remaining are probably breakdown steals, 50-22s and kicks retained
-
-    run_solver(matchday_data)
-
-    merged = perfs.join(matches, on='match_id')
-    training_data = merged[merged['date'].apply(lambda d: d.year) < 2026]
-
-    # now use our naive model to calculate the scores
-    model = WeightedMean(score, training_data, datetime.date(2025, 3, 15), decay_factor=0.99)
-    matchday_data['score'] = md.apply(lambda p: model.estimate(p['name']), axis=1)
-
-    run_solver(matchday_data)
-
-    # TODO make some notebooks
-    # RESULT: weighted mean acheives 444.2 / 574 (77.4%)
-    # scaling up yield 524.9 / 714 or 554.3 / 754
+    for label, column in [("Observed scores", "actual"), ("Model predictions", "predicted")]:
+        print(label)
+        run_solver(matchday_data.assign(score=matchday_data[column]))
