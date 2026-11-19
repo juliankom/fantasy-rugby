@@ -274,3 +274,54 @@ def test_models_do_not_add_scores_to_dataset(dataset):
     assert dataset.performances.columns.tolist() == original_performance_cols
     assert training.performances.columns.tolist() == original_performance_cols
     assert "fantasy_points" not in original_performance_cols
+
+
+@pytest.mark.parametrize(
+    ("model_class", "starter_mean"),
+    [(HistoricalMean, 30.0), (RecencyWeightedMean, 100 / 3)],
+)
+def test_models_condition_scores_on_lineup_role(model_class, starter_mean):
+    history = RugbyDataset(
+        pd.DataFrame({
+            "match_id": ["old", "new", "bench"],
+            "date": pd.to_datetime(["2025-01-01", "2025-01-11", "2025-01-11"]),
+        }),
+        pd.DataFrame({
+            "match_id": ["old", "new", "bench", "new", "new"],
+            "player_id": [1, 1, 1, 2, 3],
+            "number": [10, 10, 22, 11, 23],
+            "points": [20, 40, 10, 50, 20],
+        }),
+    )
+    kwargs = {"half_life_days": 10} if model_class is RecencyWeightedMean else {}
+    model = model_class(scorer=fake_score, **kwargs)
+    model.fit(history)
+    fixtures = pd.DataFrame(
+        {"player_id": [1, 1, 2, 3, 4, 1], "is_substitute": [False, True, True, True, True, None]},
+        index=[6, 9, 13, 18, 20, 25],
+    )
+
+    starter_pool = 40 if model_class is RecencyWeightedMean else 110 / 3
+    predictions = model.predict(fixtures)
+    assert predictions.index.equals(fixtures.index)
+    assert predictions.iloc[:5].tolist() == pytest.approx([
+        starter_mean, 10, 50 + 15 - starter_pool, 20, 15,
+    ])
+    assert predictions.iloc[5] == model.predict(fixtures.drop(columns="is_substitute")).iloc[5]
+
+
+def test_holdout_predict_receives_lineup_roles_from_shirt_numbers(dataset):
+    performances = dataset.performances.assign(number=[1, 2, 16, 16, 15, 8, 7, 21])
+    dataset = RugbyDataset(dataset.matches, performances)
+    split = temporal_split(dataset, validation_start="2025-01-01", test_start="2026-01-01")
+
+    class Spy:
+        def fit(self, history):
+            pass
+
+        def predict(self, fixtures):
+            assert set(fixtures.columns) == {"match_id", "player_id", "date", "is_substitute"}
+            assert fixtures["is_substitute"].tolist() == [True, False]
+            return pd.Series(0.0, index=fixtures.index)
+
+    evaluate_holdout(Spy(), split.train, split.validation, scorer=fake_score)
