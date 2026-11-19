@@ -3,3 +3,6 @@ six_nations_fantasy.egg-info/
 **.ipynb_checkpoints/
 notebooks/misc.ipynb
 **.venv/
+
+# Local datasets, fixture manifests, and scrape outputs
+*.parquet

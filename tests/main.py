@@ -26,7 +26,7 @@ def main() -> None:
         ),
     }
 
-    players = pd.read_parquet("data/processed/players.parquet")
+    players = pd.read_parquet("data/rebuild/players.parquet")
     for name, model in models.items():
         result = evaluate_holdout(model, training, tournament, scorer=simple_score)
         print(

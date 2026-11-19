@@ -2,22 +2,14 @@
 A project exploring various statistical models to predicting players' performances in (fantasy) six nations. 
 
 # Data
-Currently, we have 69782 performances from 3031 unique players across the major
-leagues (URC, Top14, Prem) and competitions (Champions Cup, Six Nations). 
-Most statistics relevant for calculating fantasy score, such as meters carried, tackles, 
-etc. are tracked.
 
 ## Loading and splitting data
 
-The authoritative processed dataset snapshots live in `data/processed/`:
-`matches.parquet`, `player_performances.parquet`, `players.parquet`, and
-`team_performances.parquet`. These are the unchanged files previously stored in
-`notebooks/data/`. Historical snapshots previously in `notebooks/old_data/`
-are preserved in `data/archive/`; they are **not** used by the default loader.
-
-The exploratory scraping notebooks are unchanged and some still use relative
-filenames for intermediate data; their working directories may need adjusting
-when rerunning those historical experiments.
+Place your local dataset in `data/processed/` or pass its directory to
+`load_dataset()`. The loader requires `matches.parquet` and
+`player_performances.parquet`. The squad backtest also uses `players.parquet`.
+Parquet datasets, archives and fixture manifests are ignored by Git and must
+be supplied separately in a fresh checkout.
 
 Install locally from the repository root:
 
@@ -84,6 +76,9 @@ It loads the bundled roster prices and fantasy positions, refits both baselines
 on matches before each round, and scores the selected squads from match
 statistics with `simple_score`. The best calculated score is a hindsight
 benchmark using the same candidate pool and optimizer.
+
+Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
+spreadsheets used in the squad backtest.
 
 # Aims
 To explore different statistical models predicting players' fantasy scores in a given
@@ -185,3 +180,55 @@ This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
 Predictions deliberately have a small input schema; richer pre-match features
 (such as announced lineup or opponent) must be explicitly added and validated
 rather than copied from post-match performance tables.
+
+## Scraping RugbyPass
+
+### RugbyPass terms and liability
+
+Section 9 of the RugbyPass Terms of Use prohibits scraping RugbyPass without
+its prior express written permission. Users are responsible for obtaining
+that permission and complying with applicable terms and laws.
+[RugbyPass Terms of Use](https://www.rugbypass.com/terms-of-use/)
+
+The project authors disclaim responsibility and liability arising from use
+of this code to the extent permitted by applicable law.
+
+### Pipeline usage
+
+The Python pipeline reads the fixture lists and the JSON embedded in completed match pages.
+The historical notebooks in `notebooks/scraping/` document the previous site format.
+The default discovery scope covers Six Nations 2022–2026 and URC, Top 14,
+Premiership and Champions Cup 2022/23–2025/26. Each fixture row identifies a
+match, season, competition, opponents and final score.
+
+With RugbyPass's permission, run the full pipeline from the repository root:
+
+```bash
+python -m six_nations_fantasy.scraping
+```
+
+This refreshes `data/scraping/urls.parquet`, prints fixture counts by season
+and competition, and scrapes those URLs into a new `data/rebuild/` directory.
+To reuse the saved URLs and choose a fresh output directory:
+
+```bash
+python -m six_nations_fantasy.scraping --reuse-manifest --output data/rebuild-2
+```
+
+Use `--manifest PATH` to select another URL table. The command exits with
+status 1 if any fixtures were rejected. The batch checks
+the match page against the manifest, writes the four dataset Parquets for accepted
+matches and records rejected fixtures in `failures.parquet`. Inspect failures before
+using the rebuild. If every fixture fails, the output contains only the failure report.
+
+The rebuild uses RugbyPass numeric player IDs and profile slugs. The historical
+registry assigned its own integers, so load the rebuilt tables together and use
+`player_identifier` when comparing registries. Minutes sum substitution stints
+with the historical 80-minute cap. Kicking totals count successful lineup events
+and are checked against the team totals. With RugbyPass's permission, run the
+single-match regression and display the match details, both teams' statistics
+and every player performance with:
+
+```bash
+RUGBYPASS_LIVE=1 python -m pytest -s -q tests/unit/test_rugbypass.py -k live_england_wales
+```
