@@ -33,6 +33,7 @@ NAME_ALIASES = {
 
 
 # Workbook roster entries with no appearance in the processed match records.
+# (These can be players who were initially selected but have been injured in the lead-up.)
 NON_APPEARANCES = {
     (1, "England", "immanuelfeyiwaboso"),
     (3, "France", "matthieujalibert"),
@@ -41,6 +42,7 @@ NON_APPEARANCES = {
 }
 
 
+# internal helper key used to later find the correct player_ids for the players in the csv
 def name_key(name):
     name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]", "", name.casefold())
@@ -66,11 +68,16 @@ def read_matchday_csv(filename):
 
 
 def round_candidates(round_number, roster, fixtures, players):
+
+    # retrieve the performance data from our stats
     performances = fixtures.player_matches()
     performances["actual"] = score_performances(performances, simple_score)
     performances["team"] = performances["home_team"].where(
         performances["home"], performances["away_team"]
     )
+
+    # try to merge the name_keys derived from the roster csv names with the names 
+    # stored in the performance database
     performances = add_name_keys(performances.join(players["name"], on="player_id"))
     candidates = roster.merge(
         performances[["team", "name_key", "match_id", "player_id", "date", "actual"]],
@@ -121,6 +128,36 @@ def select_squad(candidates, objective, solver):
     squad["objective_total"] = squad[objective] * multiplier
     return squad
 
+def print_squad(squad):
+    pos_order = (['Prop', 'Hooker', 'Prop'] 
+                 + 2 * ['Second-row']
+                 + 3 * ['Back-row'] 
+                 + ['Scrum-half', 'Fly-half']
+                 + ['Back Three']
+                 + 2 * ['Centre']
+                 + 2 * ['Back Three']
+    )
+
+    # a table enumerating the positions in the correct order, 
+    # also with per-position counts (occurrence)
+    slots = pd.DataFrame({"nominal_pos": pos_order})
+    slots["occurrence"] = slots.groupby("nominal_pos").cumcount()
+    slots["display_order"] = range(len(slots))
+
+    lineup = squad.loc[~squad["supersub"]].copy()
+    lineup["occurrence"] = lineup.groupby("nominal_pos").cumcount()
+    lineup["captain"] = lineup["captain"].apply(lambda x: "Captain" if x else "")
+    lineup = (
+        lineup.merge(slots, on=["nominal_pos", "occurrence"], how="left")
+        .sort_values("display_order", kind="stable")
+        .drop(columns=["occurrence", "display_order"])
+    )
+
+    print(lineup[["nominal_pos", "name", "team", "cost", "actual_total", "captain"]]
+            .to_string(index=False))
+
+    supersub = squad[squad["supersub"]][["name", "team", "cost", "actual_total"]]
+    print(f"Supersub:\n{supersub}")
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -148,6 +185,8 @@ def main():
         solver = PULP_CBC_CMD(msg=False)
     totals = dict.fromkeys(["Best calculated score", *models], 0.0)
     for round_number, (start, end) in enumerate(zip(ROUND_STARTS, ROUND_STARTS[1:]), 1):
+
+        # identify the matches played in this round
         round_matches = tournament.matches
         round_ids = round_matches.loc[round_matches["date"].between(start, end, inclusive="left"), "match_id"]
         if len(round_ids) != 3:
@@ -169,14 +208,14 @@ def main():
             candidates[label] = model.predict(candidates[["match_id", "player_id", "date"]])
             objectives[label] = label
 
+        # for each objective (actual score, or score predicted by a model), compute the optimal squad
         for label, objective in objectives.items():
             squad = select_squad(candidates, objective, solver)
             actual = squad["actual_total"].sum()
             totals[label] += actual
             print(f"{label}: cost {squad['cost'].sum():.1f}, "
                   f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
-            print(squad[["name", "team", "nominal_pos", "cost", "captain", "supersub", "actual_total"]]
-                  .to_string(index=False))
+            print_squad(squad)
 
     print("\nTournament totals (calculated actual)")
     for label, total in totals.items():
