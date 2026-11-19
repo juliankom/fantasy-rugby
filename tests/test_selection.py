@@ -1,130 +1,187 @@
+"""Compare fantasy squads in a rolling backtest of the 2026 Six Nations."""
+
+import argparse
 import re
-import sys
 import unicodedata
 from math import log
 from pathlib import Path
 
 import pandas as pd
-from pulp import COIN_CMD, value
+from pulp import COIN_CMD, LpStatus, LpStatusOptimal, PULP_CBC_CMD, value
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
-from six_nations_fantasy.models import RecencyWeightedMean
-from six_nations_fantasy.score import simple_score
+from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
+from six_nations_fantasy.score import score_performances, simple_score
 
-# turn e.g. Mickaël into Mickael 
-def remove_accents(s):
-    return ''.join(
-        c for c in unicodedata.normalize('NFD', s)
-        if unicodedata.category(c) != 'Mn'
+
+ROUND_STARTS = pd.to_datetime(
+    ["2026-02-05", "2026-02-14", "2026-02-21", "2026-03-06", "2026-03-14", "2026-04-01"]
+)
+POSITIONS = {
+    "hooker": "Hooker", "prop": "Prop", "second_row": "Second-row",
+    "back_row": "Back-row", "scrum_half": "Scrum-half", "fly_half": "Fly-half",
+    "centre": "Centre", "back_three": "Back Three",
+}
+NAME_ALIASES = {
+    ("Ireland", "tomclarkson"): "thomasclarkson",
+    ("Italy", "nachobrex"): "juanignaciobrex",
+    ("France", "noahnene"): "noahtisienene",
+    ("Wales", "gabehamerwebb"): "gabrielhamerwebb",
+    ("Italy", "davidodiase"): "davideodiase",
+}
+
+
+# Workbook roster entries with no appearance in the processed match records.
+NON_APPEARANCES = {
+    (1, "England", "immanuelfeyiwaboso"),
+    (3, "France", "matthieujalibert"),
+    (3, "Ireland", "jackconan"),
+    (4, "England", "tomcurry"),
+}
+
+
+def name_key(name):
+    name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]", "", name.casefold())
+
+
+def add_name_keys(frame):
+    return frame.assign(name_key=[
+        NAME_ALIASES.get((team, key), key)
+        for team, key in zip(frame["team"], frame["name"].map(name_key))
+    ])
+
+
+def read_matchday_csv(filename):
+    roster = pd.read_csv(filename).rename(columns={"player": "name", "price": "cost"})
+    roster = roster.loc[roster["year"] == 2026].copy()
+    if set(roster["round"]) != set(range(1, len(ROUND_STARTS))):
+        raise ValueError("Expected a roster for each 2026 round")
+    roster["nominal_pos"] = roster["nominal_position"].map(POSITIONS)
+    if roster["nominal_pos"].isna().any() or not roster["selection"].isin(["starter", "bench"]).all():
+        raise ValueError("Every roster entry needs a valid fantasy position and selection")
+    roster["is_sub"] = roster["selection"] == "bench"
+    return add_name_keys(roster)
+
+
+def round_candidates(round_number, roster, fixtures, players):
+    performances = fixtures.player_matches()
+    performances["actual"] = score_performances(performances, simple_score)
+    performances["team"] = performances["home_team"].where(
+        performances["home"], performances["away_team"]
+    )
+    performances = add_name_keys(performances.join(players["name"], on="player_id"))
+    candidates = roster.merge(
+        performances[["team", "name_key", "match_id", "player_id", "date", "actual"]],
+        on=["team", "name_key"], how="left", validate="one_to_one",
     )
 
-def process_name(row):
-        name = remove_accents(row['name'])
+    missing = candidates["actual"].isna()
+    unmatched = set(zip(candidates.loc[missing, "team"], candidates.loc[missing, "name_key"]))
+    expected = {(team, key) for number, team, key in NON_APPEARANCES if number == round_number}
+    if unmatched - expected:
+        raise ValueError(f"Round {round_number}: unmatched roster entries {sorted(unmatched - expected)}")
 
-        # match anything (not containing brackets) inside (...) 
-        match = re.search(r'\(([^()]*)\)\s*$', name)
+    # Retain priced non-appearances in the prediction pool, with their historical
+    # player identity and scheduled fixture. Their realized score is zero.
+    for index, player in candidates.loc[missing].iterrows():
+        player_ids = players.index[players["name"].map(name_key) == player["name_key"]]
+        match = fixtures.matches.loc[
+            (fixtures.matches["home_team"] == player["team"])
+            | (fixtures.matches["away_team"] == player["team"])
+        ]
+        if len(player_ids) != 1 or len(match) != 1:
+            raise ValueError(f"Could not identify player and fixture for {player['name']}")
+        candidates.at[index, "player_id"] = player_ids[0]
+        candidates.at[index, "match_id"] = match["match_id"].iloc[0]
+        candidates.at[index, "date"] = match["date"].iloc[0]
+        candidates.at[index, "actual"] = 0
+    candidates["player_id"] = candidates["player_id"].astype(players.index.dtype)
+    candidates["match_id"] = candidates["match_id"].astype(fixtures.matches["match_id"].dtype)
+    return candidates
 
-        position_abbrevs = {
-                'H': 'Hooker', 
-                'P': 'Prop',
-                'SR': 'Second-row',
-                'BR': 'Back-row',
-                'SH': 'Scrum-half',
-                'FH': 'Fly-half',
-                'C': 'Centre',
-                'BT': 'Back Three'
-                }
 
-        if match:
-            # keep only the part of the name up to the (...) and strip whitespace
-            name = name[:match.start()].strip()
-
-            label = match.group(1)
-
-            if label in position_abbrevs and row['is_sub']:
-                row['nominal_pos'] = position_abbrevs[label]
-
-        # update the name after stripping of accents and labels
-        row['name'] = name
-
-        return row
-
-def read_matchday_csv(filename): 
-    df = pd.read_csv(filename, \
-        usecols=range(1, 6), \
-        names=['cost', 'score', 'nominal_pos', 'team', 'name'])
-
-    df['is_sub'] = df['nominal_pos'] == 'Bench'
-    df = df.apply(process_name, axis=1)
-
-    return df
-
-def find_selected_team(df):
-    team = df[(df['selected_var'].apply(value) == 1) 
-              | (df['supersub_var'].apply(value) == 1)].copy()
-
-    team['is_captain'] = team.apply(lambda x: value(x['captain_var']), axis=1) 
-    team['is_supersub'] = team.apply(lambda x: value(x['supersub_var']), axis=1) 
-
-    team = team[['name', 'cost', 'score', 'nominal_pos', 'team', \
-            'is_sub', 'is_captain', 'is_supersub']]
-
-    team['final_score'] = team['score'] * (1 + team['is_captain']) \
-            * (1 - team['is_supersub']) \
-            + team['score'] * team['is_supersub'] * \
-            (3 * team['is_sub'] + 1/2 * (1 - team['is_sub']))
-
-    return team
-
-def run_solver(matchday_data):
-    problem = setup_problem(matchday_data)
-    solver = COIN_CMD(msg=False)
-
+def select_squad(candidates, objective, solver):
+    pool = candidates.assign(score=candidates[objective])
+    problem = setup_problem(pool)
     status = problem.solve(solver)
-    team = find_selected_team(matchday_data)
+    if status != LpStatusOptimal:
+        raise RuntimeError(f"Squad optimization failed: {LpStatus[status]}")
 
-    # TODO: annoying problem: the most important data we are missing are
-    # probably breakdown steals (given for penalties also), 50-22s and kicks retained
-    print(team)
-    print(f'total score: {team["final_score"].sum()}')
-    print(f'total cost: {team["cost"].sum()}')
+    selected = pool["selected_var"].map(value).eq(1)
+    supersub = pool["supersub_var"].map(value).eq(1)
+    squad = pool.loc[selected | supersub].copy()
+    squad["captain"] = squad["captain_var"].map(value).eq(1)
+    squad["supersub"] = supersub.loc[squad.index]
+    multiplier = (1.0 + squad["captain"].astype(float)).where(
+        ~squad["supersub"], squad["is_sub"].map({True: 3.0, False: 0.5})
+    )
+    squad["actual_total"] = squad["actual"] * multiplier
+    squad["objective_total"] = squad[objective] * multiplier
+    return squad
 
-if __name__ == "__main__":
-    matchday_data = read_matchday_csv(sys.argv[1])
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "roster", nargs="?", type=Path,
+        default=Path(__file__).with_name("six_nations_2026_fantasy_prices.csv"),
+    )
+    args = parser.parse_args()
+    roster = read_matchday_csv(args.roster)
     data_dir = Path(__file__).resolve().parents[1] / "data" / "processed"
     dataset = load_dataset(data_dir)
-    dates = dataset.matches["date"]
-    training = dataset.select_matches(dataset.matches.loc[dates < "2026-01-01", "match_id"])
-    round_ids = dataset.matches.loc[dates.between("2026-02-05", "2026-02-07"), "match_id"]
-    first_round = dataset.select_matches(round_ids).filter_competitions(["Six Nations"])
-    fixtures = first_round.player_matches()
-
-    # Match the previous experiment's 0.99 decay per week.
-    model = RecencyWeightedMean(
-        scorer=simple_score, half_life_days=7 * log(0.5) / log(0.99)
-    )
-    model.fit(training)
-    scores = fixtures.assign(
-        actual=simple_score(fixtures),
-        predicted=model.predict(fixtures[["match_id", "player_id", "date"]]),
-        team=fixtures["home_team"].where(fixtures["home"], fixtures["away_team"]),
-    )
+    tournament = dataset.filter_competitions(["Six Nations"])
     players = pd.read_parquet(data_dir / "players.parquet")
-    scores = scores.join(players["name"], on="player_id")
-    # The roster and performance tables sometimes use different hyphenation.
-    matchday_data["name_key"] = matchday_data["name"].str.replace("-", " ")
-    scores["name_key"] = scores["name"].map(remove_accents).str.replace("-", " ")
-    matchday_data = matchday_data.merge(
-        scores[["team", "name_key", "actual", "predicted"]],
-        on=["team", "name_key"],
-        how="left",
-        validate="one_to_one",
-    )
-    if matchday_data["actual"].isna().any():
-        missing = matchday_data.loc[matchday_data["actual"].isna(), "name"]
-        raise ValueError(f"Could not match players to Round 1 data: {', '.join(missing)}")
+    matches = dataset.matches
+    dates = matches["date"]
+    # Match the previous experiment's 0.99 decay per week.
+    models = {
+        "Historical mean": HistoricalMean(scorer=simple_score),
+        "Recency-weighted mean": RecencyWeightedMean(
+            scorer=simple_score, half_life_days=7 * log(0.5) / log(0.99)
+        ),
+    }
+    solver = COIN_CMD(msg=False)
+    if not solver.available():
+        solver = PULP_CBC_CMD(msg=False)
+    totals = dict.fromkeys(["Best calculated score", *models], 0.0)
+    for round_number, (start, end) in enumerate(zip(ROUND_STARTS, ROUND_STARTS[1:]), 1):
+        round_matches = tournament.matches
+        round_ids = round_matches.loc[round_matches["date"].between(start, end, inclusive="left"), "match_id"]
+        if len(round_ids) != 3:
+            raise ValueError(f"Round {round_number}: expected three fixtures, found {len(round_ids)}")
+        candidates = round_candidates(
+            round_number, roster.loc[roster["round"] == round_number],
+            tournament.select_matches(round_ids), players,
+        )
 
-    for label, column in [("Observed scores", "actual"), ("Model predictions", "predicted")]:
-        print(label)
-        run_solver(matchday_data.assign(score=matchday_data[column]))
+        print(f"\nRound {round_number}")
+        unpriced = candidates["cost"].isna()
+        if unpriced.any():
+            print(f"Excluded for missing price: {', '.join(candidates.loc[unpriced, 'name'])}")
+        candidates = candidates.loc[~unpriced].copy()
+        training = dataset.select_matches(matches.loc[dates < start, "match_id"])
+        objectives = {"Best calculated score": "actual"}
+        for label, model in models.items():
+            model.fit(training)
+            candidates[label] = model.predict(candidates[["match_id", "player_id", "date"]])
+            objectives[label] = label
+
+        for label, objective in objectives.items():
+            squad = select_squad(candidates, objective, solver)
+            actual = squad["actual_total"].sum()
+            totals[label] += actual
+            print(f"{label}: cost {squad['cost'].sum():.1f}, "
+                  f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
+            print(squad[["name", "team", "nominal_pos", "cost", "captain", "supersub", "actual_total"]]
+                  .to_string(index=False))
+
+    print("\nTournament totals (calculated actual)")
+    for label, total in totals.items():
+        print(f"{label}: {total:.1f}")
+
+
+if __name__ == "__main__":
+    main()

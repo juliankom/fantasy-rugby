@@ -79,7 +79,11 @@ python -m pytest
 Run `python tests/main.py` from the source checkout to compare the historical
 mean and recency-weighted mean on the 2026 Six Nations. The runner loads
 `data/processed/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
-`tests/test_selection.py` is a separate manual squad-selection experiment.
+Run `python tests/test_selection.py` for the 2026 round-by-round squad backtest.
+It loads the bundled roster prices and fantasy positions, refits both baselines
+on matches before each round, and scores the selected squads from match
+statistics with `simple_score`. The best calculated score is a hindsight
+benchmark using the same candidate pool and optimizer.
 
 # Aims
 To explore different statistical models predicting players' fantasy scores in a given
