@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 
+import pandas as pd
 import pytest
 
 from six_nations_fantasy.scraping import scrape_match
@@ -40,6 +41,21 @@ def test_discovery_includes_all_tournaments_and_finals():
 @pytest.mark.skipif(not os.getenv("RUGBYPASS_LIVE"), reason="requires RugbyPass access")
 def test_live_england_wales_2026():
     result = scrape_match("https://www.rugbypass.com/live/england-vs-wales/?g=290467")
+    print("\nMatch details")
+    print(pd.Series(result.match).to_string())
+
+    teams = pd.DataFrame(result.teams).set_index("home").rename(
+        index={True: result.match["home_team"], False: result.match["away_team"]}
+    )
+    print("\nTeam statistics")
+    print(teams.T.to_string())
+
+    performances = pd.DataFrame(result.performances)
+    for home, side in ((True, "home"), (False, "away")):
+        players_for_side = performances.loc[performances["home"] == home].sort_values("number")
+        print(f"\n{result.match[side + '_team']} player performances ({len(players_for_side)})")
+        print(players_for_side.to_string(index=False))
+
     assert (result.match["home_score"], result.match["away_score"]) == (48, 7)
     assert result.match["date"].isoformat() == "2026-02-07"
     players = {p["player_identifier"]: p for p in result.performances}

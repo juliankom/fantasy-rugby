@@ -231,5 +231,10 @@ The rebuild uses RugbyPass numeric player IDs and profile slugs. The historical
 registry assigned its own integers, so load the rebuilt tables together and use
 `player_identifier` when comparing registries. Minutes sum substitution stints
 with the historical 80-minute cap. Kicking totals count successful lineup events
-and are checked against the team totals. Run the live regression with
-`RUGBYPASS_LIVE=1 python -m pytest tests/unit/test_rugbypass.py`.
+and are checked against the team totals. With RugbyPass's permission, run the
+single-match regression and display the match details, both teams' statistics
+and every player performance with:
+
+```bash
+RUGBYPASS_LIVE=1 python -m pytest -s -q tests/unit/test_rugbypass.py -k live_england_wales
+```
