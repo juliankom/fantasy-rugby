@@ -2,10 +2,6 @@
 A project exploring various statistical models to predicting players' performances in (fantasy) six nations. 
 
 # Data
-Currently, we have 69782 performances from 3031 unique players across the major
-leagues (URC, Top14, Prem) and competitions (Champions Cup, Six Nations). 
-Most statistics relevant for calculating fantasy score, such as meters carried, tackles, 
-etc. are tracked.
 
 ## Loading and splitting data
 
@@ -80,6 +76,9 @@ It loads the bundled roster prices and fantasy positions, refits both baselines
 on matches before each round, and scores the selected squads from match
 statistics with `simple_score`. The best calculated score is a hindsight
 benchmark using the same candidate pool and optimizer.
+
+Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
+spreadsheets used in the squad backtest.
 
 # Aims
 To explore different statistical models predicting players' fantasy scores in a given
