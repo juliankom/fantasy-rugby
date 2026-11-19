@@ -17,9 +17,13 @@ class MeanScores:
             "weight": 1.0 if weights is None else weights.to_numpy(),
         })
         history["weighted_score"] *= history["weight"]
+
+        # compute the (weighted) means per-player as well as globally
         self.player_means = self._average(history, "player_id")
         self.global_mean = history["weighted_score"].sum() / history["weight"].sum()
 
+        # additionally, compute the same values, but this time separated by whether 
+        # the player was a substitute or not 
         roles = substitute_status(performances)
         if roles is not None:
             history["is_substitute"] = roles.array
@@ -36,6 +40,7 @@ class MeanScores:
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
         player_ids = fixtures["player_id"]
         predicted = player_ids.map(self.player_means).fillna(self.global_mean)
+
         if self.role_means is not None and "is_substitute" in fixtures:
             roles = fixtures["is_substitute"].astype("boolean")
             keys = pd.MultiIndex.from_arrays([player_ids, roles])
@@ -46,7 +51,12 @@ class MeanScores:
                 self.player_role_means.reindex(opposite_keys).to_numpy(), index=fixtures.index
             )
             pooled = roles.map(self.role_means)
+
             # Keep the player's difference from the pool when extrapolating to a new role.
+            # This is just an arbitrary choice an can be fiddled with if desired
             adjusted = opposite_role + (pooled - opposite_roles.map(self.role_means))
-            predicted = same_role.fillna(adjusted).fillna(pooled).fillna(predicted)
+
+            # Use the player's history in this role unless they don't have one, in which case 
+            # use the adjusted prediction or fall back to the global mean for the role
+            predicted = same_role.fillna(adjusted).fillna(pooled)
         return predicted.rename("predicted")
