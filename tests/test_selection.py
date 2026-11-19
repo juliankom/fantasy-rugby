@@ -204,13 +204,16 @@ def main():
         unpriced = candidates["cost"].isna()
         if unpriced.any():
             print(f"Excluded for missing price: {', '.join(candidates.loc[unpriced, 'name'])}")
-        candidates = candidates.loc[~unpriced].copy()
         training = dataset.select_matches(matches.loc[dates < start, "match_id"])
         objectives = {"Best calculated score": "actual"}
+        prediction_fixtures = candidates[
+            ["match_id", "player_id", "date", "team", "shirt_number"]
+        ].assign(is_substitute=candidates["is_sub"])
         for label, model in models.items():
             model.fit(training)
-            candidates[label] = model.predict(candidates[["match_id", "player_id", "date"]])
+            candidates[label] = model.predict(prediction_fixtures.copy())
             objectives[label] = label
+        candidates = candidates.loc[~unpriced].copy()
 
         # for each objective (actual score, or score predicted by a model), compute the optimal squad
         round_results = {}

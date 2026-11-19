@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset
+from six_nations_fantasy.data.lineup import substitute_status
 from six_nations_fantasy.score import score_performances
 
 # The fixture rows intentionally exclude statistics observed during the match.
@@ -24,7 +25,7 @@ class PointPredictor(Protocol):
         """
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
-        """Predict one score per pre-match fixture row, in input row order."""
+        """Predict one score per fixture row, optionally using is_substitute."""
         return pd.Series()
 
 
@@ -54,7 +55,11 @@ def _context(dataset: RugbyDataset) -> pd.DataFrame:
     )
     if context.duplicated(["match_id", "player_id"]).any():
         raise ValueError("performances: duplicate player_id within a match")
-    return context.loc[:, list(CONTEXT_COLUMNS)]
+    context = context.loc[:, list(CONTEXT_COLUMNS)]
+    roles = substitute_status(dataset.performances)
+    if roles is not None:
+        context["is_substitute"] = roles.array
+    return context
 
 
 def evaluate_holdout(
@@ -70,8 +75,9 @@ def evaluate_holdout(
     performance statistics, without precomputed fantasy points. A model can
     calculate scores from that history if its approach needs them.
 
-    predict() receives only match_id, player_id and date for each evaluation
-    appearance. Holdout outcomes are scored by the evaluator only after
+    predict() receives match_id, player_id, date and, when available,
+    is_substitute from the recorded lineup for each evaluation appearance.
+    Holdout outcomes are scored by the evaluator only after
     prediction; they are never passed into fit() or predict().
 
     Both training and holdout must contain matches and player performances.

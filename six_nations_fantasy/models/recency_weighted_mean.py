@@ -7,9 +7,11 @@ import pandas as pd
 from six_nations_fantasy.data import RugbyDataset
 from six_nations_fantasy.score import score_performances
 
+from ._mean import MeanScores
+
 
 class RecencyWeightedMean:
-    """Exponentially weighted historical mean; half-life measured in days."""
+    """Exponentially weighted mean by player and lineup role when available."""
 
     def __init__(
         self, *, scorer: Callable[[pd.DataFrame], pd.Series], half_life_days: float = 180.0
@@ -23,27 +25,16 @@ class RecencyWeightedMean:
         if history.performances.empty:
             raise ValueError("Cannot fit on empty history")
         performances = history.performances
-        scores = score_performances(performances, self.scorer).to_numpy()
+        scores = score_performances(performances, self.scorer)
         match_dates = history.matches.set_index("match_id")["date"]
         dates = performances["match_id"].map(match_dates)
         # Using the last date in training as reference avoids numerical overflow;
         # the common scaling cancels out in each weighted average.
         age = (dates.max() - dates).dt.days
         weight = 0.5 ** (age / self.half_life_days)
-        x = pd.DataFrame({
-            "player_id": performances["player_id"].to_numpy(),
-            "_weighted": scores * weight.to_numpy(),
-            "_weight": weight.to_numpy(),
-        })
-        sums = x.groupby("player_id")[["_weighted", "_weight"]].sum()
-        self.player_means_ = sums["_weighted"] / sums["_weight"]
-        self.global_mean_ = float(x["_weighted"].sum() / x["_weight"].sum())
+        self._scores = MeanScores(performances, scores, weight)
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
-        if not hasattr(self, "player_means_"):
+        if not hasattr(self, "_scores"):
             raise RuntimeError("Call fit() before predict()")
-        return pd.Series(
-            fixtures["player_id"].map(self.player_means_).fillna(self.global_mean_).to_numpy(),
-            index=fixtures.index,
-            name="predicted",
-        )
+        return self._scores.predict(fixtures)

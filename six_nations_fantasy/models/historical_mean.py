@@ -7,9 +7,11 @@ import pandas as pd
 from six_nations_fantasy.data import RugbyDataset
 from six_nations_fantasy.score import score_performances
 
+from ._mean import MeanScores
+
 
 class HistoricalMean:
-    """Mean score by player, using global training mean for unseen players.
+    """Mean score by player and lineup role when available.
 
     This model needs fantasy points during fitting and calculates
     them from the observed historical performances with the supplied scorer.
@@ -23,15 +25,9 @@ class HistoricalMean:
             raise ValueError("Cannot fit on empty history")
         performances = history.performances
         scores = score_performances(performances, self.scorer)
-        # Group by column values (not the row index), keeping all player rows.
-        self.global_mean_ = float(scores.mean())
-        self.player_means_ = scores.groupby(performances["player_id"]).mean()
+        self._scores = MeanScores(performances, scores)
 
     def predict(self, fixtures: pd.DataFrame) -> pd.Series:
-        if not hasattr(self, "player_means_"):
+        if not hasattr(self, "_scores"):
             raise RuntimeError("Call fit() before predict()")
-        return pd.Series(
-            fixtures["player_id"].map(self.player_means_).fillna(self.global_mean_).to_numpy(),
-            index=fixtures.index,
-            name="predicted",
-        )
+        return self._scores.predict(fixtures)
