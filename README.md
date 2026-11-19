@@ -185,3 +185,36 @@ This framework is a **fixed holdout** evaluator, not yet a rolling backtest.
 Predictions deliberately have a small input schema; richer pre-match features
 (such as announced lineup or opponent) must be explicitly added and validated
 rather than copied from post-match performance tables.
+
+## Scraping RugbyPass
+
+The Python pipeline reads the fixture lists and the JSON embedded in completed match pages.
+The historical notebooks in `notebooks/scraping/` document the previous site format.
+The refreshed manifest in `data/scraping/urls.parquet` covers Six Nations 2022–2026
+and URC, Top 14, Premiership and Champions Cup 2022/23–2025/26. Each row identifies
+a match, season, competition, opponents and final score. To refresh it or scrape a subset:
+
+```python
+from six_nations_fantasy.scraping import discover_urls, scrape_match, scrape_urls
+
+game = scrape_match("https://www.rugbypass.com/live/england-vs-wales/?g=290467")
+print(game.match, game.performances[0])
+
+urls = discover_urls()
+urls.to_parquet("data/scraping/urls.parquet")
+errors = scrape_urls(urls, "data/rebuild")  # use a new output directory
+print(errors)
+```
+
+To reuse the checked-in manifest, load it with `pd.read_parquet("data/scraping/urls.parquet")`.
+Pass `urls.loc[[290467]]` to exercise the batch path for one match. The batch checks
+the match page against the manifest, writes the four dataset Parquets for accepted
+matches and records rejected fixtures in `failures.parquet`. Inspect failures before
+using the rebuild. If every fixture fails, the output contains only the failure report.
+
+The rebuild uses RugbyPass numeric player IDs and profile slugs. The historical
+registry assigned its own integers, so load the rebuilt tables together and use
+`player_identifier` when comparing registries. Minutes sum substitution stints
+with the historical 80-minute cap. Kicking totals count successful lineup events
+and are checked against the team totals. Run the live regression with
+`RUGBYPASS_LIVE=1 python -m pytest tests/unit/test_rugbypass.py`.
