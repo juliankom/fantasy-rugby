@@ -9,15 +9,11 @@ etc. are tracked.
 
 ## Loading and splitting data
 
-The authoritative processed dataset snapshots live in `data/processed/`:
-`matches.parquet`, `player_performances.parquet`, `players.parquet`, and
-`team_performances.parquet`. These are the unchanged files previously stored in
-`notebooks/data/`. Historical snapshots previously in `notebooks/old_data/`
-are preserved in `data/archive/`; they are **not** used by the default loader.
-
-The exploratory scraping notebooks are unchanged and some still use relative
-filenames for intermediate data; their working directories may need adjusting
-when rerunning those historical experiments.
+Place your local dataset in `data/processed/` or pass its directory to
+`load_dataset()`. The loader requires `matches.parquet` and
+`player_performances.parquet`. The squad backtest also uses `players.parquet`.
+Parquet datasets, archives and fixture manifests are ignored by Git and must
+be supplied separately in a fresh checkout.
 
 Install locally from the repository root:
 
@@ -188,25 +184,44 @@ rather than copied from post-match performance tables.
 
 ## Scraping RugbyPass
 
+### RugbyPass terms and liability
+
+Section 9 of the RugbyPass Terms of Use prohibits scraping RugbyPass without
+its prior express written permission. Users are responsible for obtaining
+that permission and complying with applicable terms and laws.
+[RugbyPass Terms of Use](https://www.rugbypass.com/terms-of-use/)
+
+The project authors disclaim responsibility and liability arising from use
+of this code to the extent permitted by applicable law.
+
+### Pipeline usage
+
 The Python pipeline reads the fixture lists and the JSON embedded in completed match pages.
 The historical notebooks in `notebooks/scraping/` document the previous site format.
-The refreshed manifest in `data/scraping/urls.parquet` covers Six Nations 2022–2026
-and URC, Top 14, Premiership and Champions Cup 2022/23–2025/26. Each row identifies
-a match, season, competition, opponents and final score. To refresh it or scrape a subset:
+The default discovery scope covers Six Nations 2022–2026 and URC, Top 14,
+Premiership and Champions Cup 2022/23–2025/26. Each fixture row identifies a
+match, season, competition, opponents and final score.
+
+If you have RugbyPass's permission, you can run the pipeline and save the
+manifest locally.
 
 ```python
+from pathlib import Path
+
 from six_nations_fantasy.scraping import discover_urls, scrape_match, scrape_urls
 
 game = scrape_match("https://www.rugbypass.com/live/england-vs-wales/?g=290467")
 print(game.match, game.performances[0])
 
+manifest = Path("data/scraping/urls.parquet")
+manifest.parent.mkdir(parents=True, exist_ok=True)
 urls = discover_urls()
-urls.to_parquet("data/scraping/urls.parquet")
+urls.to_parquet(manifest)
 errors = scrape_urls(urls, "data/rebuild")  # use a new output directory
 print(errors)
 ```
 
-To reuse the checked-in manifest, load it with `pd.read_parquet("data/scraping/urls.parquet")`.
+To reuse a local manifest, load it with `pd.read_parquet("data/scraping/urls.parquet")`.
 Pass `urls.loc[[290467]]` to exercise the batch path for one match. The batch checks
 the match page against the manifest, writes the four dataset Parquets for accepted
 matches and records rejected fixtures in `failures.parquet`. Inspect failures before
