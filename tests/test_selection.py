@@ -173,17 +173,21 @@ def main():
     players = pd.read_parquet(data_dir / "players.parquet")
     matches = dataset.matches
     dates = matches["date"]
-    # Match the previous experiment's 0.99 decay per week.
+
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
-            scorer=simple_score, half_life_days=7 * log(0.5) / log(0.99)
+            scorer=simple_score, half_life_days=7 * log(0.5) / log(0.85)
         ),
     }
     solver = COIN_CMD(msg=False)
     if not solver.available():
         solver = PULP_CBC_CMD(msg=False)
     totals = dict.fromkeys(["Best calculated score", *models], 0.0)
+
+    # the result of all models (and the optimal score) for all rounds
+    tournament_result = []
+
     for round_number, (start, end) in enumerate(zip(ROUND_STARTS, ROUND_STARTS[1:]), 1):
 
         # identify the matches played in this round
@@ -209,18 +213,23 @@ def main():
             objectives[label] = label
 
         # for each objective (actual score, or score predicted by a model), compute the optimal squad
+        round_results = {}
         for label, objective in objectives.items():
             squad = select_squad(candidates, objective, solver)
             actual = squad["actual_total"].sum()
             totals[label] += actual
+            round_results[label] = actual
             print(f"{label}: cost {squad['cost'].sum():.1f}, "
                   f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
             print_squad(squad)
+
+        tournament_result.append(round_results)
 
     print("\nTournament totals (calculated actual)")
     for label, total in totals.items():
         print(f"{label}: {total:.1f}")
 
+    print(pd.DataFrame(tournament_result))
 
 if __name__ == "__main__":
     main()
