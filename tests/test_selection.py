@@ -229,8 +229,9 @@ def main():
         tournament_result.append(round_results)
 
     print("\nTournament totals (calculated actual)")
+    tournament_optimal = totals["Best calculated score"]
     for label, total in totals.items():
-        print(f"{label}: {total:.1f}")
+        print(f"{label}: {total:.1f} ({(total / tournament_optimal)*100:.1f}%)")
 
     print(pd.DataFrame(tournament_result))
 
