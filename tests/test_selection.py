@@ -25,10 +25,15 @@ POSITIONS = {
 }
 NAME_ALIASES = {
     ("Ireland", "tomclarkson"): "thomasclarkson",
+    ("Ireland", "tomfarrell"): "thomasfarrell",
     ("Italy", "nachobrex"): "juanignaciobrex",
     ("France", "noahnene"): "noahtisienene",
+    ("Scotland", "freddydouglas"): "freddiedouglas",
     ("Wales", "gabehamerwebb"): "gabrielhamerwebb",
+    ("Wales", "danedwards"): "danieledwards",
     ("Italy", "davidodiase"): "davideodiase",
+    ("England", "finsmith"): "finlaysmith",
+    ("England", "sebatkinson"): "sebastienatkinson",
 }
 
 
@@ -167,7 +172,7 @@ def main():
     )
     args = parser.parse_args()
     roster = read_matchday_csv(args.roster)
-    data_dir = Path(__file__).resolve().parents[1] / "data" / "processed"
+    data_dir = Path(__file__).resolve().parents[1] / "data" / "rebuild"
     dataset = load_dataset(data_dir)
     tournament = dataset.filter_competitions(["Six Nations"])
     players = pd.read_parquet(data_dir / "players.parquet")
