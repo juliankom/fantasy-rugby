@@ -202,27 +202,22 @@ The default discovery scope covers Six Nations 2022–2026 and URC, Top 14,
 Premiership and Champions Cup 2022/23–2025/26. Each fixture row identifies a
 match, season, competition, opponents and final score.
 
-If you have RugbyPass's permission, you can run the pipeline and save the
-manifest locally.
+With RugbyPass's permission, run the full pipeline from the repository root:
 
-```python
-from pathlib import Path
-
-from six_nations_fantasy.scraping import discover_urls, scrape_match, scrape_urls
-
-game = scrape_match("https://www.rugbypass.com/live/england-vs-wales/?g=290467")
-print(game.match, game.performances[0])
-
-manifest = Path("data/scraping/urls.parquet")
-manifest.parent.mkdir(parents=True, exist_ok=True)
-urls = discover_urls()
-urls.to_parquet(manifest)
-errors = scrape_urls(urls, "data/rebuild")  # use a new output directory
-print(errors)
+```bash
+python -m six_nations_fantasy.scraping
 ```
 
-To reuse a local manifest, load it with `pd.read_parquet("data/scraping/urls.parquet")`.
-Pass `urls.loc[[290467]]` to exercise the batch path for one match. The batch checks
+This refreshes `data/scraping/urls.parquet`, prints fixture counts by season
+and competition, and scrapes those URLs into a new `data/rebuild/` directory.
+To reuse the saved URLs and choose a fresh output directory:
+
+```bash
+python -m six_nations_fantasy.scraping --reuse-manifest --output data/rebuild-2
+```
+
+Use `--manifest PATH` to select another URL table. The command exits with
+status 1 if any fixtures were rejected. The batch checks
 the match page against the manifest, writes the four dataset Parquets for accepted
 matches and records rejected fixtures in `failures.parquet`. Inspect failures before
 using the rebuild. If every fixture fails, the output contains only the failure report.
