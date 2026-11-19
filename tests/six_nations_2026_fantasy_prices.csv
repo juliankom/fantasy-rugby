@@ -1,0 +1,691 @@
+year,round,team,player,selection,shirt_number,price,nominal_position,nominal_position_source,match_position,source_cell,source_player
+2026,1,France,Jean-Baptiste Gros,starter,1,10.0,prop,starter_row,prop,D5,Jean-Baptiste Gros
+2026,1,France,Julien Marchand,starter,2,13.0,hooker,starter_row,hooker,D6,Julien Marchand
+2026,1,France,Dorian Aldegheri,starter,3,6.0,prop,starter_row,prop,D7,Dorian Aldegheri
+2026,1,France,Charles Ollivon,starter,4,11.0,back_row,inferred_from_other_rounds,second_row,D8,Charles Ollivon
+2026,1,France,Mickaël Guillard,starter,5,10.0,second_row,starter_row,second_row,D9,Mickaël Guillard
+2026,1,France,Francois Cros,starter,6,13.0,back_row,starter_row,back_row,D10,Francois Cros
+2026,1,France,Oscar Jegou,starter,7,9.0,back_row,starter_row,back_row,D11,Oscar Jegou
+2026,1,France,Anthony Jelonch,starter,8,10.0,back_row,starter_row,back_row,D12,Anthony Jelonch
+2026,1,France,Antoine Dupont,starter,9,15.0,scrum_half,starter_row,scrum_half,D14,Antoine Dupont (C)
+2026,1,France,Matthieu Jalibert,starter,10,12.0,fly_half,starter_row,fly_half,D15,Matthieu Jalibert
+2026,1,France,Louis Bielle-Biarrey,starter,11,15.0,back_three,starter_row,back_three,D16,Louis Bielle-Biarrey
+2026,1,France,Yoram Moefana,starter,12,12.0,centre,starter_row,centre,D17,Yoram Moefana
+2026,1,France,Nicolas Depoortère,starter,13,11.0,centre,starter_row,centre,D18,Nicolas Depoortère
+2026,1,France,Théo Attissogbe,starter,14,10.0,back_three,starter_row,back_three,D19,Théo Attissogbe
+2026,1,France,Thomas Ramos,starter,15,16.0,back_three,starter_row,back_three,D20,Thomas Ramos
+2026,1,France,Peato Mauvaka,bench,16,11.0,hooker,bench_suffix,,D22,Peato Mauvaka (H)
+2026,1,France,Rodrigue Neti,bench,17,6.0,prop,bench_suffix,,D23,Rodrigue Neti (P)
+2026,1,France,Régis Montagne,bench,18,7.0,prop,bench_suffix,,D24,Régis Montagne (P)
+2026,1,France,Hugo Auradou,bench,19,7.0,second_row,bench_suffix,,D25,Hugo Auradou (SR)
+2026,1,France,Emmanuel Meafou,bench,20,9.0,second_row,bench_suffix,,D26,Emmanuel Meafou (SR)
+2026,1,France,Lenni Nouchi,bench,21,7.0,back_row,bench_suffix,,D27,Lenni Nouchi (BR)
+2026,1,France,Baptiste Serin,bench,22,8.0,scrum_half,bench_suffix,,D28,Baptiste Serin (SH)
+2026,1,France,Kalvin Gourgues,bench,23,10.0,centre,bench_suffix,,D29,Kalvin Gourgues (C)
+2026,1,Ireland,Jeremy Loughman,starter,1,6.0,prop,starter_row,prop,F5,Jeremy Loughman
+2026,1,Ireland,Dan Sheehan,starter,2,16.0,hooker,starter_row,hooker,F6,Dan Sheehan
+2026,1,Ireland,Thomas Clarkson,starter,3,7.0,prop,starter_row,prop,F7,Thomas Clarkson
+2026,1,Ireland,Joe McCarthy,starter,4,11.0,second_row,starter_row,second_row,F8,Joe McCarthy
+2026,1,Ireland,Tadhg Beirne,starter,5,13.0,second_row,starter_row,second_row,F9,Tadhg Beirne
+2026,1,Ireland,Cian Prendergast,starter,6,8.0,back_row,starter_row,back_row,F10,Cian Prendergast
+2026,1,Ireland,Josh van der Flier,starter,7,12.0,back_row,starter_row,back_row,F11,Josh van der Flier
+2026,1,Ireland,Caelan Doris,starter,8,15.0,back_row,starter_row,back_row,F12,Caelan Doris (C)
+2026,1,Ireland,Jamison Gibson-Park,starter,9,13.0,scrum_half,starter_row,scrum_half,F14,Jamison Gibson-Park
+2026,1,Ireland,Sam Prendergast,starter,10,11.0,fly_half,starter_row,fly_half,F15,Sam Prendergast
+2026,1,Ireland,Jacob Stockdale,starter,11,9.0,back_three,starter_row,back_three,F16,Jacob Stockdale
+2026,1,Ireland,Stuart McCloskey,starter,12,10.0,centre,starter_row,centre,F17,Stuart McCloskey
+2026,1,Ireland,Garry Ringrose,starter,13,11.0,centre,starter_row,centre,F18,Garry Ringrose
+2026,1,Ireland,Tommy O'Brien,starter,14,11.0,back_three,starter_row,back_three,F19,Tommy O'Brien
+2026,1,Ireland,Jamie Osborne,starter,15,9.0,back_three,starter_row,back_three,F20,Jamie Osborne
+2026,1,Ireland,Rónan Kelleher,bench,16,11.0,hooker,bench_suffix,,F22,Rónan Kelleher (H)
+2026,1,Ireland,Michael Milne,bench,17,6.0,prop,bench_suffix,,F23,Michael Milne (P)
+2026,1,Ireland,Finlay Bealham,bench,18,10.0,prop,bench_suffix,,F24,Finlay Bealham (P)
+2026,1,Ireland,James Ryan,bench,19,9.0,second_row,bench_suffix,,F25,James Ryan (SR)
+2026,1,Ireland,Jack Conan,bench,20,13.0,back_row,bench_suffix,,F26,Jack Conan (BR)
+2026,1,Ireland,Nick Timoney,bench,21,8.0,back_row,bench_suffix,,F27,Nick Timoney (BR)
+2026,1,Ireland,Craig Casey,bench,22,9.0,scrum_half,bench_suffix,,F28,Craig Casey (SH)
+2026,1,Ireland,Jack Crowley,bench,23,11.0,fly_half,bench_suffix,,F29,Jack Crowley (FH)
+2026,1,Italy,Danilo Fischetti,starter,1,12.0,prop,starter_row,prop,H5,Danilo Fischetti
+2026,1,Italy,Giacomo Nicotera,starter,2,11.0,hooker,starter_row,hooker,H6,Giacomo Nicotera
+2026,1,Italy,Simone Ferrari,starter,3,8.0,prop,starter_row,prop,H7,Simone Ferrari
+2026,1,Italy,Niccolò Cannone,starter,4,10.0,second_row,starter_row,second_row,H8,Niccolò Cannone
+2026,1,Italy,Andrea Zambonin,starter,5,8.0,second_row,starter_row,second_row,H9,Andrea Zambonin
+2026,1,Italy,Michele Lamaro,starter,6,13.0,back_row,starter_row,back_row,H10,Michele Lamaro (C)
+2026,1,Italy,Manuel Zuliani,starter,7,11.0,back_row,starter_row,back_row,H11,Manuel Zuliani
+2026,1,Italy,Lorenzo Cannone,starter,8,13.0,back_row,starter_row,back_row,H12,Lorenzo Cannone
+2026,1,Italy,Alessandro Fusco,starter,9,9.0,scrum_half,starter_row,scrum_half,H14,Alessandro Fusco
+2026,1,Italy,Paolo Garbisi,starter,10,13.0,fly_half,starter_row,fly_half,H15,Paolo Garbisi
+2026,1,Italy,Monty Ioane,starter,11,12.0,back_three,starter_row,back_three,H16,Monty Ioane
+2026,1,Italy,Tommaso Menoncello,starter,12,14.0,centre,starter_row,centre,H17,Tommaso Menoncello
+2026,1,Italy,Nacho Brex,starter,13,11.0,centre,starter_row,centre,H18,Nacho Brex
+2026,1,Italy,Louis Lynagh,starter,14,11.0,back_three,starter_row,back_three,H19,Louis Lynagh
+2026,1,Italy,Leonardo Marin,starter,15,7.0,fly_half,inferred_from_other_rounds,back_three,H20,Leonardo Marin
+2026,1,Italy,Tommaso Di Bartolomeo,bench,16,8.0,hooker,bench_suffix,,H22,Tommaso Di Bartolomeo (H)
+2026,1,Italy,Mirco Spagnolo,bench,17,7.0,prop,bench_suffix,,H23,Mirco Spagnolo (P)
+2026,1,Italy,Muhamed Hasa,bench,18,6.0,prop,bench_suffix,,H24,Muhamed Hasa (P)
+2026,1,Italy,Federico Ruzza,bench,19,10.0,second_row,bench_suffix,,H25,Federico Ruzza (SR)
+2026,1,Italy,Riccardo Favretto,bench,20,6.0,second_row,bench_suffix,,H26,Riccardo Favretto (SR)
+2026,1,Italy,Alessandro Garbisi,bench,21,6.0,scrum_half,bench_suffix,,H27,Alessandro Garbisi (SH)
+2026,1,Italy,Giacomo Da Re,bench,22,8.0,fly_half,bench_suffix,,H28,Giacomo Da Re (FH)
+2026,1,Italy,Lorenzo Pani,bench,23,9.0,back_three,bench_suffix,,H29,Lorenzo Pani (BT)
+2026,1,Scotland,Pierre Schoeman,starter,1,11.0,prop,starter_row,prop,J5,Pierre Schoeman
+2026,1,Scotland,Ewan Ashman,starter,2,12.0,hooker,starter_row,hooker,J6,Ewan Ashman
+2026,1,Scotland,Zander Fagerson,starter,3,12.0,prop,starter_row,prop,J7,Zander Fagerson
+2026,1,Scotland,Scott Cummings,starter,4,9.0,second_row,starter_row,second_row,J8,Scott Cummings
+2026,1,Scotland,Grant Gilchrist,starter,5,8.0,second_row,starter_row,second_row,J9,Grant Gilchrist
+2026,1,Scotland,Matt Fagerson,starter,6,13.0,back_row,starter_row,back_row,J10,Matt Fagerson
+2026,1,Scotland,Rory Darge,starter,7,12.0,back_row,starter_row,back_row,J11,Rory Darge
+2026,1,Scotland,Jack Dempsey,starter,8,13.0,back_row,starter_row,back_row,J12,Jack Dempsey
+2026,1,Scotland,Ben White,starter,9,11.0,scrum_half,starter_row,scrum_half,J14,Ben White
+2026,1,Scotland,Finn Russell,starter,10,13.0,fly_half,starter_row,fly_half,J15,Finn Russell
+2026,1,Scotland,Jamie Dobie,starter,11,9.0,scrum_half,six_nations_fantasy_preview,back_three,J16,Jamie Dobie
+2026,1,Scotland,Sione Tuipulotu,starter,12,13.0,centre,starter_row,centre,J17,Sione Tuipulotu (C)
+2026,1,Scotland,Huw Jones,starter,13,14.0,centre,starter_row,centre,J18,Huw Jones
+2026,1,Scotland,Kyle Steyn,starter,14,10.0,back_three,starter_row,back_three,J19,Kyle Steyn
+2026,1,Scotland,Tom Jordan,starter,15,11.0,centre,inferred_from_other_rounds,back_three,J20,Tom Jordan
+2026,1,Scotland,George Turner,bench,16,7.0,hooker,bench_suffix,,J22,George Turner (H)
+2026,1,Scotland,Nathan McBeth,bench,17,6.0,prop,bench_suffix,,J23,Nathan McBeth (P)
+2026,1,Scotland,Elliot Millar-Mills,bench,18,6.0,prop,bench_suffix,,J24,Elliot Millar-Mills (P)
+2026,1,Scotland,Max Williamson,bench,19,7.0,second_row,bench_suffix,,J25,Max Williamson (SR)
+2026,1,Scotland,Gregor Brown,bench,20,8.0,second_row,bench_suffix,,J26,Gregor Brown (SR)
+2026,1,Scotland,George Horne,bench,21,8.0,scrum_half,bench_suffix,,J27,George Horne (SH)
+2026,1,Scotland,Adam Hastings,bench,22,10.0,fly_half,bench_suffix,,J28,Adam Hastings (FH)
+2026,1,Scotland,Darcy Graham,bench,23,13.0,back_three,bench_suffix,,J29,Darcy Graham (BT)
+2026,1,England,Ellis Genge,starter,1,12.0,prop,starter_row,prop,L5,Ellis Genge
+2026,1,England,Jamie George,starter,2,11.0,hooker,starter_row,hooker,L6,Jamie George (C)
+2026,1,England,Joe Heyes,starter,3,10.0,prop,starter_row,prop,L7,Joe Heyes
+2026,1,England,Alex Coles,starter,4,10.0,second_row,starter_row,second_row,L8,Alex Coles
+2026,1,England,Ollie Chessum,starter,5,11.0,second_row,starter_row,second_row,L9,Ollie Chessum
+2026,1,England,Guy Pepper,starter,6,11.0,back_row,starter_row,back_row,L10,Guy Pepper
+2026,1,England,Sam Underhill,starter,7,14.0,back_row,starter_row,back_row,L11,Sam Underhill
+2026,1,England,Ben Earl,starter,8,15.0,back_row,starter_row,back_row,L12,Ben Earl
+2026,1,England,Alex Mitchell,starter,9,11.0,scrum_half,starter_row,scrum_half,L14,Alex Mitchell
+2026,1,England,George Ford,starter,10,13.0,fly_half,starter_row,fly_half,L15,George Ford
+2026,1,England,Henry Arundell,starter,11,11.0,back_three,starter_row,back_three,L16,Henry Arundell
+2026,1,England,Fraser Dingwall,starter,12,9.0,centre,starter_row,centre,L17,Fraser Dingwall
+2026,1,England,Tommy Freeman,starter,13,14.0,back_three,inferred_from_other_rounds,centre,L18,Tommy Freeman
+2026,1,England,Immanuel Feyi-Waboso,starter,14,13.0,back_three,starter_row,back_three,L19,Immanuel Feyi-Waboso
+2026,1,England,Freddie Steward,starter,15,9.0,back_three,starter_row,back_three,L20,Freddie Steward
+2026,1,England,Luke Cowan-Dickie,bench,16,12.0,hooker,inferred_from_other_rounds,,L22,Luke Cowan-Dickie
+2026,1,England,Bevan Rodd,bench,17,7.0,prop,inferred_from_other_rounds,,L23,Bevan Rodd
+2026,1,England,Trevor Davison,bench,18,6.0,prop,inferred_from_other_rounds,,L24,Trevor Davison
+2026,1,England,Maro Itoje,bench,19,13.0,second_row,inferred_from_other_rounds,,L25,Maro Itoje
+2026,1,England,Tom Curry,bench,20,14.0,back_row,inferred_from_other_rounds,,L26,Tom Curry
+2026,1,England,Henry Pollock,bench,21,13.0,back_row,inferred_from_other_rounds,,L27,Henry Pollock
+2026,1,England,Ben Spencer,bench,22,10.0,scrum_half,inferred_from_other_rounds,,L28,Ben Spencer
+2026,1,England,Marcus Smith,bench,23,12.0,fly_half,inferred_from_other_rounds,,L29,Marcus Smith
+2026,1,Wales,Nicky Smith,starter,1,8.0,prop,starter_row,prop,N5,Nicky Smith
+2026,1,Wales,Dewi Lake,starter,2,11.0,hooker,starter_row,hooker,N6,Dewi Lake
+2026,1,Wales,Archie Griffin,starter,3,7.0,prop,starter_row,prop,N7,Archie Griffin
+2026,1,Wales,Dafydd Jenkins,starter,4,12.0,second_row,starter_row,second_row,N8,Dafydd Jenkins
+2026,1,Wales,Adam Beard,starter,5,9.0,second_row,starter_row,second_row,N9,Adam Beard
+2026,1,Wales,Alex Mann,starter,6,9.0,back_row,starter_row,back_row,N10,Alex Mann
+2026,1,Wales,Josh Macleod,starter,7,7.0,back_row,starter_row,back_row,N11,Josh Macleod
+2026,1,Wales,Aaron Wainwright,starter,8,12.0,back_row,starter_row,back_row,N12,Aaron Wainwright
+2026,1,Wales,Tomos Williams,starter,9,11.0,scrum_half,starter_row,scrum_half,N14,Tomos Williams
+2026,1,Wales,Dan Edwards,starter,10,11.0,fly_half,starter_row,fly_half,N15,Dan Edwards
+2026,1,Wales,Josh Adams,starter,11,9.0,back_three,starter_row,back_three,N16,Josh Adams
+2026,1,Wales,Ben Thomas,starter,12,12.0,centre,starter_row,centre,N17,Ben Thomas
+2026,1,Wales,Eddie James,starter,13,7.0,centre,starter_row,centre,N18,Eddie James
+2026,1,Wales,Ellis Mee,starter,14,9.0,back_three,starter_row,back_three,N19,Ellis Mee
+2026,1,Wales,Louis Rees-Zammit,starter,15,13.0,back_three,starter_row,back_three,N20,Louis Rees-Zammit
+2026,1,Wales,Liam Belcher,bench,16,6.0,hooker,bench_suffix,,N22,Liam Belcher (H)
+2026,1,Wales,Rhys Carre,bench,17,7.0,prop,bench_suffix,,N23,Rhys Carre (P)
+2026,1,Wales,Tomas Francis,bench,18,7.0,prop,bench_suffix,,N24,Tomas Francis (P)
+2026,1,Wales,Ben Carter,bench,19,8.0,second_row,bench_suffix,,N25,Ben Carter (SR)
+2026,1,Wales,Taine Plumtree,bench,20,11.0,back_row,bench_suffix,,N26,Taine Plumtree (BR)
+2026,1,Wales,Harri Deaves,bench,21,7.0,back_row,bench_suffix,,N27,Harri Deaves (BR)
+2026,1,Wales,Kieran Hardy,bench,22,8.0,scrum_half,bench_suffix,,N28,Kieran Hardy (SH)
+2026,1,Wales,Mason Grady,bench,23,7.0,centre,bench_suffix,,N29,Mason Grady (C)
+2026,2,Ireland,Jeremy Loughman,starter,1,6.4,prop,starter_row,prop,D5,Jeremy Loughman
+2026,2,Ireland,Dan Sheehan,starter,2,15.9,hooker,starter_row,hooker,D6,Dan Sheehan
+2026,2,Ireland,Tom Clarkson,starter,3,7.1,prop,starter_row,prop,D7,Tom Clarkson
+2026,2,Ireland,Joe McCarthy,starter,4,11.2,second_row,starter_row,second_row,D8,Joe McCarthy
+2026,2,Ireland,James Ryan,starter,5,9.3,second_row,starter_row,second_row,D9,James Ryan
+2026,2,Ireland,Cormac Izuchukwu,starter,6,7.9,second_row,fantasy_rugby_geek,back_row,D10,Cormac Izuchukwu
+2026,2,Ireland,Caelan Doris,starter,7,15.6,back_row,starter_row,back_row,D11,Caelan Doris (C)
+2026,2,Ireland,Jack Conan,starter,8,12.9,back_row,starter_row,back_row,D12,Jack Conan
+2026,2,Ireland,Craig Casey,starter,9,9.0,scrum_half,starter_row,scrum_half,D14,Craig Casey
+2026,2,Ireland,Sam Prendergast,starter,10,12.0,fly_half,starter_row,fly_half,D15,Sam Prendergast
+2026,2,Ireland,James Lowe,starter,11,12.7,back_three,starter_row,back_three,D16,James Lowe
+2026,2,Ireland,Stuart McCloskey,starter,12,10.7,centre,starter_row,centre,D17,Stuart McCloskey
+2026,2,Ireland,Garry Ringrose,starter,13,11.0,centre,starter_row,centre,D18,Garry Ringrose
+2026,2,Ireland,Robert Baloucoune,starter,14,7.9,back_three,starter_row,back_three,D19,Robert Baloucoune
+2026,2,Ireland,Jamie Osborne,starter,15,9.8,back_three,starter_row,back_three,D20,Jamie Osborne
+2026,2,Ireland,Rónan Kelleher,bench,16,11.1,hooker,bench_suffix,,D22,Rónan Kelleher (H)
+2026,2,Ireland,Tom O'Toole,bench,17,6.9,prop,bench_suffix,,D23,Tom O'Toole (P)
+2026,2,Ireland,Tadhg Furlong,bench,18,9.8,prop,bench_suffix,,D24,Tadhg Furlong (P)
+2026,2,Ireland,Edwin Edogbo,bench,19,6.9,second_row,bench_suffix,,D25,Edwin Edogbo (SR)
+2026,2,Ireland,Tadhg Beirne,bench,20,13.8,second_row,bench_suffix,,D26,Tadhg Beirne (SR)
+2026,2,Ireland,Nick Timoney,bench,21,9.8,back_row,bench_suffix,,D27,Nick Timoney (BR)
+2026,2,Ireland,Jamison Gibson-Park,bench,22,12.6,scrum_half,bench_suffix,,D28,Jamison Gibson-Park (SH)
+2026,2,Ireland,Jack Crowley,bench,23,11.1,fly_half,bench_suffix,,D29,Jack Crowley (FH)
+2026,2,Italy,Danilo Fischetti,starter,1,12.5,prop,starter_row,prop,F5,Danilo Fischetti
+2026,2,Italy,Giacomo Nicotera,starter,2,11.5,hooker,starter_row,hooker,F6,Giacomo Nicotera
+2026,2,Italy,Simone Ferrari,starter,3,9.6,prop,starter_row,prop,F7,Simone Ferrari
+2026,2,Italy,Niccolò Cannone,starter,4,10.9,second_row,starter_row,second_row,F8,Niccolò Cannone
+2026,2,Italy,Andrea Zambonin,starter,5,9.3,second_row,starter_row,second_row,F9,Andrea Zambonin
+2026,2,Italy,Michele Lamaro,starter,6,13.8,back_row,starter_row,back_row,F10,Michele Lamaro (C)
+2026,2,Italy,Manuel Zuliani,starter,7,12.1,back_row,starter_row,back_row,F11,Manuel Zuliani
+2026,2,Italy,Lorenzo Cannone,starter,8,14.0,back_row,starter_row,back_row,F12,Lorenzo Cannone
+2026,2,Italy,Alessandro Fusco,starter,9,9.2,scrum_half,starter_row,scrum_half,F14,Alessandro Fusco
+2026,2,Italy,Paolo Garbisi,starter,10,12.8,fly_half,starter_row,fly_half,F15,Paolo Garbisi
+2026,2,Italy,Monty Ioane,starter,11,12.2,back_three,starter_row,back_three,F16,Monty Ioane
+2026,2,Italy,Leonardo Marin,starter,12,7.0,fly_half,inferred_from_other_rounds,centre,F17,Leonardo Marin
+2026,2,Italy,Tommaso Menoncello,starter,13,14.6,centre,starter_row,centre,F18,Tommaso Menoncello
+2026,2,Italy,Louis Lynagh,starter,14,11.2,back_three,starter_row,back_three,F19,Louis Lynagh
+2026,2,Italy,Lorenzo Pani,starter,15,9.1,back_three,starter_row,back_three,F20,Lorenzo Pani
+2026,2,Italy,Tommaso Di Bartolomeo,bench,16,8.6,hooker,bench_suffix,,F22,Tommaso Di Bartolomeo (H)
+2026,2,Italy,Mirco Spagnolo,bench,17,7.2,prop,bench_suffix,,F23,Mirco Spagnolo (P)
+2026,2,Italy,Muhamed Hasa,bench,18,6.3,prop,bench_suffix,,F24,Muhamed Hasa (P)
+2026,2,Italy,Federico Ruzza,bench,19,10.3,second_row,bench_suffix,,F25,Federico Ruzza (SR)
+2026,2,Italy,Riccardo Favretto,bench,20,6.6,second_row,bench_suffix,,F26,Riccardo Favretto (SR)
+2026,2,Italy,Davide Odiase,bench,21,6.9,back_row,bench_suffix,,F27,Davide Odiase (BR)
+2026,2,Italy,Alessandro Garbisi,bench,22,6.2,scrum_half,bench_suffix,,F28,Alessandro Garbisi (SH)
+2026,2,Italy,Paolo Odogwu,bench,23,6.9,back_three,bench_suffix,,F29,Paolo Odogwu (BT)
+2026,2,Scotland,Nathan McBeth,starter,1,6.2,prop,starter_row,prop,H5,Nathan McBeth
+2026,2,Scotland,George Turner,starter,2,6.9,hooker,starter_row,hooker,H6,George Turner
+2026,2,Scotland,Zander Fagerson,starter,3,12.1,prop,starter_row,prop,H7,Zander Fagerson
+2026,2,Scotland,Gregor Brown,starter,4,8.6,second_row,starter_row,second_row,H8,Gregor Brown
+2026,2,Scotland,Scott Cummings,starter,5,9.0,second_row,starter_row,second_row,H9,Scott Cummings
+2026,2,Scotland,Jamie Ritchie,starter,6,10.8,back_row,starter_row,back_row,H10,Jamie Ritchie
+2026,2,Scotland,Rory Darge,starter,7,12.5,back_row,starter_row,back_row,H11,Rory Darge
+2026,2,Scotland,Jack Dempsey,starter,8,13.8,back_row,starter_row,back_row,H12,Jack Dempsey
+2026,2,Scotland,Ben White,starter,9,11.8,scrum_half,starter_row,scrum_half,H14,Ben White
+2026,2,Scotland,Finn Russell,starter,10,12.7,fly_half,starter_row,fly_half,H15,Finn Russell
+2026,2,Scotland,Jamie Dobie,starter,11,9.3,scrum_half,six_nations_fantasy_preview,back_three,H16,Jamie Dobie
+2026,2,Scotland,Sione Tuipulotu,starter,12,12.6,centre,starter_row,centre,H17,Sione Tuipulotu (C)
+2026,2,Scotland,Huw Jones,starter,13,13.4,centre,starter_row,centre,H18,Huw Jones
+2026,2,Scotland,Kyle Steyn,starter,14,10.0,back_three,starter_row,back_three,H19,Kyle Steyn
+2026,2,Scotland,Tom Jordan,starter,15,10.7,centre,inferred_from_other_rounds,back_three,H20,Tom Jordan
+2026,2,Scotland,Dave Cherry,bench,16,7.9,hooker,bench_suffix,,H22,Dave Cherry (H)
+2026,2,Scotland,Pierre Schoeman,bench,17,11.0,prop,bench_suffix,,H23,Pierre Schoeman (P)
+2026,2,Scotland,Elliot Millar-Mills,bench,18,6.1,prop,bench_suffix,,H24,Elliot Millar-Mills (P)
+2026,2,Scotland,Max Williamson,bench,19,7.1,second_row,bench_suffix,,H25,Max Williamson (SR)
+2026,2,Scotland,Matt Fagerson,bench,20,13.1,back_row,bench_suffix,,H26,Matt Fagerson (BR)
+2026,2,Scotland,George Horne,bench,21,8.8,scrum_half,bench_suffix,,H27,George Horne (SH)
+2026,2,Scotland,Adam Hastings,bench,22,9.8,fly_half,bench_suffix,,H28,Adam Hastings (FH)
+2026,2,Scotland,Darcy Graham,bench,23,12.7,back_three,bench_suffix,,H29,Darcy Graham (BT)
+2026,2,England,Ellis Genge,starter,1,12.2,prop,starter_row,prop,J5,Ellis Genge
+2026,2,England,Luke Cowan-Dickie,starter,2,12.0,hooker,starter_row,hooker,J6,Luke Cowan-Dickie
+2026,2,England,Joe Heyes,starter,3,10.0,prop,starter_row,prop,J7,Joe Heyes
+2026,2,England,Maro Itoje,starter,4,12.8,second_row,starter_row,second_row,J8,Maro Itoje (C)
+2026,2,England,Ollie Chessum,starter,5,11.9,second_row,starter_row,second_row,J9,Ollie Chessum
+2026,2,England,Guy Pepper,starter,6,12.0,back_row,starter_row,back_row,J10,Guy Pepper
+2026,2,England,Sam Underhill,starter,7,13.9,back_row,starter_row,back_row,J11,Sam Underhill
+2026,2,England,Ben Earl,starter,8,16.2,back_row,starter_row,back_row,J12,Ben Earl
+2026,2,England,Alex Mitchell,starter,9,10.8,scrum_half,starter_row,scrum_half,J14,Alex Mitchell
+2026,2,England,George Ford,starter,10,14.4,fly_half,starter_row,fly_half,J15,George Ford
+2026,2,England,Henry Arundell,starter,11,12.7,back_three,starter_row,back_three,J16,Henry Arundell
+2026,2,England,Fraser Dingwall,starter,12,9.7,centre,starter_row,centre,J17,Fraser Dingwall
+2026,2,England,Tommy Freeman,starter,13,15.2,back_three,inferred_from_other_rounds,centre,J18,Tommy Freeman
+2026,2,England,Tom Roebuck,starter,14,9.6,back_three,starter_row,back_three,J19,Tom Roebuck
+2026,2,England,Freddie Steward,starter,15,9.5,back_three,starter_row,back_three,J20,Freddie Steward
+2026,2,England,Jamie George,bench,16,11.2,hooker,bench_suffix,,J22,Jamie George (H)
+2026,2,England,Bevan Rodd,bench,17,7.8,prop,bench_suffix,,J23,Bevan Rodd (P)
+2026,2,England,Trevor Davison,bench,18,6.2,prop,bench_suffix,,J24,Trevor Davison (P)
+2026,2,England,Alex Coles,bench,19,10.7,second_row,bench_suffix,,J25,Alex Coles (SR)
+2026,2,England,Tom Curry,bench,20,13.6,back_row,bench_suffix,,J26,Tom Curry (BR)
+2026,2,England,Henry Pollock,bench,21,13.0,back_row,bench_suffix,,J27,Henry Pollock (BR)
+2026,2,England,Ben Spencer,bench,22,10.0,scrum_half,bench_suffix,,J28,Ben Spencer (SH)
+2026,2,England,Fin Smith,bench,23,11.7,fly_half,bench_suffix,,J29,Fin Smith (FH)
+2026,2,Wales,Rhys Carre,starter,1,7.0,prop,starter_row,prop,L5,Rhys Carre
+2026,2,Wales,Dewi Lake,starter,2,10.9,hooker,starter_row,hooker,L6,Dewi Lake (C)
+2026,2,Wales,Tomas Francis,starter,3,7.1,prop,starter_row,prop,L7,Tomas Francis
+2026,2,Wales,Dafydd Jenkins,starter,4,12.1,second_row,starter_row,second_row,L8,Dafydd Jenkins
+2026,2,Wales,Adam Beard,starter,5,9.4,second_row,starter_row,second_row,L9,Adam Beard
+2026,2,Wales,Aaron Wainwright,starter,6,12.6,back_row,starter_row,back_row,L10,Aaron Wainwright
+2026,2,Wales,Alex Mann,starter,7,9.5,back_row,starter_row,back_row,L11,Alex Mann
+2026,2,Wales,Olly Cracknell,starter,8,6.9,back_row,starter_row,back_row,L12,Olly Cracknell
+2026,2,Wales,Tomos Williams,starter,9,11.4,scrum_half,starter_row,scrum_half,L14,Tomos Williams
+2026,2,Wales,Dan Edwards,starter,10,11.2,fly_half,starter_row,fly_half,L15,Dan Edwards
+2026,2,Wales,Josh Adams,starter,11,9.7,back_three,starter_row,back_three,L16,Josh Adams
+2026,2,Wales,Joe Hawkins,starter,12,6.9,centre,starter_row,centre,L17,Joe Hawkins
+2026,2,Wales,Eddie James,starter,13,7.2,centre,starter_row,centre,L18,Eddie James
+2026,2,Wales,Ellis Mee,starter,14,9.1,back_three,starter_row,back_three,L19,Ellis Mee
+2026,2,Wales,Louis Rees-Zammit,starter,15,13.1,back_three,starter_row,back_three,L20,Louis Rees-Zammit
+2026,2,Wales,Ryan Elias,bench,16,7.9,hooker,bench_suffix,,L22,Ryan Elias (H)
+2026,2,Wales,Nicky Smith,bench,17,7.8,prop,bench_suffix,,L23,Nicky Smith (P)
+2026,2,Wales,Archie Griffin,bench,18,7.5,prop,bench_suffix,,L24,Archie Griffin (P)
+2026,2,Wales,Ben Carter,bench,19,8.1,second_row,bench_suffix,,L25,Ben Carter (SR)
+2026,2,Wales,Taine Plumtree,bench,20,10.7,back_row,bench_suffix,,L26,Taine Plumtree (BR)
+2026,2,Wales,Kieran Hardy,bench,21,8.0,scrum_half,bench_suffix,,L27,Kieran Hardy (SH)
+2026,2,Wales,Jarrod Evans,bench,22,9.8,fly_half,bench_suffix,,L28,Jarrod Evans (FH)
+2026,2,Wales,Mason Grady,bench,23,7.2,centre,bench_suffix,,L29,Mason Grady (C)
+2026,2,France,Jean-Baptiste Gros,starter,1,10.0,prop,starter_row,prop,N5,Jean-Baptiste Gros
+2026,2,France,Julien Marchand,starter,2,13.0,hooker,starter_row,hooker,N6,Julien Marchand
+2026,2,France,Dorian Aldegheri,starter,3,6.0,prop,starter_row,prop,N7,Dorian Aldegheri
+2026,2,France,Charles Ollivon,starter,4,11.7,back_row,inferred_from_other_rounds,second_row,N8,Charles Ollivon
+2026,2,France,Mickaël Guillard,starter,5,11.7,second_row,starter_row,second_row,N9,Mickaël Guillard
+2026,2,France,François Cros,starter,6,12.8,back_row,starter_row,back_row,N10,François Cros
+2026,2,France,Oscar Jegou,starter,7,10.3,back_row,starter_row,back_row,N11,Oscar Jegou
+2026,2,France,Anthony Jelonch,starter,8,10.9,back_row,starter_row,back_row,N12,Anthony Jelonch
+2026,2,France,Antoine Dupont,starter,9,15.5,scrum_half,starter_row,scrum_half,N14,Antoine Dupont (C)
+2026,2,France,Matthieu Jalibert,starter,10,14.0,fly_half,starter_row,fly_half,N15,Matthieu Jalibert
+2026,2,France,Louis Bielle-Biarrey,starter,11,16.3,back_three,starter_row,back_three,N16,Louis Bielle-Biarrey
+2026,2,France,Fabien Brau-Boirie,starter,12,6.9,centre,starter_row,centre,N17,Fabien Brau-Boirie
+2026,2,France,Émilien Gailleton,starter,13,8.8,centre,starter_row,centre,N18,Émilien Gailleton
+2026,2,France,Théo Attissogbe,starter,14,11.0,back_three,starter_row,back_three,N19,Théo Attissogbe
+2026,2,France,Thomas Ramos,starter,15,17.1,back_three,starter_row,back_three,N20,Thomas Ramos
+2026,2,France,Maxime Lamothe,bench,16,7.9,hooker,bench_suffix,,N22,Maxime Lamothe (H)
+2026,2,France,Rodrigue Neti,bench,17,6.1,prop,bench_suffix,,N23,Rodrigue Neti (P)
+2026,2,France,Régis Montagne,bench,18,7.9,prop,bench_suffix,,N24,Régis Montagne (P)
+2026,2,France,Thibaud Flament,bench,19,8.8,second_row,bench_suffix,,N25,Thibaud Flament (SR)
+2026,2,France,Emmanuel Meafou,bench,20,9.5,second_row,bench_suffix,,N26,Emmanuel Meafou (SR)
+2026,2,France,Lenni Nouchi,bench,21,7.9,back_row,bench_suffix,,N27,Lenni Nouchi (BR)
+2026,2,France,Baptiste Serin,bench,22,8.3,scrum_half,bench_suffix,,N28,Baptiste Serin (SH)
+2026,2,France,Noah Nene,bench,23,7.9,centre,bench_suffix,,N29,Noah Nene (C)
+2026,3,England,Ellis Genge,starter,1,11.7,prop,starter_row,prop,D5,Ellis Genge
+2026,3,England,Luke Cowan-Dickie,starter,2,12.1,hooker,starter_row,hooker,D6,Luke Cowan-Dickie
+2026,3,England,Joe Heyes,starter,3,10.0,prop,starter_row,prop,D7,Joe Heyes
+2026,3,England,Maro Itoje,starter,4,12.7,second_row,starter_row,second_row,D8,Maro Itoje (C)
+2026,3,England,Ollie Chessum,starter,5,12.1,second_row,starter_row,second_row,D9,Ollie Chessum
+2026,3,England,Tom Curry,starter,6,13.6,back_row,starter_row,back_row,D10,Tom Curry
+2026,3,England,Ben Earl,starter,7,17.0,back_row,starter_row,back_row,D11,Ben Earl
+2026,3,England,Henry Pollock,starter,8,13.7,back_row,starter_row,back_row,D12,Henry Pollock
+2026,3,England,Alex Mitchell,starter,9,10.9,scrum_half,starter_row,scrum_half,D14,Alex Mitchell
+2026,3,England,George Ford,starter,10,14.8,fly_half,starter_row,fly_half,D15,George Ford
+2026,3,England,Henry Arundell,starter,11,12.3,back_three,starter_row,back_three,D16,Henry Arundell
+2026,3,England,Fraser Dingwall,starter,12,9.7,centre,starter_row,centre,D17,Fraser Dingwall
+2026,3,England,Ollie Lawrence,starter,13,11.5,centre,starter_row,centre,D18,Ollie Lawrence
+2026,3,England,Tommy Freeman,starter,14,14.6,back_three,starter_row,back_three,D19,Tommy Freeman
+2026,3,England,Freddie Steward,starter,15,9.9,back_three,starter_row,back_three,D20,Freddie Steward
+2026,3,England,Jamie George,bench,16,11.4,hooker,bench_suffix,,D22,Jamie George (H)
+2026,3,England,Bevan Rodd,bench,17,8.2,prop,bench_suffix,,D23,Bevan Rodd (P)
+2026,3,England,Trevor Davison,bench,18,6.2,prop,bench_suffix,,D24,Trevor Davison (P)
+2026,3,England,Alex Coles,bench,19,10.8,second_row,bench_suffix,,D25,Alex Coles (SR)
+2026,3,England,Guy Pepper,bench,20,11.9,back_row,bench_suffix,,D26,Guy Pepper (BR)
+2026,3,England,Sam Underhill,bench,21,13.7,back_row,bench_suffix,,D27,Sam Underhill (BR)
+2026,3,England,Jack van Poortvliet,bench,22,8.7,scrum_half,bench_suffix,,D28,Jack van Poortvliet (SH)
+2026,3,England,Marcus Smith,bench,23,12.0,fly_half,bench_suffix,,D29,Marcus Smith (FH)
+2026,3,Ireland,Jeremy Loughman,starter,1,6.4,prop,starter_row,prop,F5,Jeremy Loughman
+2026,3,Ireland,Dan Sheehan,starter,2,15.5,hooker,starter_row,hooker,F6,Dan Sheehan
+2026,3,Ireland,Tadhg Furlong,starter,3,9.8,prop,starter_row,prop,F7,Tadhg Furlong
+2026,3,Ireland,Joe McCarthy,starter,4,11.3,second_row,starter_row,second_row,F8,Joe McCarthy
+2026,3,Ireland,James Ryan,starter,5,9.2,second_row,starter_row,second_row,F9,James Ryan
+2026,3,Ireland,Tadhg Beirne,starter,6,14.0,second_row,inferred_from_other_rounds,back_row,F10,Tadhg Beirne
+2026,3,Ireland,Josh van der Flier,starter,7,12.0,back_row,starter_row,back_row,F11,Josh van der Flier
+2026,3,Ireland,Caelan Doris,starter,8,16.4,back_row,starter_row,back_row,F12,Caelan Doris (C)
+2026,3,Ireland,Jamison Gibson-Park,starter,9,12.5,scrum_half,starter_row,scrum_half,F14,Jamison Gibson-Park
+2026,3,Ireland,Jack Crowley,starter,10,11.4,fly_half,starter_row,fly_half,F15,Jack Crowley
+2026,3,Ireland,James Lowe,starter,11,13.8,back_three,starter_row,back_three,F16,James Lowe
+2026,3,Ireland,Stuart McCloskey,starter,12,12.1,centre,starter_row,centre,F17,Stuart McCloskey
+2026,3,Ireland,Garry Ringrose,starter,13,11.1,centre,starter_row,centre,F18,Garry Ringrose
+2026,3,Ireland,Robert Baloucoune,starter,14,10.1,back_three,starter_row,back_three,F19,Robert Baloucoune
+2026,3,Ireland,Jamie Osborne,starter,15,10.6,back_three,starter_row,back_three,F20,Jamie Osborne
+2026,3,Ireland,Rónan Kelleher,bench,16,11.5,hooker,bench_suffix,,F22,Rónan Kelleher (H)
+2026,3,Ireland,Tom O'Toole,bench,17,7.4,prop,bench_suffix,,F23,Tom O’Toole (P)
+2026,3,Ireland,Finlay Bealham,bench,18,9.7,prop,bench_suffix,,F24,Finlay Bealham (P)
+2026,3,Ireland,Nick Timoney,bench,19,10.0,back_row,bench_suffix,,F25,Nick Timoney (BR)
+2026,3,Ireland,Jack Conan,bench,20,13.9,back_row,bench_suffix,,F26,Jack Conan (BR)
+2026,3,Ireland,Craig Casey,bench,21,9.0,scrum_half,bench_suffix,,F27,Craig Casey (SH)
+2026,3,Ireland,Ciaran Frawley,bench,22,8.7,fly_half,bench_suffix,,F28,Ciaran Frawley (FH)
+2026,3,Ireland,Tommy O'Brien,bench,23,10.8,back_three,bench_suffix,,F29,Tommy O'Brien (BT)
+2026,3,Wales,Rhys Carre,starter,1,8.4,prop,starter_row,prop,H5,Rhys Carre
+2026,3,Wales,Dewi Lake,starter,2,11.5,hooker,starter_row,hooker,H6,Dewi Lake (C)
+2026,3,Wales,Tomas Francis,starter,3,7.4,prop,starter_row,prop,H7,Tomas Francis
+2026,3,Wales,Dafydd Jenkins,starter,4,12.2,second_row,starter_row,second_row,H8,Dafydd Jenkins
+2026,3,Wales,Ben Carter,starter,5,8.3,second_row,starter_row,second_row,H9,Ben Carter
+2026,3,Wales,Taine Plumtree,starter,6,11.0,back_row,starter_row,back_row,H10,Taine Plumtree
+2026,3,Wales,Alex Mann,starter,7,10.2,back_row,starter_row,back_row,H11,Alex Mann
+2026,3,Wales,Aaron Wainwright,starter,8,13.0,back_row,starter_row,back_row,H12,Aaron Wainwright
+2026,3,Wales,Tomos Williams,starter,9,11.6,scrum_half,starter_row,scrum_half,H14,Tomos Williams
+2026,3,Wales,Sam Costelow,starter,10,7.8,fly_half,starter_row,fly_half,H15,Sam Costelow
+2026,3,Wales,Josh Adams,starter,11,9.7,back_three,starter_row,back_three,H16,Josh Adams
+2026,3,Wales,Joe Hawkins,starter,12,7.4,centre,starter_row,centre,H17,Joe Hawkins
+2026,3,Wales,Eddie James,starter,13,7.8,centre,starter_row,centre,H18,Eddie James
+2026,3,Wales,Gabe Hamer-Webb,starter,14,6.8,back_three,starter_row,back_three,H19,Gabe Hamer-Webb
+2026,3,Wales,Louis Rees-Zammit,starter,15,13.8,back_three,starter_row,back_three,H20,Louis Rees-Zammit
+2026,3,Wales,Ryan Elias,bench,16,8.3,hooker,bench_suffix,,H22,Ryan Elias (H)
+2026,3,Wales,Nicky Smith,bench,17,8.0,prop,bench_suffix,,H23,Nicky Smith (P)
+2026,3,Wales,Archie Griffin,bench,18,8.1,prop,bench_suffix,,H24,Archie Griffin (P)
+2026,3,Wales,Freddie Thomas,bench,19,5.8,second_row,bench_suffix,,H25,Freddie Thomas (SR)
+2026,3,Wales,James Botham,bench,20,6.8,back_row,bench_suffix,,H26,James Botham (BR)
+2026,3,Wales,Kieran Hardy,bench,21,8.0,scrum_half,bench_suffix,,H27,Kieran Hardy (SH)
+2026,3,Wales,Jarrod Evans,bench,22,9.8,fly_half,bench_suffix,,H28,Jarrod Evans (FH)
+2026,3,Wales,Blair Murray,bench,23,10.6,back_three,bench_suffix,,H29,Blair Murray (BT)
+2026,3,Scotland,Nathan McBeth,starter,1,6.3,prop,starter_row,prop,J5,Nathan McBeth
+2026,3,Scotland,Dave Cherry,starter,2,8.1,hooker,starter_row,hooker,J6,Dave Cherry
+2026,3,Scotland,Zander Fagerson,starter,3,11.9,prop,starter_row,prop,J7,Zander Fagerson
+2026,3,Scotland,Max Williamson,starter,4,7.2,second_row,starter_row,second_row,J8,Max Williamson
+2026,3,Scotland,Scott Cummings,starter,5,9.8,second_row,starter_row,second_row,J9,Scott Cummings
+2026,3,Scotland,Gregor Brown,starter,6,9.6,second_row,inferred_from_other_rounds,back_row,J10,Gregor Brown
+2026,3,Scotland,Rory Darge,starter,7,13.3,back_row,starter_row,back_row,J11,Rory Darge
+2026,3,Scotland,Matt Fagerson,starter,8,13.5,back_row,starter_row,back_row,J12,Matt Fagerson
+2026,3,Scotland,Ben White,starter,9,12.7,scrum_half,starter_row,scrum_half,J14,Ben White
+2026,3,Scotland,Finn Russell,starter,10,13.4,fly_half,starter_row,fly_half,J15,Finn Russell
+2026,3,Scotland,Duhan van der Merwe,starter,11,13.4,back_three,starter_row,back_three,J16,Duhan van der Merwe
+2026,3,Scotland,Sione Tuipulotu,starter,12,12.5,centre,starter_row,centre,J17,Sione Tuipulotu (C)
+2026,3,Scotland,Huw Jones,starter,13,14.6,centre,starter_row,centre,J18,Huw Jones
+2026,3,Scotland,Kyle Steyn,starter,14,11.6,back_three,starter_row,back_three,J19,Kyle Steyn
+2026,3,Scotland,Blair Kinghorn,starter,15,13.4,back_three,starter_row,back_three,J20,Blair Kinghorn
+2026,3,Scotland,George Turner,bench,16,7.5,hooker,bench_suffix,,J22,George Turner (H)
+2026,3,Scotland,Pierre Schoeman,bench,17,11.2,prop,bench_suffix,,J23,Pierre Schoeman (P)
+2026,3,Scotland,Elliot Millar-Mills,bench,18,6.6,prop,bench_suffix,,J24,Elliot Millar-Mills (P)
+2026,3,Scotland,Grant Gilchrist,bench,19,7.8,second_row,bench_suffix,,J25,Grant Gilchrist (SR)
+2026,3,Scotland,Josh Bayliss,bench,20,9.6,back_row,bench_suffix,,J26,Josh Bayliss (BR)
+2026,3,Scotland,George Horne,bench,21,9.1,scrum_half,bench_suffix,,J27,George Horne (SH)
+2026,3,Scotland,Tom Jordan,bench,22,10.4,centre,bench_suffix,,J28,Tom Jordan (C)
+2026,3,Scotland,Darcy Graham,bench,23,12.8,back_three,bench_suffix,,J29,Darcy Graham (BT)
+2026,3,France,Jean-Baptiste Gros,starter,1,10.1,prop,starter_row,prop,L5,Jean-Baptiste Gros
+2026,3,France,Julien Marchand,starter,2,13.8,hooker,starter_row,hooker,L6,Julien Marchand
+2026,3,France,Dorian Aldegheri,starter,3,6.2,prop,starter_row,prop,L7,Dorian Aldegheri
+2026,3,France,Thibaud Flament,starter,4,9.3,second_row,starter_row,second_row,L8,Thibaud Flament
+2026,3,France,Emmanuel Meafou,starter,5,9.6,second_row,starter_row,second_row,L9,Emmanuel Meafou
+2026,3,France,François Cros,starter,6,12.9,back_row,starter_row,back_row,L10,François Cros
+2026,3,France,Oscar Jegou,starter,7,10.9,back_row,starter_row,back_row,L11,Oscar Jegou
+2026,3,France,Anthony Jelonch,starter,8,11.4,back_row,starter_row,back_row,L12,Anthony Jelonch
+2026,3,France,Antoine Dupont,starter,9,16.3,scrum_half,starter_row,scrum_half,L14,Antoine Dupont (C)
+2026,3,France,Matthieu Jalibert,starter,10,16.7,fly_half,starter_row,fly_half,L15,Matthieu Jalibert
+2026,3,France,Louis Bielle-Biarrey,starter,11,17.1,back_three,starter_row,back_three,L16,Louis Bielle-Biarrey
+2026,3,France,Fabien Brau-Boirie,starter,12,9.7,centre,starter_row,centre,L17,Fabien Brau-Boirie
+2026,3,France,Émilien Gailleton,starter,13,10.3,centre,starter_row,centre,L18,Émilien Gailleton
+2026,3,France,Théo Attissogbe,starter,14,12.8,back_three,starter_row,back_three,L19,Théo Attissogbe
+2026,3,France,Thomas Ramos,starter,15,17.7,back_three,starter_row,back_three,L20,Thomas Ramos
+2026,3,France,Peato Mauvaka,bench,16,11.6,hooker,bench_suffix,,L22,Peato Mauvaka (H)
+2026,3,France,Rodrigue Neti,bench,17,6.3,prop,bench_suffix,,L23,Rodrigue Neti (P)
+2026,3,France,Georges-Henri Colombe,bench,18,7.8,prop,bench_suffix,,L24,Georges-Henri Colombe (P)
+2026,3,France,Charles Ollivon,bench,19,13.0,back_row,bench_suffix,,L25,Charles Ollivon (BR)
+2026,3,France,Mickaël Guillard,bench,20,12.7,second_row,bench_suffix,,L26,Mickaël Guillard (SR)
+2026,3,France,Lenni Nouchi,bench,21,8.7,back_row,bench_suffix,,L27,Lenni Nouchi (BR)
+2026,3,France,Baptiste Serin,bench,22,8.9,scrum_half,bench_suffix,,L28,Baptiste Serin (SH)
+2026,3,France,Pierre-Louis Barassi,bench,23,9.6,centre,bench_suffix,,L29,Pierre-Louis Barassi (C)
+2026,3,Italy,Danilo Fischetti,starter,1,12.4,prop,starter_row,prop,N5,Danilo Fischetti
+2026,3,Italy,Giacomo Nicotera,starter,2,12.6,hooker,starter_row,hooker,N6,Giacomo Nicotera
+2026,3,Italy,Simone Ferrari,starter,3,9.8,prop,starter_row,prop,N7,Simone Ferrari
+2026,3,Italy,Niccolò Cannone,starter,4,11.1,second_row,starter_row,second_row,N8,Niccolò Cannone
+2026,3,Italy,Andrea Zambonin,starter,5,9.6,second_row,starter_row,second_row,N9,Andrea Zambonin
+2026,3,Italy,Michele Lamaro,starter,6,13.9,back_row,starter_row,back_row,N10,Michele Lamaro (C)
+2026,3,Italy,Manuel Zuliani,starter,7,13.0,back_row,starter_row,back_row,N11,Manuel Zuliani
+2026,3,Italy,Lorenzo Cannone,starter,8,14.5,back_row,starter_row,back_row,N12,Lorenzo Cannone
+2026,3,Italy,Alessandro Fusco,starter,9,9.3,scrum_half,starter_row,scrum_half,N14,Alessandro Fusco
+2026,3,Italy,Paolo Garbisi,starter,10,13.0,fly_half,starter_row,fly_half,N15,Paolo Garbisi
+2026,3,Italy,Monty Ioane,starter,11,12.7,back_three,starter_row,back_three,N16,Monty Ioane
+2026,3,Italy,Leonardo Marin,starter,12,7.5,fly_half,inferred_from_other_rounds,centre,N17,Leonardo Marin
+2026,3,Italy,Tommaso Menoncello,starter,13,14.8,centre,starter_row,centre,N18,Tommaso Menoncello
+2026,3,Italy,Louis Lynagh,starter,14,11.2,back_three,starter_row,back_three,N19,Louis Lynagh
+2026,3,Italy,Ange Capuozzo,starter,15,11.5,back_three,starter_row,back_three,N20,Ange Capuozzo
+2026,3,Italy,Pablo Dimcheff,bench,16,7.8,hooker,bench_suffix,,N22,Pablo Dimcheff (H)
+2026,3,Italy,Mirco Spagnolo,bench,17,7.4,prop,bench_suffix,,N23,Mirco Spagnolo (P)
+2026,3,Italy,Giosuè Zilocchi,bench,18,6.8,prop,bench_suffix,,N24,Giosuè Zilocchi (P)
+2026,3,Italy,Federico Ruzza,bench,19,10.3,second_row,bench_suffix,,N25,Federico Ruzza (SR)
+2026,3,Italy,Riccardo Favretto,bench,20,6.6,second_row,bench_suffix,,N26,Riccardo Favretto (SR)
+2026,3,Italy,Davide Odiase,bench,21,7.0,back_row,bench_suffix,,N27,Davide Odiase (BR)
+2026,3,Italy,Alessandro Garbisi,bench,22,6.1,scrum_half,bench_suffix,,N28,Alessandro Garbisi (SH)
+2026,3,Italy,Paolo Odogwu,bench,23,7.0,back_three,bench_suffix,,N29,Paolo Odogwu (BT)
+2026,4,Ireland,Tom O'Toole,starter,1,7.6,prop,starter_row,prop,D5,Tom O'Toole
+2026,4,Ireland,Rónan Kelleher,starter,2,11.6,hooker,starter_row,hooker,D6,Rónan Kelleher
+2026,4,Ireland,Tadhg Furlong,starter,3,10.1,prop,starter_row,prop,D7,Tadhg Furlong
+2026,4,Ireland,James Ryan,starter,4,9.3,second_row,starter_row,second_row,D8,James Ryan
+2026,4,Ireland,Tadhg Beirne,starter,5,14.6,second_row,starter_row,second_row,D9,Tadhg Beirne
+2026,4,Ireland,Jack Conan,starter,6,13.6,back_row,starter_row,back_row,D10,Jack Conan
+2026,4,Ireland,Nick Timoney,starter,7,10.5,back_row,starter_row,back_row,D11,Nick Timoney
+2026,4,Ireland,Caelan Doris,starter,8,17.2,back_row,starter_row,back_row,D12,Caelan Doris (C)
+2026,4,Ireland,Jamison Gibson-Park,starter,9,14.3,scrum_half,starter_row,scrum_half,D14,Jamison Gibson-Park
+2026,4,Ireland,Jack Crowley,starter,10,12.8,fly_half,starter_row,fly_half,D15,Jack Crowley
+2026,4,Ireland,Jacob Stockdale,starter,11,8.8,back_three,starter_row,back_three,D16,Jacob Stockdale
+2026,4,Ireland,Stuart McCloskey,starter,12,12.7,centre,starter_row,centre,D17,Stuart McCloskey
+2026,4,Ireland,Garry Ringrose,starter,13,11.1,centre,starter_row,centre,D18,Garry Ringrose
+2026,4,Ireland,Robert Baloucoune,starter,14,11.5,back_three,starter_row,back_three,D19,Robert Baloucoune
+2026,4,Ireland,Jamie Osborne,starter,15,10.9,back_three,starter_row,back_three,D20,Jamie Osborne
+2026,4,Ireland,Tom Stewart,bench,16,7.7,hooker,bench_suffix,,D22,Tom Stewart (H)
+2026,4,Ireland,Michael Milne,bench,17,6.7,prop,bench_suffix,,D23,Michael Milne (P)
+2026,4,Ireland,Tom Clarkson,bench,18,7.4,prop,bench_suffix,,D24,Tom Clarkson (P)
+2026,4,Ireland,Joe McCarthy,bench,19,11.6,second_row,bench_suffix,,D25,Joe McCarthy (SR)
+2026,4,Ireland,Josh van der Flier,bench,20,13.0,back_row,bench_suffix,,D26,Josh van der Flier (BR)
+2026,4,Ireland,Nathan Doak,bench,21,6.7,scrum_half,bench_suffix,,D27,Nathan Doak (SH)
+2026,4,Ireland,Tom Farrell,bench,22,7.7,centre,bench_suffix,,D28,Tom Farrell (C)
+2026,4,Ireland,Ciaran Frawley,bench,23,8.7,fly_half,bench_suffix,,D29,Ciaran Frawley (FH)
+2026,4,Wales,Rhys Carre,starter,1,9.8,prop,starter_row,prop,F5,Rhys Carre
+2026,4,Wales,Dewi Lake,starter,2,12.0,hooker,starter_row,hooker,F6,Dewi Lake (C)
+2026,4,Wales,Tomas Francis,starter,3,7.8,prop,starter_row,prop,F7,Tomas Francis
+2026,4,Wales,Dafydd Jenkins,starter,4,12.4,second_row,starter_row,second_row,F8,Dafydd Jenkins
+2026,4,Wales,Ben Carter,starter,5,9.4,second_row,starter_row,second_row,F9,Ben Carter
+2026,4,Wales,Alex Mann,starter,6,11.4,back_row,starter_row,back_row,F10,Alex Mann
+2026,4,Wales,James Botham,starter,7,7.9,back_row,starter_row,back_row,F11,James Botham
+2026,4,Wales,Aaron Wainwright,starter,8,13.4,back_row,starter_row,back_row,F12,Aaron Wainwright
+2026,4,Wales,Tomos Williams,starter,9,11.5,scrum_half,starter_row,scrum_half,F14,Tomos Williams
+2026,4,Wales,Dan Edwards,starter,10,11.1,fly_half,starter_row,fly_half,F15,Dan Edwards
+2026,4,Wales,Josh Adams,starter,11,10.0,back_three,starter_row,back_three,F16,Josh Adams
+2026,4,Wales,Joe Hawkins,starter,12,7.3,centre,starter_row,centre,F17,Joe Hawkins
+2026,4,Wales,Eddie James,starter,13,8.3,centre,starter_row,centre,F18,Eddie James
+2026,4,Wales,Ellis Mee,starter,14,9.0,back_three,starter_row,back_three,F19,Ellis Mee
+2026,4,Wales,Louis Rees-Zammit,starter,15,13.5,back_three,starter_row,back_three,F20,Louis Rees-Zammit
+2026,4,Wales,Ryan Elias,bench,16,8.6,hooker,bench_suffix,,F22,Ryan Elias (H)
+2026,4,Wales,Nicky Smith,bench,17,9.2,prop,bench_suffix,,F23,Nicky Smith (P)
+2026,4,Wales,Archie Griffin,bench,18,8.5,prop,bench_suffix,,F24,Archie Griffin (P)
+2026,4,Wales,Adam Beard,bench,19,9.4,second_row,bench_suffix,,F25,Adam Beard (SR)
+2026,4,Wales,Olly Cracknell,bench,20,7.4,back_row,bench_suffix,,F26,Olly Cracknell (BR)
+2026,4,Wales,Kieran Hardy,bench,21,7.9,scrum_half,bench_suffix,,F27,Kieran Hardy (SH)
+2026,4,Wales,Jarrod Evans,bench,22,9.9,fly_half,bench_suffix,,F28,Jarrod Evans (FH)
+2026,4,Wales,Louie Hennessey,bench,23,6.7,centre,bench_suffix,,F29,Louie Hennessey (C)
+2026,4,Scotland,Pierre Schoeman,starter,1,11.2,prop,starter_row,prop,H5,Pierre Schoeman
+2026,4,Scotland,George Turner,starter,2,8.4,hooker,starter_row,hooker,H6,George Turner
+2026,4,Scotland,D'arcy Rae,starter,3,5.7,prop,starter_row,prop,H7,D'arcy Rae
+2026,4,Scotland,Gregor Brown,starter,4,9.8,second_row,starter_row,second_row,H8,Gregor Brown
+2026,4,Scotland,Scott Cummings,starter,5,10.0,second_row,starter_row,second_row,H9,Scott Cummings
+2026,4,Scotland,Matt Fagerson,starter,6,13.4,back_row,starter_row,back_row,H10,Matt Fagerson
+2026,4,Scotland,Rory Darge,starter,7,14.3,back_row,starter_row,back_row,H11,Rory Darge
+2026,4,Scotland,Jack Dempsey,starter,8,13.6,back_row,starter_row,back_row,H12,Jack Dempsey
+2026,4,Scotland,Ben White,starter,9,12.6,scrum_half,starter_row,scrum_half,H14,Ben White
+2026,4,Scotland,Finn Russell,starter,10,14.0,fly_half,starter_row,fly_half,H15,Finn Russell
+2026,4,Scotland,Kyle Steyn,starter,11,12.8,back_three,starter_row,back_three,H16,Kyle Steyn
+2026,4,Scotland,Sione Tuipulotu,starter,12,12.7,centre,starter_row,centre,H17,Sione Tuipulotu (C)
+2026,4,Scotland,Huw Jones,starter,13,14.5,centre,starter_row,centre,H18,Huw Jones
+2026,4,Scotland,Darcy Graham,starter,14,13.1,back_three,starter_row,back_three,H19,Darcy Graham
+2026,4,Scotland,Blair Kinghorn,starter,15,13.4,back_three,starter_row,back_three,H20,Blair Kinghorn
+2026,4,Scotland,Ewan Ashman,bench,16,11.7,hooker,bench_suffix,,H22,Ewan Ashman (H)
+2026,4,Scotland,Rory Sutherland,bench,17,6.7,prop,bench_suffix,,H23,Rory Sutherland (P)
+2026,4,Scotland,Zander Fagerson,bench,18,12.4,prop,bench_suffix,,H24,Zander Fagerson (P)
+2026,4,Scotland,Grant Gilchrist,bench,19,7.8,second_row,bench_suffix,,H25,Grant Gilchrist (SR)
+2026,4,Scotland,Freddy Douglas,bench,20,6.7,back_row,bench_suffix,,H26,Freddy Douglas (BR)
+2026,4,Scotland,Josh Bayliss,bench,21,10.2,back_row,bench_suffix,,H27,Josh Bayliss (BR)
+2026,4,Scotland,George Horne,bench,22,9.1,scrum_half,bench_suffix,,H28,George Horne (SH)
+2026,4,Scotland,Tom Jordan,bench,23,10.3,centre,bench_suffix,,H29,Tom Jordan (C)
+2026,4,France,Jean-Baptiste Gros,starter,1,10.3,prop,starter_row,prop,J5,Jean-Baptiste Gros
+2026,4,France,Julien Marchand,starter,2,13.6,hooker,starter_row,hooker,J6,Julien Marchand
+2026,4,France,Dorian Aldegheri,starter,3,6.4,prop,starter_row,prop,J7,Dorian Aldegheri
+2026,4,France,Charles Ollivon,starter,4,13.1,back_row,inferred_from_other_rounds,second_row,J8,Charles Ollivon
+2026,4,France,Mickaël Guillard,starter,5,12.9,second_row,starter_row,second_row,J9,Mickaël Guillard
+2026,4,France,François Cros,starter,6,12.8,back_row,starter_row,back_row,J10,François Cros
+2026,4,France,Oscar Jegou,starter,7,11.6,back_row,starter_row,back_row,J11,Oscar Jegou
+2026,4,France,Anthony Jelonch,starter,8,12.1,back_row,starter_row,back_row,J12,Anthony Jelonch
+2026,4,France,Antoine Dupont,starter,9,17.2,scrum_half,starter_row,scrum_half,J14,Antoine Dupont (C)
+2026,4,France,Matthieu Jalibert,starter,10,16.4,fly_half,starter_row,fly_half,J15,Matthieu Jalibert
+2026,4,France,Louis Bielle-Biarrey,starter,11,17.1,back_three,starter_row,back_three,J16,Louis Bielle-Biarrey
+2026,4,France,Yoram Moefana,starter,12,11.7,centre,starter_row,centre,J17,Yoram Moefana
+2026,4,France,Nicolas Depoortère,starter,13,11.7,centre,starter_row,centre,J18,Nicolas Depoortère
+2026,4,France,Théo Attissogbe,starter,14,12.8,back_three,starter_row,back_three,J19,Théo Attissogbe
+2026,4,France,Thomas Ramos,starter,15,18.6,back_three,starter_row,back_three,J20,Thomas Ramos
+2026,4,France,Peato Mauvaka,bench,16,11.9,hooker,bench_suffix,,J22,Peato Mauvaka (H)
+2026,4,France,Rodrigue Neti,bench,17,6.7,prop,bench_suffix,,J23,Rodrigue Neti (P)
+2026,4,France,Demba Bamba,bench,18,7.0,prop,bench_suffix,,J24,Demba Bamba (P)
+2026,4,France,Thibaud Flament,bench,19,10.0,second_row,bench_suffix,,J25,Thibaud Flament (SR)
+2026,4,France,Emmanuel Meafou,bench,20,12.0,second_row,bench_suffix,,J26,Emmanuel Meafou (SR)
+2026,4,France,Lenni Nouchi,bench,21,9.1,back_row,bench_suffix,,J27,Lenni Nouchi (BR)
+2026,4,France,Baptiste Serin,bench,22,8.9,scrum_half,bench_suffix,,J28,Baptiste Serin (SH)
+2026,4,France,Pierre-Louis Barassi,bench,23,9.6,centre,bench_suffix,,J29,Pierre-Louis Barassi (C)
+2026,4,Italy,Danilo Fischetti,starter,1,12.1,prop,starter_row,prop,L5,Danilo Fischetti
+2026,4,Italy,Giacomo Nicotera,starter,2,12.3,hooker,starter_row,hooker,L6,Giacomo Nicotera
+2026,4,Italy,Simone Ferrari,starter,3,9.6,prop,starter_row,prop,L7,Simone Ferrari
+2026,4,Italy,Niccolò Cannone,starter,4,11.2,second_row,starter_row,second_row,L8,Niccolò Cannone
+2026,4,Italy,Andrea Zambonin,starter,5,9.4,second_row,starter_row,second_row,L9,Andrea Zambonin
+2026,4,Italy,Michele Lamaro,starter,6,13.7,back_row,starter_row,back_row,L10,Michele Lamaro (C)
+2026,4,Italy,Manuel Zuliani,starter,7,12.9,back_row,starter_row,back_row,L11,Manuel Zuliani
+2026,4,Italy,Lorenzo Cannone,starter,8,14.7,back_row,starter_row,back_row,L12,Lorenzo Cannone
+2026,4,Italy,Alessandro Garbisi,starter,9,6.3,scrum_half,starter_row,scrum_half,L14,Alessandro Garbisi
+2026,4,Italy,Paolo Garbisi,starter,10,12.8,fly_half,starter_row,fly_half,L15,Paolo Garbisi
+2026,4,Italy,Monty Ioane,starter,11,12.3,back_three,starter_row,back_three,L16,Monty Ioane
+2026,4,Italy,Tommaso Menoncello,starter,12,15.2,centre,starter_row,centre,L17,Tommaso Menoncello
+2026,4,Italy,Nacho Brex,starter,13,11.0,centre,starter_row,centre,L18,Nacho Brex
+2026,4,Italy,Louis Lynagh,starter,14,10.9,back_three,starter_row,back_three,L19,Louis Lynagh
+2026,4,Italy,Lorenzo Pani,starter,15,9.2,back_three,starter_row,back_three,L20,Lorenzo Pani
+2026,4,Italy,Tommaso Di Bartolomeo,bench,16,8.7,hooker,bench_suffix,,L22,Tommaso Di Bartolomeo (H)
+2026,4,Italy,Mirco Spagnolo,bench,17,7.9,prop,bench_suffix,,L23,Mirco Spagnolo (P)
+2026,4,Italy,Muhamed Hasa,bench,18,6.3,prop,bench_suffix,,L24,Muhamed Hasa (P)
+2026,4,Italy,Federico Ruzza,bench,19,10.9,second_row,bench_suffix,,L25,Federico Ruzza (SR)
+2026,4,Italy,Riccardo Favretto,bench,20,7.0,second_row,bench_suffix,,L26,Riccardo Favretto (SR)
+2026,4,Italy,Alessandro Fusco,bench,21,9.4,scrum_half,bench_suffix,,L27,Alessandro Fusco (SH)
+2026,4,Italy,Leonardo Marin,bench,22,8.5,fly_half,bench_suffix,,L28,Leonardo Marin (FH)
+2026,4,Italy,Tommaso Allan,bench,23,10.4,fly_half,bench_suffix,,L29,Tommaso Allan (FH)
+2026,4,England,Ellis Genge,starter,1,11.9,prop,starter_row,prop,N5,Ellis Genge
+2026,4,England,Jamie George,starter,2,11.5,hooker,starter_row,hooker,N6,Jamie George
+2026,4,England,Joe Heyes,starter,3,10.5,prop,starter_row,prop,N7,Joe Heyes
+2026,4,England,Maro Itoje,starter,4,12.8,second_row,starter_row,second_row,N8,Maro Itoje (C)
+2026,4,England,Alex Coles,starter,5,10.8,second_row,starter_row,second_row,N9,Alex Coles
+2026,4,England,Guy Pepper,starter,6,11.9,back_row,starter_row,back_row,N10,Guy Pepper
+2026,4,England,Tom Curry,starter,7,13.4,back_row,starter_row,back_row,N11,Tom Curry
+2026,4,England,Ben Earl,starter,8,16.8,back_row,starter_row,back_row,N12,Ben Earl
+2026,4,England,Ben Spencer,starter,9,9.8,scrum_half,starter_row,scrum_half,N14,Ben Spencer
+2026,4,England,Fin Smith,starter,10,11.5,fly_half,starter_row,fly_half,N15,Fin Smith
+2026,4,England,Cadan Murley,starter,11,8.6,back_three,starter_row,back_three,N16,Cadan Murley
+2026,4,England,Seb Atkinson,starter,12,6.7,centre,starter_row,centre,N17,Seb Atkinson
+2026,4,England,Tommy Freeman,starter,13,14.5,back_three,inferred_from_other_rounds,centre,N18,Tommy Freeman
+2026,4,England,Tom Roebuck,starter,14,9.0,back_three,starter_row,back_three,N19,Tom Roebuck
+2026,4,England,Elliot Daly,starter,15,9.4,back_three,starter_row,back_three,N20,Elliot Daly
+2026,4,England,Luke Cowan-Dickie,bench,16,12.1,hooker,bench_suffix,,N22,Luke Cowan-Dickie (H)
+2026,4,England,Bevan Rodd,bench,17,8.5,prop,bench_suffix,,N23,Bevan Rodd (P)
+2026,4,England,Trevor Davison,bench,18,6.3,prop,bench_suffix,,N24,Trevor Davison (P)
+2026,4,England,Ollie Chessum,bench,19,11.8,second_row,bench_suffix,,N25,Ollie Chessum (SR)
+2026,4,England,Sam Underhill,bench,20,14.4,back_row,bench_suffix,,N26,Sam Underhill (BR)
+2026,4,England,Henry Pollock,bench,21,14.1,back_row,bench_suffix,,N27,Henry Pollock (BR)
+2026,4,England,Jack van Poortvliet,bench,22,9.0,scrum_half,bench_suffix,,N28,Jack van Poortvliet (SH)
+2026,4,England,Marcus Smith,bench,23,12.6,fly_half,bench_suffix,,N29,Marcus Smith (FH)
+2026,5,Ireland,Tom O'Toole,starter,1,8.0,prop,starter_row,prop,D5,Tom O'Toole
+2026,5,Ireland,Dan Sheehan,starter,2,16.4,hooker,starter_row,hooker,D6,Dan Sheehan
+2026,5,Ireland,Tadhg Furlong,starter,3,10.3,prop,starter_row,prop,D7,Tadhg Furlong
+2026,5,Ireland,Joe McCarthy,starter,4,12.2,second_row,starter_row,second_row,D8,Joe McCarthy
+2026,5,Ireland,Tadhg Beirne,starter,5,15.1,second_row,starter_row,second_row,D9,Tadhg Beirne
+2026,5,Ireland,Jack Conan,starter,6,15.6,back_row,starter_row,back_row,D10,Jack Conan
+2026,5,Ireland,Josh van der Flier,starter,7,13.2,back_row,starter_row,back_row,D11,Josh van der Flier
+2026,5,Ireland,Caelan Doris,starter,8,17.3,back_row,starter_row,back_row,D12,Caelan Doris (C)
+2026,5,Ireland,Jamison Gibson-Park,starter,9,14.7,scrum_half,starter_row,scrum_half,D14,Jamison Gibson-Park
+2026,5,Ireland,Jack Crowley,starter,10,13.6,fly_half,starter_row,fly_half,D15,Jack Crowley
+2026,5,Ireland,Tommy O'Brien,starter,11,11.2,back_three,starter_row,back_three,D16,Tommy O’Brien
+2026,5,Ireland,Stuart McCloskey,starter,12,13.2,centre,starter_row,centre,D17,Stuart McCloskey
+2026,5,Ireland,Garry Ringrose,starter,13,11.3,centre,starter_row,centre,D18,Garry Ringrose
+2026,5,Ireland,Robert Baloucoune,starter,14,11.7,back_three,starter_row,back_three,D19,Robert Baloucoune
+2026,5,Ireland,Jamie Osborne,starter,15,11.4,back_three,starter_row,back_three,D20,Jamie Osborne
+2026,5,Ireland,Rónan Kelleher,bench,16,12.8,hooker,bench_suffix,,D22,Rónan Kelleher (H)
+2026,5,Ireland,Michael Milne,bench,17,6.9,prop,bench_suffix,,D23,Michael Milne (P)
+2026,5,Ireland,Finlay Bealham,bench,18,9.4,prop,bench_suffix,,D24,Finlay Bealham (P)
+2026,5,Ireland,Darragh Murray,bench,19,,second_row,bench_suffix,,D25,Darragh Murray (SR)
+2026,5,Ireland,Nick Timoney,bench,20,11.0,back_row,bench_suffix,,D26,Nick Timoney (BR)
+2026,5,Ireland,Craig Casey,bench,21,8.8,scrum_half,bench_suffix,,D27,Craig Casey (SH)
+2026,5,Ireland,Ciaran Frawley,bench,22,8.8,fly_half,bench_suffix,,D28,Ciaran Frawley (FH)
+2026,5,Ireland,Bundee Aki,bench,23,11.1,centre,bench_suffix,,D29,Bundee Aki (C)
+2026,5,Scotland,Pierre Schoeman,starter,1,11.9,prop,starter_row,prop,F5,Pierre Schoeman
+2026,5,Scotland,George Turner,starter,2,8.8,hooker,starter_row,hooker,F6,George Turner
+2026,5,Scotland,Zander Fagerson,starter,3,12.4,prop,starter_row,prop,F7,Zander Fagerson
+2026,5,Scotland,Max Williamson,starter,4,7.2,second_row,starter_row,second_row,F8,Max Williamson
+2026,5,Scotland,Grant Gilchrist,starter,5,8.0,second_row,starter_row,second_row,F9,Grant Gilchrist
+2026,5,Scotland,Matt Fagerson,starter,6,13.2,back_row,starter_row,back_row,F10,Matt Fagerson
+2026,5,Scotland,Rory Darge,starter,7,14.5,back_row,starter_row,back_row,F11,Rory Darge
+2026,5,Scotland,Jack Dempsey,starter,8,13.8,back_row,starter_row,back_row,F12,Jack Dempsey
+2026,5,Scotland,Ben White,starter,9,12.8,scrum_half,starter_row,scrum_half,F14,Ben White
+2026,5,Scotland,Finn Russell,starter,10,14.3,fly_half,starter_row,fly_half,F15,Finn Russell
+2026,5,Scotland,Kyle Steyn,starter,11,14.6,back_three,starter_row,back_three,F16,Kyle Steyn
+2026,5,Scotland,Sione Tuipulotu,starter,12,12.9,centre,starter_row,centre,F17,Sione Tuipulotu (C)
+2026,5,Scotland,Huw Jones,starter,13,14.6,centre,starter_row,centre,F18,Huw Jones
+2026,5,Scotland,Darcy Graham,starter,14,14.2,back_three,starter_row,back_three,F19,Darcy Graham
+2026,5,Scotland,Blair Kinghorn,starter,15,13.8,back_three,starter_row,back_three,F20,Blair Kinghorn
+2026,5,Scotland,Ewan Ashman,bench,16,11.9,hooker,bench_suffix,,F22,Ewan Ashman (H)
+2026,5,Scotland,Rory Sutherland,bench,17,6.9,prop,bench_suffix,,F23,Rory Sutherland (P)
+2026,5,Scotland,D'arcy Rae,bench,18,5.7,prop,bench_suffix,,F24,D'arcy Rae (P)
+2026,5,Scotland,Alex Craig,bench,19,5.6,second_row,bench_suffix,,F25,Alex Craig (SR)
+2026,5,Scotland,Magnus Bradbury,bench,20,8.5,back_row,bench_suffix,,F26,Magnus Bradbury (BR)
+2026,5,Scotland,George Horne,bench,21,9.3,scrum_half,bench_suffix,,F27,George Horne (SH)
+2026,5,Scotland,Kyle Rowe,bench,22,7.6,back_three,bench_suffix,,F28,Kyle Rowe (BT)
+2026,5,Scotland,Tom Jordan,bench,23,11.1,centre,bench_suffix,,F29,Tom Jordan (C)
+2026,5,Wales,Rhys Carre,starter,1,11.3,prop,starter_row,prop,H5,Rhys Carre
+2026,5,Wales,Dewi Lake,starter,2,13.1,hooker,starter_row,hooker,H6,Dewi Lake (C)
+2026,5,Wales,Tomas Francis,starter,3,8.4,prop,starter_row,prop,H7,Tomas Francis
+2026,5,Wales,Dafydd Jenkins,starter,4,12.9,second_row,starter_row,second_row,H8,Dafydd Jenkins
+2026,5,Wales,Ben Carter,starter,5,10.1,second_row,starter_row,second_row,H9,Ben Carter
+2026,5,Wales,Alex Mann,starter,6,12.9,back_row,starter_row,back_row,H10,Alex Mann
+2026,5,Wales,James Botham,starter,7,10.5,back_row,starter_row,back_row,H11,James Botham
+2026,5,Wales,Aaron Wainwright,starter,8,13.9,back_row,starter_row,back_row,H12,Aaron Wainwright
+2026,5,Wales,Tomos Williams,starter,9,11.4,scrum_half,starter_row,scrum_half,H14,Tomos Williams
+2026,5,Wales,Dan Edwards,starter,10,11.3,fly_half,starter_row,fly_half,H15,Dan Edwards
+2026,5,Wales,Josh Adams,starter,11,9.8,back_three,starter_row,back_three,H16,Josh Adams
+2026,5,Wales,Joe Hawkins,starter,12,7.7,centre,starter_row,centre,H17,Joe Hawkins
+2026,5,Wales,Eddie James,starter,13,9.1,centre,starter_row,centre,H18,Eddie James
+2026,5,Wales,Ellis Mee,starter,14,8.9,back_three,starter_row,back_three,H19,Ellis Mee
+2026,5,Wales,Louis Rees-Zammit,starter,15,13.4,back_three,starter_row,back_three,H20,Louis Rees-Zammit
+2026,5,Wales,Ryan Elias,bench,16,8.9,hooker,bench_suffix,,H22,Ryan Elias (H)
+2026,5,Wales,Nicky Smith,bench,17,9.3,prop,bench_suffix,,H23,Nicky Smith (P)
+2026,5,Wales,Archie Griffin,bench,18,8.7,prop,bench_suffix,,H24,Archie Griffin (P)
+2026,5,Wales,Adam Beard,bench,19,9.5,second_row,bench_suffix,,H25,Adam Beard (SR)
+2026,5,Wales,Olly Cracknell,bench,20,7.7,back_row,bench_suffix,,H26,Olly Cracknell (BR)
+2026,5,Wales,Kieran Hardy,bench,21,7.8,scrum_half,bench_suffix,,H27,Kieran Hardy (SH)
+2026,5,Wales,Jarrod Evans,bench,22,9.7,fly_half,bench_suffix,,H28,Jarrod Evans (FH)
+2026,5,Wales,Blair Murray,bench,23,10.4,back_three,bench_suffix,,H29,Blair Murray (BT)
+2026,5,Italy,Danilo Fischetti,starter,1,12.1,prop,starter_row,prop,J5,Danilo Fischetti
+2026,5,Italy,Giacomo Nicotera,starter,2,12.3,hooker,starter_row,hooker,J6,Giacomo Nicotera
+2026,5,Italy,Muhamed Hasa,starter,3,6.2,prop,starter_row,prop,J7,Muhamed Hasa
+2026,5,Italy,Niccolò Cannone,starter,4,11.1,second_row,starter_row,second_row,J8,Niccolò Cannone
+2026,5,Italy,Federico Ruzza,starter,5,11.0,second_row,starter_row,second_row,J9,Federico Ruzza
+2026,5,Italy,Michele Lamaro,starter,6,13.5,back_row,starter_row,back_row,J10,Michele Lamaro (C)
+2026,5,Italy,Manuel Zuliani,starter,7,13.1,back_row,starter_row,back_row,J11,Manuel Zuliani
+2026,5,Italy,Lorenzo Cannone,starter,8,15.2,back_row,starter_row,back_row,J12,Lorenzo Cannone
+2026,5,Italy,Alessandro Fusco,starter,9,9.6,scrum_half,starter_row,scrum_half,J14,Alessandro Fusco
+2026,5,Italy,Paolo Garbisi,starter,10,13.2,fly_half,starter_row,fly_half,J15,Paolo Garbisi
+2026,5,Italy,Monty Ioane,starter,11,12.5,back_three,starter_row,back_three,J16,Monty Ioane
+2026,5,Italy,Tommaso Menoncello,starter,12,16.6,centre,starter_row,centre,J17,Tommaso Menoncello
+2026,5,Italy,Nacho Brex,starter,13,10.9,centre,starter_row,centre,J18,Nacho Brex
+2026,5,Italy,Louis Lynagh,starter,14,11.2,back_three,starter_row,back_three,J19,Louis Lynagh
+2026,5,Italy,Lorenzo Pani,starter,15,9.1,back_three,starter_row,back_three,J20,Lorenzo Pani
+2026,5,Italy,Tommaso Di Bartolomeo,bench,16,8.8,hooker,bench_suffix,,J22,Tommaso Di Bartolomeo (H)
+2026,5,Italy,Mirco Spagnolo,bench,17,8.4,prop,bench_suffix,,J23,Mirco Spagnolo (P)
+2026,5,Italy,Giosuè Zilocchi,bench,18,7.0,prop,bench_suffix,,J24,Giosuè Zilocchi (P)
+2026,5,Italy,Riccardo Favretto,bench,19,7.0,second_row,bench_suffix,,J25,Riccardo Favretto (SR)
+2026,5,Italy,David Odiase,bench,20,6.9,back_row,bench_suffix,,J26,David Odiase (BR)
+2026,5,Italy,Stephen Varney,bench,21,7.6,scrum_half,bench_suffix,,J27,Stephen Varney (SH)
+2026,5,Italy,Leonardo Marin,bench,22,9.1,fly_half,bench_suffix,,J28,Leonardo Marin (FH)
+2026,5,Italy,Tommaso Allan,bench,23,10.4,fly_half,bench_suffix,,J29,Tommaso Allan (FH)
+2026,5,France,Jean-Baptiste Gros,starter,1,11.1,prop,starter_row,prop,L5,Jean-Baptiste Gros
+2026,5,France,Julien Marchand,starter,2,13.7,hooker,starter_row,hooker,L6,Julien Marchand
+2026,5,France,Dorian Aldegheri,starter,3,6.5,prop,starter_row,prop,L7,Dorian Aldegheri
+2026,5,France,Thibaud Flament,starter,4,10.6,second_row,starter_row,second_row,L8,Thibaud Flament
+2026,5,France,Emmanuel Meafou,starter,5,12.6,second_row,starter_row,second_row,L9,Emmanuel Meafou
+2026,5,France,François Cros,starter,6,12.8,back_row,starter_row,back_row,L10,François Cros
+2026,5,France,Temo Matiu,starter,7,6.6,back_row,starter_row,back_row,L11,Temo Matiu
+2026,5,France,Charles Ollivon,starter,8,13.2,back_row,starter_row,back_row,L12,Charles Ollivon
+2026,5,France,Antoine Dupont,starter,9,17.1,scrum_half,starter_row,scrum_half,L14,Antoine Dupont (C)
+2026,5,France,Matthieu Jalibert,starter,10,16.3,fly_half,starter_row,fly_half,L15,Matthieu Jalibert
+2026,5,France,Louis Bielle-Biarrey,starter,11,17.8,back_three,starter_row,back_three,L16,Louis Bielle-Biarrey
+2026,5,France,Yoram Moefana,starter,12,11.8,centre,starter_row,centre,L17,Yoram Moefana
+2026,5,France,Pierre-Louis Barassi,starter,13,9.9,centre,starter_row,centre,L18,Pierre-Louis Barassi
+2026,5,France,Théo Attissogbe,starter,14,13.0,back_three,starter_row,back_three,L19,Théo Attissogbe
+2026,5,France,Thomas Ramos,starter,15,19.1,back_three,starter_row,back_three,L20,Thomas Ramos
+2026,5,France,Peato Mauvaka,bench,16,11.9,hooker,bench_suffix,,L22,Peato Mauvaka (H)
+2026,5,France,Rodrigue Neti,bench,17,6.9,prop,bench_suffix,,L23,Rodrigue Neti (P)
+2026,5,France,Demba Bamba,bench,18,7.2,prop,bench_suffix,,L24,Demba Bamba (P)
+2026,5,France,Hugo Auradou,bench,19,7.6,second_row,bench_suffix,,L25,Hugo Auradou (SR)
+2026,5,France,Mickaël Guillard,bench,20,13.0,second_row,bench_suffix,,L26,Mickaël Guillard (SR)
+2026,5,France,Joshua Brennan,bench,21,7.6,second_row,bench_suffix,,L27,Joshua Brennan (SR)
+2026,5,France,Baptiste Serin,bench,22,9.2,scrum_half,bench_suffix,,L28,Baptiste Serin (SH)
+2026,5,France,Émilien Gailleton,bench,23,11.7,centre,bench_suffix,,L29,Émilien Gailleton (C)
+2026,5,England,Ellis Genge,starter,1,11.8,prop,starter_row,prop,N5,Ellis Genge
+2026,5,England,Jamie George,starter,2,11.5,hooker,starter_row,hooker,N6,Jamie George
+2026,5,England,Joe Heyes,starter,3,10.5,prop,starter_row,prop,N7,Joe Heyes
+2026,5,England,Maro Itoje,starter,4,13.1,second_row,starter_row,second_row,N8,Maro Itoje (C)
+2026,5,England,Alex Coles,starter,5,11.4,second_row,starter_row,second_row,N9,Alex Coles
+2026,5,England,Ollie Chessum,starter,6,12.2,second_row,inferred_from_other_rounds,back_row,N10,Ollie Chessum
+2026,5,England,Guy Pepper,starter,7,12.9,back_row,starter_row,back_row,N11,Guy Pepper
+2026,5,England,Ben Earl,starter,8,17.1,back_row,starter_row,back_row,N12,Ben Earl
+2026,5,England,Ben Spencer,starter,9,9.9,scrum_half,starter_row,scrum_half,N14,Ben Spencer
+2026,5,England,Fin Smith,starter,10,11.8,fly_half,starter_row,fly_half,N15,Fin Smith
+2026,5,England,Cadan Murley,starter,11,9.0,back_three,starter_row,back_three,N16,Cadan Murley
+2026,5,England,Seb Atkinson,starter,12,6.7,centre,starter_row,centre,N17,Seb Atkinson
+2026,5,England,Tommy Freeman,starter,13,14.6,back_three,inferred_from_other_rounds,centre,N18,Tommy Freeman
+2026,5,England,Tom Roebuck,starter,14,10.6,back_three,starter_row,back_three,N19,Tom Roebuck
+2026,5,England,Elliot Daly,starter,15,9.5,back_three,starter_row,back_three,N20,Elliot Daly
+2026,5,England,Luke Cowan-Dickie,bench,16,12.1,hooker,bench_suffix,,N22,Luke Cowan-Dickie (H)
+2026,5,England,Bevan Rodd,bench,17,8.6,prop,bench_suffix,,N23,Bevan Rodd (P)
+2026,5,England,Trevor Davison,bench,18,6.3,prop,bench_suffix,,N24,Trevor Davison (P)
+2026,5,England,Chandler Cunningham-South,bench,19,10.5,back_row,bench_suffix,,N25,Chandler Cunningham-South (BR)
+2026,5,England,Sam Underhill,bench,20,14.5,back_row,bench_suffix,,N26,Sam Underhill (BR)
+2026,5,England,Henry Pollock,bench,21,14.0,back_row,bench_suffix,,N27,Henry Pollock (BR)
+2026,5,England,Jack van Poortvliet,bench,22,9.3,scrum_half,bench_suffix,,N28,Jack van Poortvliet (SH)
+2026,5,England,Marcus Smith,bench,23,12.5,fly_half,bench_suffix,,N29,Marcus Smith (FH)

@@ -10,7 +10,7 @@ dependencies = [
     "pandas",
     "numpy",
     "pyarrow",
-    "pulp[cbc]",
+    "pulp>=3,<4",
 ]
 
 [project.optional-dependencies]

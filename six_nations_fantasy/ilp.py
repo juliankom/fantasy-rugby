@@ -1,7 +1,7 @@
 import sys
 import csv
 import pandas as pd
-from pulp import *
+from pulp import lpSum, LpVariable, LpProblem, LpMaximize
 
 def add_position_constraint(problem, df): 
 
@@ -27,7 +27,7 @@ def add_position_constraint(problem, df):
     
 def add_team_constraint(problem, df, max_per_team=4):
     for pos, group in df.groupby('team'):
-        problem += lpSum(group['selected_var']) <= max_per_team
+        problem += lpSum(group['selected_var']) + lpSum(group['supersub_var']) <= max_per_team
 
 def add_captaincy_constraint(problem, df):
     # at most one captain
