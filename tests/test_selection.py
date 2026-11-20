@@ -7,7 +7,7 @@ from math import log
 from pathlib import Path
 
 import pandas as pd
-from pulp import COIN_CMD, LpStatus, LpStatusOptimal, PULP_CBC_CMD, value
+from pulp import COIN_CMD, LpStatus, LpStatusInfeasible, LpStatusOptimal, PULP_CBC_CMD, value
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
@@ -114,10 +114,16 @@ def round_candidates(round_number, roster, fixtures, players):
     return candidates
 
 
+class InfeasibleSquadError(RuntimeError):
+    """The candidate pool cannot fill a legal squad."""
+
+
 def select_squad(candidates, objective, solver):
     pool = candidates.assign(score=candidates[objective])
     problem = setup_problem(pool)
     status = problem.solve(solver)
+    if status == LpStatusInfeasible:
+        raise InfeasibleSquadError("No feasible squad")
     if status != LpStatusOptimal:
         raise RuntimeError(f"Squad optimization failed: {LpStatus[status]}")
 
@@ -132,6 +138,28 @@ def select_squad(candidates, objective, solver):
     squad["actual_total"] = squad["actual"] * multiplier
     squad["objective_total"] = squad[objective] * multiplier
     return squad
+
+
+def single_player_exclusions(candidates, optimal_squad, solver):
+    optimal_score = optimal_squad["actual_total"].sum()
+    results = []
+    for player in optimal_squad.itertuples():
+        remaining = candidates.loc[candidates["player_id"] != player.player_id]
+        try:
+            alternative = select_squad(remaining, "actual", solver)
+        except InfeasibleSquadError:
+            score = float("nan")
+        else:
+            score = alternative["actual_total"].sum()
+
+        results.append({
+            "excluded": player.name,
+            "team": player.team,
+            "best_score": score,
+            "points_lost": optimal_score - score,
+        })
+    return pd.DataFrame(results).sort_values("points_lost", ascending=False, kind="stable")
+
 
 def print_squad(squad):
     pos_order = (['Prop', 'Hooker', 'Prop'] 
@@ -234,6 +262,10 @@ def main():
             print(f"{label}: cost {squad['cost'].sum():.1f}, "
                   f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
             print_squad(squad)
+            if objective == "actual":
+                print("\nHindsight score after each single-player exclusion")
+                exclusions = single_player_exclusions(candidates, squad, solver)
+                print(exclusions.to_string(index=False, na_rep="infeasible"))
 
         tournament_result.append(round_results)
 
