@@ -58,5 +58,5 @@ class MeanScores:
 
             # Use the player's history in this role unless they don't have one, in which case 
             # use the adjusted prediction or fall back to the global mean for the role
-            predicted = same_role.fillna(adjusted).fillna(pooled)
+            predicted = same_role.fillna(adjusted).fillna(pooled).fillna(predicted)
         return predicted.rename("predicted")
