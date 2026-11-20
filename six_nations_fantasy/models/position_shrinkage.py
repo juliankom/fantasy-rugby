@@ -31,13 +31,18 @@ def _positions(frame, roles):
 
 
 class PositionShrinkageMean:
-    """Blend the role-aware historical estimate with a training-set position mean."""
+    """Blend the role-aware historical estimate with a training-set position mean.
+
+    The parameter k adjusts how strongly a players predicted performance should be 
+    moved towards the mean. The higher k is, the more appearances a player needs to
+    make for the model to trust the player mean. If k is zero, then this just
+    returns the historical means.
+    """
 
     def __init__(self, *, scorer: Callable[[pd.DataFrame], pd.Series], k: float = 5.0):
         if not isfinite(k) or k < 0:
             raise ValueError("k must be finite and non-negative")
         self.scorer = scorer
-        # Five pseudo-appearances is an experiment default, not a fitted value.
         self.k = k
 
     def fit(self, history: RugbyDataset) -> None:
@@ -65,7 +70,10 @@ class PositionShrinkageMean:
             return baseline
 
         players = fixtures["player_id"]
+        # appearances per player in ANY position and role
         counts = players.map(self._counts)
+
+        # this is what we shrink towards: the global mean for that position and role
         target = _positions(fixtures, roles).map(self._targets)
         if roles is not None and self._role_counts is not None:
             keys = pd.MultiIndex.from_arrays([players, roles])
@@ -73,9 +81,11 @@ class PositionShrinkageMean:
             # The baseline transfers opposite-role history when same-role history
             # is absent. Give each transferred appearance full weight for now.
             counts = pd.Series(same_role, index=fixtures.index).fillna(counts)
+            # if we don't know about the players number in the fixture, fall back
+            # to role (starter or substitute) mean
             target = target.fillna(roles.map(self._means.role_means))
 
-        # Missing position falls back to role, then the overall training mean.
+        # only happens if we didn't have the role: fallback to global mean.
         target = target.fillna(self._means.global_mean)
         counts = counts.fillna(0)
         weight = counts / (counts + self.k)
