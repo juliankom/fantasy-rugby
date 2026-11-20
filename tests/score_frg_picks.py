@@ -65,6 +65,7 @@ def main():
         tournament = load_dataset(args.data_dir).filter_competitions(["Six Nations"])
         players = pd.read_parquet(args.data_dir / "players.parquet")
     keys = ["team", "name_key"]
+    scores={}
     for number, tips in picks.groupby("round"):
         pool = roster.loc[roster["round"] == number]
         if args.data_dir:
@@ -81,11 +82,14 @@ def main():
         if squad.actual.isna().any():
             raise ValueError(f"Round {number}: missing scores for selected players")
         squad["points"] = squad.actual * squad.multiplier
-        print(f"\nRound {number} recommendations (base points)")
-        print(tips[["section", "source_name", "actual"]].to_string(index=False, na_rep="unavailable"))
-        print(f"Reconstructed squad: {squad.points.sum():g} points")
-        print(squad[["name", "team", "nominal_pos", "actual", "multiplier", "points"]].to_string(index=False))
-
+        #print(f"\nRound {number} recommendations (base points)")
+        #print(tips[["section", "source_name", "actual"]].to_string(index=False, na_rep="unavailable"))
+        print(f"Round {number} squad: {squad.points.sum():g} points")
+        scores[number] = squad.points.sum()
+        #print(squad[["name", "team", "nominal_pos", "actual", "multiplier", "points"]].to_string(index=False))
+    frg_estimated_scores = pd.DataFrame(scores.values(), columns=["score"])
+    frg_estimated_scores["round_number"] = list(range(1, 6))
+    frg_estimated_scores.to_parquet(HERE / "frg_estimated_scores.parquet")
 
 if __name__ == "__main__":
     main()

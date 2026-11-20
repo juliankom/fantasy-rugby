@@ -274,7 +274,14 @@ def main():
     for label, total in totals.items():
         print(f"{label}: {total:.1f} ({(total / tournament_optimal)*100:.1f}%)")
 
-    print(pd.DataFrame(tournament_result))
+    result = pd.DataFrame(tournament_result)
+    try:
+        frg = pd.read_parquet(Path(__file__).resolve().parent / "frg_estimated_scores.parquet")
+        result["FRG score"] = frg["score"]
+    except:
+        pass
 
+    result.loc["total"] = result.sum(axis=0)
+    print(result)
 if __name__ == "__main__":
     main()
