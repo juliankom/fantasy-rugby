@@ -56,6 +56,8 @@ def _context(dataset: RugbyDataset) -> pd.DataFrame:
     if context.duplicated(["match_id", "player_id"]).any():
         raise ValueError("performances: duplicate player_id within a match")
     context = context.loc[:, list(CONTEXT_COLUMNS)]
+    if "number" in dataset.performances:
+        context["number"] = dataset.performances["number"].to_numpy()
     roles = substitute_status(dataset.performances)
     if roles is not None:
         context["is_substitute"] = roles.array
@@ -76,7 +78,7 @@ def evaluate_holdout(
     calculate scores from that history if its approach needs them.
 
     predict() receives match_id, player_id, date and, when available,
-    is_substitute from the recorded lineup for each evaluation appearance.
+    number and is_substitute from the recorded lineup for each evaluation appearance.
     Holdout outcomes are scored by the evaluator only after
     prediction; they are never passed into fit() or predict().
 

@@ -11,7 +11,7 @@ from pulp import COIN_CMD, LpStatus, LpStatusOptimal, PULP_CBC_CMD, value
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
-from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
+from six_nations_fantasy.models import HistoricalMean, PositionShrinkageMean, RecencyWeightedMean
 from six_nations_fantasy.score import score_performances, simple_score
 
 
@@ -170,6 +170,8 @@ def main():
         "roster", nargs="?", type=Path,
         default=Path(__file__).with_name("six_nations_2026_fantasy_prices.csv"),
     )
+    parser.add_argument("--k", type=float, nargs="+", default=[5.0],
+                        help="Shrinkage pseudo-appearances; compare several values in one run")
     args = parser.parse_args()
     roster = read_matchday_csv(args.roster)
     data_dir = Path(__file__).resolve().parents[1] / "data" / "rebuild"
@@ -185,6 +187,8 @@ def main():
             scorer=simple_score, half_life_days=7 * log(0.5) / log(0.85)
         ),
     }
+    for k in args.k:
+        models[f"Position shrinkage (k={k:g})"] = PositionShrinkageMean(scorer=simple_score, k=k)
     solver = COIN_CMD(msg=False)
     if not solver.available():
         solver = PULP_CBC_CMD(msg=False)
@@ -213,7 +217,7 @@ def main():
         objectives = {"Best calculated score": "actual"}
         prediction_fixtures = candidates[
             ["match_id", "player_id", "date", "team", "shirt_number"]
-        ].assign(is_substitute=candidates["is_sub"])
+        ].rename(columns={"shirt_number": "number"}).assign(is_substitute=candidates["is_sub"])
         for label, model in models.items():
             model.fit(training)
             candidates[label] = model.predict(prediction_fixtures.copy())

@@ -5,7 +5,7 @@ import pytest
 
 from six_nations_fantasy.data import RugbyDataset, temporal_split
 from six_nations_fantasy.evaluation import evaluate_holdout
-from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
+from six_nations_fantasy.models import HistoricalMean, PositionShrinkageMean, RecencyWeightedMean
 
 
 def fake_score(row):
@@ -320,8 +320,39 @@ def test_holdout_predict_receives_lineup_roles_from_shirt_numbers(dataset):
             pass
 
         def predict(self, fixtures):
-            assert set(fixtures.columns) == {"match_id", "player_id", "date", "is_substitute"}
+            assert set(fixtures.columns) == {"match_id", "player_id", "date", "is_substitute", "number"}
+            assert fixtures["number"].tolist() == [16, 15]
             assert fixtures["is_substitute"].tolist() == [True, False]
             return pd.Series(0.0, index=fixtures.index)
 
     evaluate_holdout(Spy(), split.train, split.validation, scorer=fake_score)
+
+
+def test_position_shrinkage_uses_announced_shirt_and_role_history():
+    history = RugbyDataset(
+        pd.DataFrame({"match_id": [1], "date": ["2025-01-01"]}),
+        pd.DataFrame({
+            "match_id": [1] * 5,
+            "player_id": [1, 2, 3, 4, 5],
+            "number": [1, 3, 10, 16, 22],
+            "points": [10, 30, 50, 8, 4],
+        }),
+    )
+    fixtures = pd.DataFrame({
+        "player_id": [1, 6, 6, 6, 3],
+        "number": [3, 1, 10, 23, 23],
+        "is_substitute": [False, False, False, True, True],
+    }, index=[9, 7, 4, 6, 1])
+    model = PositionShrinkageMean(scorer=fake_score, k=2)
+    model.fit(history)
+    predicted = model.predict(fixtures)
+    assert predicted.index.equals(fixtures.index)
+    # Prop pool = 20, fly-half = 50, bench = 6. Player 3's transferred
+    # bench estimate is 50 + (6 - 30) before shrinkage.
+    assert predicted.tolist() == pytest.approx([50 / 3, 20, 50, 6, 38 / 3])
+
+    model = PositionShrinkageMean(scorer=fake_score, k=0)
+    baseline = HistoricalMean(scorer=fake_score)
+    model.fit(history)
+    baseline.fit(history)
+    pd.testing.assert_series_equal(model.predict(fixtures), baseline.predict(fixtures))
