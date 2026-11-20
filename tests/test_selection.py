@@ -200,6 +200,8 @@ def main():
     )
     parser.add_argument("--k", type=float, nargs="+", default=[5.0],
                         help="Shrinkage pseudo-appearances; compare several values in one run")
+    parser.add_argument("--single-player-drops", action="store_true",
+                        help="Reoptimize the hindsight squad after excluding each member")
     args = parser.parse_args()
     roster = read_matchday_csv(args.roster)
     data_dir = Path(__file__).resolve().parents[1] / "data" / "rebuild"
@@ -262,7 +264,7 @@ def main():
             print(f"{label}: cost {squad['cost'].sum():.1f}, "
                   f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
             print_squad(squad)
-            if objective == "actual":
+            if args.single_player_drops and objective == "actual":
                 print("\nHindsight score after each single-player exclusion")
                 exclusions = single_player_exclusions(candidates, squad, solver)
                 print(exclusions.to_string(index=False, na_rep="infeasible"))
@@ -276,9 +278,9 @@ def main():
 
     result = pd.DataFrame(tournament_result)
     try:
-        frg = pd.read_parquet(Path(__file__).resolve().parent / "frg_estimated_scores.parquet")
+        frg = pd.read_parquet(Path(__file__).resolve().parent / "frg_simple_scores.parquet")
         result["FRG score"] = frg["score"]
-    except:
+    except FileNotFoundError:
         pass
 
     result.loc["total"] = result.sum(axis=0)
