@@ -7,7 +7,7 @@ from math import log
 from pathlib import Path
 
 import pandas as pd
-from pulp import COIN_CMD, LpStatus, LpStatusOptimal, PULP_CBC_CMD, value
+from pulp import COIN_CMD, LpStatus, LpStatusInfeasible, LpStatusOptimal, PULP_CBC_CMD, value
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
@@ -114,10 +114,16 @@ def round_candidates(round_number, roster, fixtures, players):
     return candidates
 
 
+class InfeasibleSquadError(RuntimeError):
+    """The candidate pool cannot fill a legal squad."""
+
+
 def select_squad(candidates, objective, solver):
     pool = candidates.assign(score=candidates[objective])
     problem = setup_problem(pool)
     status = problem.solve(solver)
+    if status == LpStatusInfeasible:
+        raise InfeasibleSquadError("No feasible squad")
     if status != LpStatusOptimal:
         raise RuntimeError(f"Squad optimization failed: {LpStatus[status]}")
 
@@ -132,6 +138,28 @@ def select_squad(candidates, objective, solver):
     squad["actual_total"] = squad["actual"] * multiplier
     squad["objective_total"] = squad[objective] * multiplier
     return squad
+
+
+def single_player_exclusions(candidates, optimal_squad, solver):
+    optimal_score = optimal_squad["actual_total"].sum()
+    results = []
+    for player in optimal_squad.itertuples():
+        remaining = candidates.loc[candidates["player_id"] != player.player_id]
+        try:
+            alternative = select_squad(remaining, "actual", solver)
+        except InfeasibleSquadError:
+            score = float("nan")
+        else:
+            score = alternative["actual_total"].sum()
+
+        results.append({
+            "excluded": player.name,
+            "team": player.team,
+            "best_score": score,
+            "points_lost": optimal_score - score,
+        })
+    return pd.DataFrame(results).sort_values("points_lost", ascending=False, kind="stable")
+
 
 def print_squad(squad):
     pos_order = (['Prop', 'Hooker', 'Prop'] 
@@ -172,6 +200,8 @@ def main():
     )
     parser.add_argument("--k", type=float, nargs="+", default=[5.0],
                         help="Shrinkage pseudo-appearances; compare several values in one run")
+    parser.add_argument("--single-player-drops", action="store_true",
+                        help="Reoptimize the hindsight squad after excluding each member")
     args = parser.parse_args()
     roster = read_matchday_csv(args.roster)
     data_dir = Path(__file__).resolve().parents[1] / "data" / "rebuild"
@@ -234,6 +264,10 @@ def main():
             print(f"{label}: cost {squad['cost'].sum():.1f}, "
                   f"objective {squad['objective_total'].sum():.1f}, calculated actual {actual:.1f}")
             print_squad(squad)
+            if args.single_player_drops and objective == "actual":
+                print("\nHindsight score after each single-player exclusion")
+                exclusions = single_player_exclusions(candidates, squad, solver)
+                print(exclusions.to_string(index=False, na_rep="infeasible"))
 
         tournament_result.append(round_results)
 
@@ -242,7 +276,14 @@ def main():
     for label, total in totals.items():
         print(f"{label}: {total:.1f} ({(total / tournament_optimal)*100:.1f}%)")
 
-    print(pd.DataFrame(tournament_result))
+    result = pd.DataFrame(tournament_result)
+    try:
+        frg = pd.read_parquet(Path(__file__).resolve().parent / "frg_simple_scores.parquet")
+        result["FRG score"] = frg["score"]
+    except FileNotFoundError:
+        pass
 
+    result.loc["total"] = result.sum(axis=0)
+    print(result)
 if __name__ == "__main__":
     main()
