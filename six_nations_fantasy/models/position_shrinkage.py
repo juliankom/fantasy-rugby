@@ -45,6 +45,11 @@ class PositionShrinkageMean:
         self.scorer = scorer
         self.k = k
 
+    def baselines(self, fixtures) -> pd.Series:
+        roles = substitute_status(fixtures)
+
+        return _positions(fixtures, roles).map(self._targets)
+
     def fit(self, history: RugbyDataset) -> None:
         rows = history.performances
         if rows.empty:
