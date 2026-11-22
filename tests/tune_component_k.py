@@ -3,19 +3,26 @@
 import argparse
 from pathlib import Path
 
+import pandas as pd
+
 from six_nations_fantasy.data import load_dataset
+from six_nations_fantasy.data.fantasy_fixtures import fixture_path, tournament_rounds
 from six_nations_fantasy.data.load import DATA_DIR
-from six_nations_fantasy.evaluation.selection import evaluation_rounds, training_before_round
+from six_nations_fantasy.evaluation.selection import prediction_lineup, scored_player_fixtures
 from six_nations_fantasy.models import ComponentShrinkageMean
 from six_nations_fantasy.score import SCORE_COMPONENTS
 
 
 def validation_folds(dataset, years, directory):
     for year in years:
-        rounds = evaluation_rounds(dataset, year, directory, require_prices=False)
-        for _, round_start, fixtures, actual, _ in rounds:
-            yield training_before_round(dataset, round_start), fixtures, actual
-
+        path = fixture_path(directory, year)
+        roster = pd.read_parquet(path) if path.exists() else None
+        for round_number, schedule in tournament_rounds(dataset.matches, year):
+            round_matches = dataset.select_matches(schedule["match_id"])
+            fixtures = scored_player_fixtures(round_matches, round_number, roster)
+            if not fixtures.empty:
+                training = dataset.matches_before(schedule["date"].min())
+                yield training, prediction_lineup(fixtures), fixtures["actual"]
 
 
 def total_mse(folds, k, overrides):

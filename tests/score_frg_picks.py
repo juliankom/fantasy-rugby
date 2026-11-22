@@ -21,10 +21,10 @@ SUB = "Supersub Strategy"
 SECONDARY = {"Bargain buys on the Official game", "Round 5 Differentials"}
 
 
-def reconstruct(pool, picks):
+def reconstruct(scored_fixtures, picks):
     # Only published options can occupy their respective roles. Prefer positional
     # recommendations to other tips, then earlier entries in each printed list.
-    candidates = pool.dropna(subset=["cost"]).assign(score=0)
+    candidates = scored_fixtures.dropna(subset=["cost"]).assign(score=0)
     problem = setup_problem(candidates)
     terms = []
     by_player = picks.groupby(["team", "name_key"])
@@ -64,16 +64,16 @@ def main():
     picks = add_name_keys(pd.read_csv(HERE / "frg_picks_2026.csv"))
     tournament = load_dataset(args.data_dir).filter_competitions(["Six Nations"])
     scores = []
-    for number, tips in picks.groupby("round"):
-        entries = roster.loc[roster["round"].eq(number)]
-        pool = with_actual_scores(entries, tournament.select_matches(entries["match_id"]))
-        squad = reconstruct(pool, tips)
+    for round_number, tips in picks.groupby("round"):
+        entries = roster.loc[roster["round"].eq(round_number)]
+        scored_fixtures = with_actual_scores(entries, tournament.select_matches(entries["match_id"]))
+        squad = reconstruct(scored_fixtures, tips)
         if squad.actual.isna().any():
-            raise ValueError(f"Round {number}: missing scores for selected players")
+            raise ValueError(f"Round {round_number}: missing scores for selected players")
         squad["points"] = squad.actual * squad.multiplier
         score = squad.points.sum()
-        print(f"Round {number} squad: {score:g} points")
-        scores.append({"round_number": number, "score": score})
+        print(f"Round {round_number} squad: {score:g} points")
+        scores.append({"round_number": round_number, "score": score})
     pd.DataFrame(scores).to_parquet(HERE / "frg_simple_scores.parquet", index=False)
 
 

@@ -15,14 +15,14 @@ from six_nations_fantasy.data.fantasy_fixtures import fixture_path, with_actual_
 from six_nations_fantasy.evaluation.squads import select_squad, squad_solver
 
 
-def sample_scores(pool, count, rng):
+def sample_scores(scored_fixtures, count, rng):
     """Independent draws with replacement over legal XV, captain and supersub choices."""
-    costs = pool["cost"].tolist()
-    teams = pool["team"].tolist()
-    scores = pool["actual"].tolist()
-    bench = pool["is_sub"].to_numpy()
+    costs = scored_fixtures["cost"].tolist()
+    teams = scored_fixtures["team"].tolist()
+    scores = scored_fixtures["actual"].tolist()
+    bench = scored_fixtures["is_sub"].to_numpy()
     substitutes = [index for index, is_sub in enumerate(bench) if is_sub]
-    position_values = pool["nominal_pos"].to_numpy()
+    position_values = scored_fixtures["nominal_pos"].to_numpy()
     groups = {}
     for index, position in enumerate(position_values):
         if not bench[index]:
@@ -44,9 +44,9 @@ def sample_scores(pool, count, rng):
     return accepted
 
 
-def check_sampling_feasibility(pool, solver, round_number):
+def check_sampling_feasibility(scored_fixtures, solver, round_number):
     # A feasible unrestricted optimum does not guarantee a feasible restricted draw.
-    candidates = pool.assign(score=0)
+    candidates = scored_fixtures.assign(score=0)
     problem = setup_problem(candidates)
     for player in candidates.itertuples():
         if player.is_sub:
@@ -74,14 +74,14 @@ def main():
     solver = squad_solver()
     rng = Random(args.seed)
     rounds = []
-    for number, entries in roster.groupby("round"):
-        pool = with_actual_scores(entries, dataset.select_matches(entries["match_id"])).dropna(subset=["cost"])
-        check_sampling_feasibility(pool, solver, number)
+    for round_number, entries in roster.groupby("round"):
+        scored_fixtures = with_actual_scores(entries, dataset.select_matches(entries["match_id"])).dropna(subset=["cost"])
+        check_sampling_feasibility(scored_fixtures, solver, round_number)
         # Keep thresholds relative to the unrestricted backtest optimum.
-        optimum = select_squad(pool, "actual", solver)["actual_total"].sum()
-        scores = pd.Series(sample_scores(pool, args.samples, rng))
-        rounds.append(pd.DataFrame({"round": number, "score": scores, "optimum": optimum}))
-        print(f"Round {number} (optimum {optimum:g}, {len(scores)} sampled squads)")
+        optimum = select_squad(scored_fixtures, "actual", solver)["actual_total"].sum()
+        scores = pd.Series(sample_scores(scored_fixtures, args.samples, rng))
+        rounds.append(pd.DataFrame({"round": round_number, "score": scores, "optimum": optimum}))
+        print(f"Round {round_number} (optimum {optimum:g}, {len(scores)} sampled squads)")
         for threshold in (0.6, 0.7, 0.8):
             hits = scores.ge(threshold * optimum).sum()
             print(f"  Reached {threshold:.0%}: {hits}/{len(scores)} ({hits / len(scores):.2%})")

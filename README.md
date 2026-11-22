@@ -74,9 +74,10 @@ mean and recency-weighted mean on the 2026 Six Nations. The runner loads
 ### Validate and test squad selection
 
 From an editable install, run validation first. The default validation year is
-2025. Before each round, refit each model on all Six Nations matches played
-before the round's opening fixture. For example, training for 2026 round 2
-includes every earlier edition and 2026 round 1. Keep the hyperparameters
+2025. Before each round, refit each model on every available match from every competition
+dated before the round's opening fixture. For example, training for 2026 round 2
+includes earlier seasons, round 1, and any club matches played before round 2.
+Only the evaluated fixtures are restricted to that year's Six Nations. Keep the hyperparameters
 chosen on validation fixed throughout the test tournament. Compare model definitions in `tests/test_selection.py`.
 
 ```bash

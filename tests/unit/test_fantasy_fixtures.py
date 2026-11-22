@@ -3,8 +3,8 @@ import pytest
 
 from scripts.prepare_fixtures import prepare_fixtures
 from six_nations_fantasy.data import RugbyDataset
-from six_nations_fantasy.data.fantasy_fixtures import fixture_path
-from six_nations_fantasy.evaluation.selection import evaluation_rounds, summarize, training_before_round
+from six_nations_fantasy.data.fantasy_fixtures import tournament_rounds
+from six_nations_fantasy.evaluation.selection import prediction_lineup, scored_player_fixtures, summarize
 from six_nations_fantasy.score import SCORE_COMPONENTS
 
 
@@ -26,15 +26,17 @@ def test_partial_sheet_preserves_announced_withdrawal(tmp_path):
         "shirt_number": [1, 17],
     }).to_csv(csv, index=False)
     roster = prepare_fixtures(csv, 2025, dataset, players)
-    roster.to_parquet(fixture_path(tmp_path, 2025))
-    (number, round_start, fixtures, actual, pool), = evaluation_rounds(dataset, 2025, tmp_path, require_prices=True)
-    assert training_before_round(dataset, round_start).matches.match_id.tolist() == [0]
-    assert number == 2
+    rounds = dict(tournament_rounds(dataset.matches, 2025))
+    first_round = dataset.select_matches(rounds[1]["match_id"])
+    assert scored_player_fixtures(first_round, 1, roster).empty
+    second_round = dataset.select_matches(rounds[2]["match_id"])
+    scored = scored_player_fixtures(second_round, 2, roster)
+    fixtures = prediction_lineup(scored)
     assert fixtures.player_id.tolist() == [8, 9]
     assert fixtures.match_id.tolist() == [1, 1]
     assert fixtures.is_substitute.tolist() == [False, True]
     assert "actual" not in fixtures
-    assert actual.tolist() == pool.actual.tolist() == [3, 0]
+    assert scored.actual.tolist() == [3, 0]
 
 
 def test_season_metrics_weight_players_and_rounds_correctly():
@@ -47,11 +49,11 @@ def test_season_metrics_weight_players_and_rounds_correctly():
 
 
 @pytest.mark.parametrize(("round_start", "training_ids"), [
-    ("2025-02-01", [1, 2]),
-    ("2025-03-15", [1, 2, 4]),
-    ("2026-02-01", [1, 2, 4, 5]),
+    ("2025-02-01", [1, 2, 3]),
+    ("2025-03-15", [1, 2, 3, 4]),
+    ("2026-02-01", [1, 2, 3, 4, 5]),
 ])
-def test_training_expands_with_completed_six_nations_matches(round_start, training_ids):
+def test_training_expands_with_completed_matches_from_all_competitions(round_start, training_ids):
     matches = pd.DataFrame({
         "match_id": range(1, 7),
         "date": pd.to_datetime(["2020-02-01", "2024-02-01", "2024-12-20",
@@ -60,5 +62,5 @@ def test_training_expands_with_completed_six_nations_matches(round_start, traini
                         "Six Nations", "Six Nations", "Six Nations"],
     })
     dataset = RugbyDataset(matches, matches[["match_id"]])
-    training = training_before_round(dataset, pd.Timestamp(round_start))
+    training = dataset.matches_before(pd.Timestamp(round_start))
     assert training.performances.match_id.tolist() == training_ids

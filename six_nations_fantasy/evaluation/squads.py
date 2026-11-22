@@ -12,21 +12,21 @@ def squad_solver():
 
 
 class InfeasibleSquadError(RuntimeError):
-    """The candidate pool cannot fill a legal squad."""
+    """The available players cannot fill a legal squad."""
 
 
 def select_squad(candidates, objective, solver):
-    pool = candidates.assign(score=candidates[objective])
-    problem = setup_problem(pool)
+    candidates = candidates.assign(score=candidates[objective])
+    problem = setup_problem(candidates)
     status = problem.solve(solver)
     if status == LpStatusInfeasible:
         raise InfeasibleSquadError("No feasible squad")
     if status != LpStatusOptimal:
         raise RuntimeError(f"Squad optimization failed: {LpStatus[status]}")
 
-    selected = pool["selected_var"].map(value).eq(1)
-    supersub = pool["supersub_var"].map(value).eq(1)
-    squad = pool.loc[selected | supersub].copy()
+    selected = candidates["selected_var"].map(value).eq(1)
+    supersub = candidates["supersub_var"].map(value).eq(1)
+    squad = candidates.loc[selected | supersub].copy()
     squad["captain"] = squad["captain_var"].map(value).eq(1)
     squad["supersub"] = supersub.loc[squad.index]
     multiplier = (1.0 + squad["captain"].astype(float)).where(

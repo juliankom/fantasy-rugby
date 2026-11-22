@@ -2,37 +2,26 @@
 
 import pandas as pd
 
-from six_nations_fantasy.data.fantasy_fixtures import fixture_path, tournament_rounds, with_actual_scores
+from six_nations_fantasy.data.fantasy_fixtures import with_actual_scores
 from six_nations_fantasy.evaluation.pipeline import recorded_lineup
 from six_nations_fantasy.score import score_performances, simple_score
 
 
-def training_before_round(dataset, round_start):
-    """All Six Nations matches played strictly before the round's opening fixture."""
-    matches = dataset.matches
-    eligible = matches["competition"].eq("Six Nations") & (matches["date"] < round_start)
-    return dataset.select_matches(matches.loc[eligible, "match_id"])
+def scored_player_fixtures(round_matches, round_number, fantasy_roster):
+    """Attach realized points to each announced player, or use the recorded lineup."""
+    if fantasy_roster is None:
+        lineup = recorded_lineup(round_matches)
+        actual = score_performances(round_matches.performances, simple_score)
+        return lineup.assign(actual=actual.to_numpy())
+
+    entries = fantasy_roster.loc[fantasy_roster["round"].eq(round_number)]
+    return with_actual_scores(entries, round_matches)
 
 
-def evaluation_rounds(dataset, year, directory, *, require_prices):
-    path = fixture_path(directory, year)
-    roster = pd.read_parquet(path) if require_prices or path.exists() else None
-    for number, scheduled in tournament_rounds(dataset.matches, year):
-        holdout = dataset.select_matches(scheduled["match_id"])
-        if roster is None:
-            fixtures = recorded_lineup(holdout)
-            actual = score_performances(holdout.performances, simple_score)
-            pool = None
-        else:
-            entries = roster.loc[roster["round"].eq(number)]
-            if entries.empty:  # Historical workbooks may cover only some rounds.
-                continue
-            pool = with_actual_scores(entries, holdout)
-            fixtures = pool[["match_id", "player_id", "date", "team", "shirt_number", "is_sub"]].rename(
-                columns={"shirt_number": "number", "is_sub": "is_substitute"}
-            )
-            actual = pool["actual"]
-        yield number, scheduled["date"].min(), fixtures, actual.to_numpy(), pool
+def prediction_lineup(scored_fixtures):
+    """Pass only player identity and pre-match lineup information to predict()."""
+    lineup = scored_fixtures.rename(columns={"shirt_number": "number", "is_sub": "is_substitute"})
+    return lineup.filter(items=["match_id", "player_id", "date", "team", "number", "is_substitute"])
 
 
 def summarize(rounds):
