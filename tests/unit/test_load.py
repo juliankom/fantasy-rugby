@@ -34,22 +34,22 @@ def test_loader_reads_both_tables(tmp_path, monkeypatch):
 def test_default_directory_is_source_checkout_data_directory():
     from six_nations_fantasy.data import load as load_module
 
-    assert load_module._DEFAULT_DATA_DIRECTORY == (
-        Path(load_module.__file__).resolve().parents[2] / "data" / "processed"
+    assert load_module.DATA_DIR == (
+        Path(load_module.__file__).resolve().parents[2] / "data" / "rebuild"
     )
 
 
 def test_default_directory_is_independent_of_working_directory(tmp_path, monkeypatch):
     from six_nations_fantasy.data import load as load_module
 
-    processed = tmp_path / "data" / "processed"
+    processed = tmp_path / "data" / "rebuild"
     processed.mkdir(parents=True)
     (processed / "matches.parquet").touch()
     (processed / "player_performances.parquet").touch()
     other_directory = tmp_path / "elsewhere"
     other_directory.mkdir()
 
-    monkeypatch.setattr(load_module, "_DEFAULT_DATA_DIRECTORY", processed)
+    monkeypatch.setattr(load_module, "DATA_DIR", processed)
     monkeypatch.chdir(other_directory)
 
     matches = pd.DataFrame({"match_id": [1], "date": [date(2025, 1, 1)]})

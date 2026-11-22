@@ -7,7 +7,7 @@ import pandas as pd
 from .dataset import RugbyDataset
 
 
-_DEFAULT_DATA_DIRECTORY = Path(__file__).resolve().parents[2] / "data" / "rebuild"
+DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "rebuild"
 
 
 # Competition IDs assigned by notebooks/scraping/rugbypass_urls.ipynb.
@@ -30,7 +30,7 @@ def load_dataset(directory: str | Path | None = None) -> RugbyDataset:
 
     Both files are required; other Parquet files are left untouched.
     """
-    path = _DEFAULT_DATA_DIRECTORY if directory is None else Path(directory)
+    path = DATA_DIR if directory is None else Path(directory)
     paths = [path / "matches.parquet", path / "player_performances.parquet"]
     missing = [str(file) for file in paths if not file.is_file()]
     if missing:

@@ -1,4 +1,4 @@
-"""Rolling round evaluation on announced rosters or recorded lineups."""
+"""Tournament evaluation on announced rosters or recorded lineups."""
 
 import pandas as pd
 
@@ -7,11 +7,17 @@ from six_nations_fantasy.evaluation.pipeline import recorded_lineup
 from six_nations_fantasy.score import score_performances, simple_score
 
 
-def rolling_rounds(dataset, year, directory, *, require_prices):
+def training_before_round(dataset, round_start):
+    """All Six Nations matches played strictly before the round's opening fixture."""
+    matches = dataset.matches
+    eligible = matches["competition"].eq("Six Nations") & (matches["date"] < round_start)
+    return dataset.select_matches(matches.loc[eligible, "match_id"])
+
+
+def evaluation_rounds(dataset, year, directory, *, require_prices):
     path = fixture_path(directory, year)
     roster = pd.read_parquet(path) if require_prices or path.exists() else None
-    matches = dataset.matches
-    for number, scheduled in tournament_rounds(matches, year):
+    for number, scheduled in tournament_rounds(dataset.matches, year):
         holdout = dataset.select_matches(scheduled["match_id"])
         if roster is None:
             fixtures = recorded_lineup(holdout)
@@ -26,9 +32,7 @@ def rolling_rounds(dataset, year, directory, *, require_prices):
                 columns={"shirt_number": "number", "is_sub": "is_substitute"}
             )
             actual = pool["actual"]
-        cutoff = scheduled["date"].min()
-        history = dataset.select_matches(matches.loc[matches["date"] < cutoff, "match_id"])
-        yield number, history, fixtures, actual.to_numpy(), pool
+        yield number, scheduled["date"].min(), fixtures, actual.to_numpy(), pool
 
 
 def summarize(rounds):

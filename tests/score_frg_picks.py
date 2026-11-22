@@ -11,7 +11,9 @@ from pulp import LpStatus, LpStatusOptimal, PULP_CBC_CMD, lpSum, value
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
-from test_selection import ROUND_STARTS, add_name_keys, read_matchday_csv, round_candidates
+from six_nations_fantasy.data.load import DATA_DIR
+from six_nations_fantasy.data.fantasy_fixtures import fixture_path, with_actual_scores
+from six_nations_fantasy.data.roster_names import add_name_keys
 
 HERE = Path(__file__).resolve().parent
 CAPTAIN = "Recommended Captain Picks"
@@ -55,20 +57,16 @@ def reconstruct(pool, picks):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path,
-                        default=HERE.parent / "data" / "rebuild",
+                        default=DATA_DIR,
                         help="Directory containing match Parquets for project scoring")
     args = parser.parse_args()
-    roster = read_matchday_csv(HERE / "six_nations_2026_fantasy_prices.csv")
+    roster = pd.read_parquet(fixture_path(args.data_dir, 2026))
     picks = add_name_keys(pd.read_csv(HERE / "frg_picks_2026.csv"))
     tournament = load_dataset(args.data_dir).filter_competitions(["Six Nations"])
-    players = pd.read_parquet(args.data_dir / "players.parquet")
     scores = []
     for number, tips in picks.groupby("round"):
-        start, end = ROUND_STARTS[number - 1:number + 1]
-        matches = tournament.matches
-        ids = matches.loc[matches.date.between(start, end, inclusive="left"), "match_id"]
-        pool = round_candidates(number, roster.loc[roster["round"] == number],
-                                tournament.select_matches(ids), players)
+        entries = roster.loc[roster["round"].eq(number)]
+        pool = with_actual_scores(entries, tournament.select_matches(entries["match_id"]))
         squad = reconstruct(pool, tips)
         if squad.actual.isna().any():
             raise ValueError(f"Round {number}: missing scores for selected players")

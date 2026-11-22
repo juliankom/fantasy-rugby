@@ -1,23 +1,21 @@
 """Choose component shrinkage strengths on expanding-window Six Nations validation folds."""
 
 import argparse
+from pathlib import Path
 
 from six_nations_fantasy.data import load_dataset
+from six_nations_fantasy.data.load import DATA_DIR
+from six_nations_fantasy.evaluation.selection import evaluation_rounds, training_before_round
 from six_nations_fantasy.models import ComponentShrinkageMean
-from six_nations_fantasy.score import SCORE_COMPONENTS, simple_score
+from six_nations_fantasy.score import SCORE_COMPONENTS
 
 
-def validation_folds(dataset, years):
-    matches = dataset.matches
-    tournament = dataset.filter_competitions(["Six Nations"])
+def validation_folds(dataset, years, directory):
     for year in years:
-        season = tournament.matches.loc[tournament.matches["date"].dt.year.eq(year)]
-        if season.empty:
-            raise ValueError(f"No Six Nations matches in {year}")
-        history = dataset.select_matches(matches.loc[matches["date"] < season["date"].min(), "match_id"])
-        actual = tournament.select_matches(season["match_id"]).player_matches()
-        fixtures = actual.filter(items=["player_id", "number", "is_substitute"])
-        yield history, fixtures, simple_score(actual)
+        rounds = evaluation_rounds(dataset, year, directory, require_prices=False)
+        for _, round_start, fixtures, actual, _ in rounds:
+            yield training_before_round(dataset, round_start), fixtures, actual
+
 
 
 def total_mse(folds, k, overrides):
@@ -55,11 +53,15 @@ def tune(folds, strengths):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--years", type=int, nargs="+", required=True,
+    parser.add_argument("--years", type=int, nargs="+", default=[2025],
                         help="Validation tournaments preceding the squad backtest")
     parser.add_argument("--k", type=float, nargs="+", default=[0, 5, 20, 80])
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument("--test-year", type=int, default=2026)
     args = parser.parse_args()
-    folds = list(validation_folds(load_dataset(), sorted(set(args.years))))
+    if max(args.years) >= args.test_year:
+        parser.error("Validation years must precede the held-out test year")
+    folds = list(validation_folds(load_dataset(args.data_dir), sorted(set(args.years)), args.data_dir))
     default, overrides = tune(folds, sorted(set(args.k)))
     options = ["--k", f"{default:g}"]
     if overrides:
