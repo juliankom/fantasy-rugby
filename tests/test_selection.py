@@ -11,7 +11,7 @@ from pulp import COIN_CMD, LpStatus, LpStatusInfeasible, LpStatusOptimal, PULP_C
 
 from six_nations_fantasy.data import load_dataset
 from six_nations_fantasy.ilp import setup_problem
-from six_nations_fantasy.models import HistoricalMean, PositionShrinkageMean, RecencyWeightedMean
+from six_nations_fantasy.models import ComponentShrinkageMean, HistoricalMean, PositionShrinkageMean, RecencyWeightedMean
 from six_nations_fantasy.score import score_performances, simple_score
 
 
@@ -202,7 +202,16 @@ def main():
                         help="Shrinkage pseudo-appearances; compare several values in one run")
     parser.add_argument("--single-player-drops", action="store_true",
                         help="Reoptimize the hindsight squad after excluding each member")
+    parser.add_argument("--component-k", nargs="+", metavar="STAT=K",
+                        help="Compare component shrinkage with these overrides for each shared --k")
     args = parser.parse_args()
+    overrides = {}
+    for setting in args.component_k or []:
+        try:
+            stat, strength = setting.split("=")
+            overrides[stat] = float(strength)
+        except ValueError:
+            parser.error(f"Expected STAT=K, got {setting!r}")
     roster = read_matchday_csv(args.roster)
     data_dir = Path(__file__).resolve().parents[1] / "data" / "rebuild"
     dataset = load_dataset(data_dir)
@@ -219,6 +228,10 @@ def main():
     }
     for k in args.k:
         models[f"Position shrinkage (k={k:g})"] = PositionShrinkageMean(scorer=simple_score, k=k)
+        if overrides:
+            models[f"Component shrinkage (k={k:g}, {overrides})"] = ComponentShrinkageMean(
+                k=k, k_by_stat=overrides
+            )
     solver = COIN_CMD(msg=False)
     if not solver.available():
         solver = PULP_CBC_CMD(msg=False)
