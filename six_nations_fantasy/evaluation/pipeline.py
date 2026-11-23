@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from six_nations_fantasy.data import RugbyDataset
-from six_nations_fantasy.data.lineup import substitute_status
+from six_nations_fantasy.data.lineup import match_context, substitute_status
 from six_nations_fantasy.score import score_performances
 
 # The fixture rows intentionally exclude statistics observed during the match.
@@ -61,6 +61,9 @@ def recorded_lineup(dataset: RugbyDataset) -> pd.DataFrame:
     roles = substitute_status(dataset.performances)
     if roles is not None:
         context["is_substitute"] = roles.array
+    if "home" in dataset.performances and {"home_team", "away_team", "competition"}.issubset(dataset.matches):
+        context["home"] = dataset.performances["home"].to_numpy()
+        context = match_context(context, dataset.matches)
     return context
 
 
@@ -78,7 +81,7 @@ def evaluate_holdout(
     calculate scores from that history if its approach needs them.
 
     predict() receives match_id, player_id, date and, when available,
-    number and is_substitute from the recorded lineup for each evaluation appearance.
+    shirt number, bench status and scheduled fixture context for each lineup row.
     Holdout outcomes are scored by the evaluator only after
     prediction; they are never passed into fit() or predict().
 

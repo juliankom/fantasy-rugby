@@ -15,7 +15,7 @@ from six_nations_fantasy.evaluation.squads import (
     print_squad, select_squad, single_player_exclusions, squad_solver,
 )
 from six_nations_fantasy.models import (
-    ComponentShrinkageMean, HistoricalMean, PositionShrinkageMean, RecencyWeightedMean,
+    ComponentShrinkageMean, HistoricalMean, PlayerShareModel, PositionShrinkageMean, RecencyWeightedMean,
 )
 from six_nations_fantasy.score import simple_score
 
@@ -24,7 +24,7 @@ VALIDATION_YEARS = [2025]
 TEST_YEAR = 2026
 
 
-def models_to_compare(strengths, component_k):
+def models_to_compare(strengths, component_k, share_tau=None):
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
@@ -37,6 +37,12 @@ def models_to_compare(strengths, component_k):
             models[f"Component shrinkage (k={k:g}, {component_k})"] = ComponentShrinkageMean(
                 k=k, k_by_stat=component_k
             )
+    if share_tau is not None:
+        if share_tau <= 0:
+            raise ValueError("--share-tau requires a positive reference scale")
+        models["Player shares without opponent"] = PlayerShareModel(tau=0)
+        models["Player shares with shared tau"] = PlayerShareModel(tau=share_tau)
+        models["Player shares with component tau"] = PlayerShareModel(tau=share_tau, component_tau=True)
     return models
 
 
@@ -104,6 +110,8 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--k", nargs="+", type=float, default=[5.0])
     parser.add_argument("--component-k", nargs="+", metavar="STAT=K", default=[])
+    parser.add_argument("--share-tau", type=float, metavar="SCALE",
+                        help="Also compare the three player-share models with this reference opponent scale")
     parser.add_argument("--single-player-drops", action="store_true")
     args = parser.parse_args()
     if args.stage == "validate" and max(args.validation_years) >= args.test_year:
@@ -112,7 +120,7 @@ def main():
     for setting in args.component_k:
         stat, k = setting.split("=")
         overrides[stat] = float(k)
-    models = models_to_compare(args.k, overrides)
+    models = models_to_compare(args.k, overrides, args.share_tau)
     dataset = load_dataset(args.data_dir)
     years = args.validation_years if args.stage == "validate" else [args.test_year]
     for year in years:
