@@ -75,6 +75,11 @@ class RugbyDataset:
             ],
         )
 
+    def matches_before(self, cutoff: pd.Timestamp) -> "RugbyDataset":
+        """Select every match strictly before the cutoff, across all competitions."""
+        earlier = self.matches["date"] < cutoff
+        return self.select_matches(self.matches.loc[earlier, "match_id"])
+
     def filter_competitions(self, competitions: Iterable[str]) -> "RugbyDataset":
         """Filter a partition to specific competitions (e.g. Six Nations)."""
         if "competition" not in self.matches.columns:

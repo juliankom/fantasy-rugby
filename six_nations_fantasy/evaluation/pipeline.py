@@ -40,7 +40,7 @@ class EvaluationResult:
     n: int
 
 
-def _context(dataset: RugbyDataset) -> pd.DataFrame:
+def recorded_lineup(dataset: RugbyDataset) -> pd.DataFrame:
     """Construct model input from approved pre-match identifiers only."""
     if "player_id" not in dataset.performances.columns:
         raise ValueError("performances: missing required 'player_id' column")
@@ -100,11 +100,31 @@ def evaluate_holdout(
         raise ValueError("A match appears in both training and holdout")
 
     # Check player-match identity in both partitions before calling the model.
-    _context(training)
-    fixtures = _context(holdout)
+    recorded_lineup(training)
+    fixtures = recorded_lineup(holdout)
 
+    pred = fit_predict(model, training, fixtures)
+    actual = score_performances(holdout.performances, scorer).to_numpy()
+    error = pred - actual
+    output = fixtures.assign(actual=actual, predicted=pred, error=error)
+    return EvaluationResult(
+        predictions=output,
+        mae=float(np.mean(np.abs(error))),
+        rmse=float(np.sqrt(np.mean(error**2))),
+        bias=float(np.mean(error)),
+        n=len(error),
+    )
+
+
+def fit_predict(model, training, fixtures):
+    """Fit on prior matches and return aligned, finite player predictions."""
     # Give fit its own copy: models may transform history during training.
     model.fit(RugbyDataset(training.matches, training.performances))
+    return predict_points(model, fixtures)
+
+
+def predict_points(model, fixtures):
+    """Predict with a fitted model and validate player-row alignment."""
     predicted = model.predict(fixtures.copy())
     if not isinstance(predicted, pd.Series):
         raise TypeError("predict() must return a pandas Series")
@@ -117,14 +137,4 @@ def evaluate_holdout(
     if not np.isfinite(pred).all():
         raise ValueError("Predictions must be finite and non-missing")
 
-    actual = score_performances(holdout.performances, scorer).to_numpy()
-    error = pred - actual
-    output = fixtures.assign(actual=actual, predicted=pred, error=error)
-    return EvaluationResult(
-        predictions=output,
-        mae=float(np.mean(np.abs(error))),
-        rmse=float(np.sqrt(np.mean(error**2))),
-        bias=float(np.mean(error)),
-        n=len(error),
-    )
-
+    return pd.Series(pred, index=fixtures.index)

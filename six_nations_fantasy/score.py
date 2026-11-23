@@ -5,21 +5,31 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-def simple_score(performances: pd.DataFrame, try_points=15): 
-    """Calculate fantasy scores from performance data.
-    """
-    return try_points * performances['tries'] \
-        + 4 * performances['try_assists'] \
-        + 2 * performances['conversions'] \
-        + 3 * performances['penalty_goals'] \
-        + 5 * performances['drop_goals'] \
-        + 2 * performances['defenders_beaten'] \
-        + performances['carried_meters'] // 10 \
-        + performances['completed_tackles'] \
-        + 5 * performances['turnovers_won'] \
-        + 2 * performances['offloads'] \
-        - 5 * performances['yellow_cards'] \
-        - 8 * performances['red_cards']
+
+# Each callable returns the fantasy points earned from one observed component.
+SCORE_COMPONENTS = {
+    "tries": lambda rows: 15 * rows["tries"],
+    "try_assists": lambda rows: 4 * rows["try_assists"],
+    "conversions": lambda rows: 2 * rows["conversions"],
+    "penalty_goals": lambda rows: 3 * rows["penalty_goals"],
+    "drop_goals": lambda rows: 5 * rows["drop_goals"],
+    "defenders_beaten": lambda rows: 2 * rows["defenders_beaten"],
+    "carried_meters": lambda rows: rows["carried_meters"] // 10,
+    "completed_tackles": lambda rows: rows["completed_tackles"],
+    "turnovers_won": lambda rows: 5 * rows["turnovers_won"],
+    "offloads": lambda rows: 2 * rows["offloads"],
+    "yellow_cards": lambda rows: -5 * rows["yellow_cards"],
+    "red_cards": lambda rows: -8 * rows["red_cards"],
+}
+
+
+def simple_score(performances: pd.DataFrame, try_points=15):
+    """Sum the point contributions of an observed performance."""
+    components = SCORE_COMPONENTS
+    if try_points != 15:
+        components = {**components, "tries": lambda rows: try_points * rows["tries"]}
+    return sum(component(performances) for component in components.values())
+
 
 def score_performances(
     performances: pd.DataFrame, scorer: Callable[[pd.DataFrame], pd.Series]

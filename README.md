@@ -70,12 +70,46 @@ python -m pytest
 
 Run `python tests/main.py` from the source checkout to compare the historical
 mean and recency-weighted mean on the 2026 Six Nations. The runner loads
-`data/processed/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
-Run `python tests/test_selection.py` for the 2026 round-by-round squad backtest.
-It loads the bundled roster prices and fantasy positions, refits both baselines
-on matches before each round, and scores the selected squads from match
-statistics with `simple_score`. The best calculated score is a hindsight
-benchmark using the same candidate pool and optimizer.
+`data/rebuild/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
+### Validate and test squad selection
+
+From an editable install, run validation first. The default validation year is
+2025. Before each round, refit each model on every available match from every competition
+dated before the round's opening fixture. For example, training for 2026 round 2
+includes earlier seasons, round 1, and any club matches played before round 2.
+Only the evaluated fixtures are restricted to that year's Six Nations. Keep the hyperparameters
+chosen on validation fixed throughout the test tournament. Compare model definitions in `tests/test_selection.py`.
+
+```bash
+python tests/test_selection.py validate --k 5 15 20
+```
+
+Validation without a fantasy roster reports player RMSE on recorded lineups.
+To also score squads, prepare each year's Google Sheets CSV export once.
+The generator expects the same columns and position labels as the bundled
+2026 CSV. Pass the year and CSV path, for example:
+
+```bash
+python scripts/prepare_fixtures.py 2026 tests/six_nations_2026_fantasy_prices.csv
+```
+
+Use the same command with 2024 or 2025 and the corresponding export. Supply
+whole rounds for comparable squad scores. The generator writes
+`data/rebuild/six_nations_<year>_fixtures.parquet` with player IDs, match IDs,
+prices, fantasy positions and announced roles. If the export covers only
+some rounds, evaluation uses those rounds.
+
+After choosing hyperparameters, run the held-out tournament explicitly:
+
+```bash
+python tests/test_selection.py test --k 15
+```
+
+Testing defaults to 2026 and requires its prepared roster. Player RMSE pools
+squared errors across all player fixtures in each evaluated season, including
+unpriced players. Squad totals use priced players, captain and supersub
+multipliers, and project-calculated actual points. The percentage compares
+total selected points to the sum of the round-by-round hindsight optima.
 
 Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
 spreadsheets used in the squad backtest.
