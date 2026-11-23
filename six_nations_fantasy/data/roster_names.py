@@ -7,13 +7,17 @@ NAME_ALIASES = {
     ("Ireland", "tomclarkson"): "thomasclarkson",
     ("Ireland", "tomfarrell"): "thomasfarrell",
     ("Italy", "nachobrex"): "juanignaciobrex",
+    ("Italy", "davidodiase"): "davideodiase",
+    ("Italy", "sebastiannegri"): "sebastiannegridaollegio",
     ("France", "noahnene"): "noahtisienene",
     ("Scotland", "freddydouglas"): "freddiedouglas",
-    ("Wales", "gabehamerwebb"): "gabrielhamerwebb",
-    ("Wales", "danedwards"): "danieledwards",
-    ("Italy", "davidodiase"): "davideodiase",
     ("England", "finsmith"): "finlaysmith",
     ("England", "sebatkinson"): "sebastienatkinson",
+    ("Wales", "elliotdee"): "elliottdee",
+    ("Wales", "keironassiratti"): "kieronassiratti",
+    ("Wales", "gabehamerwebb"): "gabrielhamerwebb",
+    ("Wales", "danedwards"): "danieledwards",
+    ("Wales", "willgriffjohn"): "willjohn",
 }
 
 

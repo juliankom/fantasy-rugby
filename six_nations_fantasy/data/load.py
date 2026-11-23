@@ -7,7 +7,7 @@ import pandas as pd
 from .dataset import RugbyDataset
 
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "rebuild"
+DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "rebuild_extended"
 
 
 # Competition IDs assigned by notebooks/scraping/rugbypass_urls.ipynb.
@@ -23,7 +23,7 @@ _RUGBYPASS_COMPETITIONS = {
 def load_dataset(directory: str | Path | None = None) -> RugbyDataset:
     """Read matches.parquet and player_performances.parquet from *directory*.
 
-    By default, use ``data/rebuild/`` at the repository root, regardless of
+    By default, use ``data/rebuild_extended/`` at the repository root, regardless of
     the current working directory. Pass an explicit directory when loading a
     different dataset or running outside the source checkout. Relative explicit
     paths are interpreted from the current working directory.

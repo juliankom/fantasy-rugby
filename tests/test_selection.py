@@ -34,7 +34,7 @@ def models_to_compare(strengths, component_k):
     for k in strengths:
         models[f"Position shrinkage (k={k:g})"] = PositionShrinkageMean(scorer=simple_score, k=k)
         if component_k:
-            models[f"Component shrinkage (k={k:g}, {component_k})"] = ComponentShrinkageMean(
+            models[f"Component shrinkage"] = ComponentShrinkageMean(
                 k=k, k_by_stat=component_k
             )
     return models
