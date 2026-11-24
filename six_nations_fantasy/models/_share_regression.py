@@ -43,15 +43,28 @@ class CategoricalDesign:
         return pd.DataFrame(factors, index=frame.index)
 
 
-def minimize_loss(objective, size):
-    """Fit ridge-penalized coefficients starting at zero (all multipliers equal 1)."""
-    # L-BFGS-B uses the gradient returned by objective (jac=True). Stop when
-    # the relative improvement in loss is below ftol, with a cap of 600 iterations.
-    result = minimize(objective, np.zeros(size), jac=True, method="L-BFGS-B",
+def minimize_loss(objective, curvature, regression):
+    """Rescale the coefficients so frequently and rarely seen categories fit together."""
+    # A step in a coefficient seen in thousands of lineups changes the loss
+    # much more than the same step for a player seen once. Divide the step
+    # by the square root of estimated curvature to bring those changes closer.
+    # This is a change of coordinates for the optimizer. The loss and ridge
+    # penalty still use coefficients in their original units.
+    step_scale = 1 / np.sqrt(curvature)
+
+    def scaled_objective(parameters):
+        loss, gradient = objective(parameters * step_scale)
+        return loss, gradient * step_scale
+
+    # L-BFGS-B uses the supplied gradient. ftol tests relative improvement in loss.
+    result = minimize(scaled_objective, np.zeros(len(curvature)), jac=True, method="L-BFGS-B",
                       options={"maxiter": 600, "ftol": 1e-11})
     if not result.success or not np.isfinite(result.fun) or not np.isfinite(result.x).all():
-        raise RuntimeError(f"Share model fit failed: {result.message}")
-    return result.x
+        gradient = np.linalg.norm(result.jac, ord=np.inf)
+        raise RuntimeError(
+            f"{regression}: {result.message} (iterations={result.nit}, max scaled gradient={gradient:.3g})"
+        )
+    return result.x * step_scale
 
 
 class TeamRate:
@@ -80,8 +93,12 @@ class TeamRate:
             gradient = design.T @ (expected - counts) + precision * coefficients
             return loss, gradient
 
-        size = design.shape[1]
-        self.coefficients = minimize_loss(objective, size) if self.base_rate else np.zeros(size)
+        # At zero coefficients every team starts at base_rate. With binary
+        # features the Poisson curvature per coefficient is its total expected count.
+        curvature = self.base_rate * np.asarray(design.sum(axis=0)).ravel() + precision
+        self.coefficients = (
+            minimize_loss(objective, curvature, "team total") if self.base_rate else np.zeros_like(precision)
+        )
 
     def predict(self, frame):
         return self.base_rate * np.exp(self.design.matrix(frame) @ self.coefficients)
@@ -110,8 +127,14 @@ class Allocation:
             gradient = design.T @ (expected - counts) + precision * coefficients
             return loss, gradient
 
-        size = design.shape[1]
-        self.coefficients = minimize_loss(objective, size) if counts.any() else np.zeros(size)
+        # At zero coefficients players split the team total equally. Sum a
+        # feature's expected counts as a simple upper bound on its curvature.
+        lineup_sizes = np.bincount(team_rows)
+        initial_counts = (totals / lineup_sizes)[team_rows]
+        curvature = design.T @ initial_counts + precision
+        self.coefficients = (
+            minimize_loss(objective, curvature, "player allocation") if counts.any() else np.zeros_like(precision)
+        )
 
     @staticmethod
     def log_shares(log_weights, team_rows):

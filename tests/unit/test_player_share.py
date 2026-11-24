@@ -6,7 +6,7 @@ from six_nations_fantasy.data import RugbyDataset
 from six_nations_fantasy.evaluation.pipeline import recorded_lineup
 from six_nations_fantasy.evaluation.selection import scored_player_fixtures, prediction_lineup
 from six_nations_fantasy.models import PlayerShareModel
-from six_nations_fantasy.models._share_regression import TeamRate
+from six_nations_fantasy.models._share_regression import Allocation, TeamRate
 from six_nations_fantasy.models.player_share import component_units
 from six_nations_fantasy.score import POINTS_PER_UNIT
 
@@ -70,3 +70,28 @@ def test_announced_lineup_allocation_and_scoring():
     np.testing.assert_allclose(team.baseline_units * factors.prod(axis=1), team.expected_units)
     np.testing.assert_allclose(player.groupby(["match_id", "team"]).share.sum(), 1)
     np.testing.assert_allclose(player.expected_units, model.predict_components(fixtures).carried_meters)
+
+
+
+def test_metre_allocation_converges_with_uneven_player_histories():
+    rng = np.random.default_rng(817)
+    team_rows = np.repeat(np.arange(2200), 23)
+    shirts = np.tile(np.arange(23), 2200)
+    teams = rng.integers(0, 32, 2200)
+    # Most starts at a given club and shirt go to a few players. Some players
+    # appear only once. Use metre counts per appearance to exercise the wide
+    # range of information available for the individual coefficients.
+    players = np.repeat(teams, 23) * 460 + shirts * 20
+    players += np.minimum(rng.zipf(1.8, len(shirts)) - 1, 19)
+    positions = np.minimum(shirts, 15)
+    rows = pd.DataFrame({"position_role": positions, "player_id": players})
+    player_metre_rate = rng.lognormal(0, 1.1, 32 * 460)
+    position_metre_rate = np.array([
+        0.45, 0.35, 0.65, 0.7, 0.75, 1.2, 1.2, 1.5, 2.0, 2.0, 2.4, 2.4, 2.4, 2.6, 2.6, 0.3
+    ])
+    counts = rng.poisson(15 * player_metre_rate[players] * position_metre_rate[positions])
+    totals = np.bincount(team_rows, weights=counts)
+    allocation = Allocation(rows, team_rows, totals, counts)
+    shares = allocation.predict(rows, team_rows)
+    np.testing.assert_allclose(np.bincount(team_rows, weights=shares), 1)
+    assert np.sum(counts * np.log(shares)) > counts.sum() * np.log(1 / 23)

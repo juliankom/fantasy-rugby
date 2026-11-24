@@ -87,7 +87,12 @@ class PlayerShareModel:
             counts = units[stat].to_numpy(dtype=float)
             # Sum the player counts into one observation per team row.
             totals = np.bincount(team_rows, weights=counts)
-            models[stat] = (TeamRate(teams, totals, tau), Allocation(rows, team_rows, totals, counts))
+            try:
+                rate = TeamRate(teams, totals, tau)
+                allocation = Allocation(rows, team_rows, totals, counts)
+            except RuntimeError as exc:
+                raise RuntimeError(f"Share model fit failed for {stat} (tau={tau:g}): {exc}") from exc
+            models[stat] = rate, allocation
         self.models_ = models
 
     def _prediction_lineups(self, fixtures):
