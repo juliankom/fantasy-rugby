@@ -111,67 +111,51 @@ unpriced players. Squad totals use priced players, captain and supersub
 multipliers, and project-calculated actual points. The percentage compares
 total selected points to the sum of the round-by-round hindsight optima.
 
-#### Comparing team opportunity and player shares
+#### Player-share model
 
-Run the usual walk-forward comparison with the player-share models enabled:
+Compare a few opponent settings on validation rounds:
 
 ```bash
-python tests/test_selection.py validate --share-tau 0.25 --k 20
+python tests/test_selection.py validate --share-tau 0 0.125 0.25 0.5 --k 20
 ```
 
-This adds three forecasts on identical rounds: no opponent effect, a shared opponent
-scale, and component-specific scales. The position-shrinkage baseline with common
-k is also the common-k component-shrinkage baseline. All models refit before the
-first match of the round using available history across competitions.
+Each number runs a separate model. Zero leaves out the opponent effect. The fit
+uses the requested scale for every stat. In Python, pass
+`PlayerShareModel(tau=0.25, tau_by_stat={"tries": 0.125})` to override a particular
+stat. Choose scales on validation rounds before using them for test rounds.
 
-**Team totals.** Each observation is one side of a match. Sum player scoring units
-within each side, flooring metres per player first. Negative floored metre units
-are modelled as a separate count and subtracted when scoring. For each component
-fit a penalized Poisson regression:
+The model makes a separate forecast for each scoring stat. It first sums the
+players' stats for each team in each historical match. It fits a Poisson
+regression to those totals. For an England home match against Wales, for example,
+the predicted total is the historical average times four multipliers: Six
+Nations, home, England as the team, and Wales as the opponent.
 
-```text
-log(mu) = log(historical mean team units) + competition + home/away + team + opponent
-loss = sum(mu - observed_units * log(mu)) + sum(coefficient² / (2 * prior_scale²))
-```
+The regression fits the logarithms of those multipliers. It pulls the logs
+toward zero, which pulls the multipliers toward one. If a log multiplier is
+`b`, the penalty is `b² / (2 × scale²)`. Halving the opponent scale `tau`
+therefore quadruples that penalty. The hand-set scales for competition, home/away
+and team are 2, 0.5 and 0.5. An opponent with no training history gets a
+multiplier of one.
 
-The historically observed opponents are fitted jointly. An opponent coefficient
-of log(1.2) multiplies the expected total by 1.2. Its prior scale is tau, so
-halving tau quadruples its penalty. Zero disables the opponent term. Prediction
-uses the fitted coefficient directly. Unseen categorical levels contribute zero.
-A component with no events anywhere in training forecasts zero. Listed home/away
-is a proxy for venue. Competition, venue and team prior scales are fixed at
-2, 0.5 and 0.5 log units respectively. These are modelling choices.
+A second regression estimates who gets credit for the team's total. Each player
+gets a weight for their shirt position and another for their own playing history.
+Multiply these weights and divide by the sum of the 23 combined weights to get
+the player's share. The fit gives more weight to matches with more events for
+that stat. An unseen player gets their position weight alone. All bench shirts
+use the same position weight. The player multiplier carries across club and
+country.
 
-**Selecting tau.** The shared model uses the supplied reference value. The
-component-specific model fits candidates at half, equal to, and twice that value
-on the first 80% of distinct training dates (rounded down). On the remaining
-dates it minimizes summed team-count Poisson loss plus
-`0.5 * log2(tau / reference_tau)²`, then refits on the full history. This is
-regularized predictive tuning. It yields one scale per component shared by
-club and international opponents. It does not estimate a national-team-specific
-variance or integrate over uncertainty in tau. Inspect `model.opponent_scales_`
-after fitting. Candidate scores use all available competitions, so club fixtures
-can dominate the choice. Poisson is a working count model; these fits do not
-supply calibrated prediction intervals.
+Multiply the share by the predicted team total, then apply the fantasy points
+for that stat. This model predicts raw carried metres at 0.1 points per metre.
+Negative recorded metres count as zero in its training. The backtest still
+scores actual performances with `simple_score()`, which floors each player's
+metres in blocks of ten.
 
-**Player allocation.** Conditional on the team's units, fit a multinomial model
-on the whole sheet. Each player has log weight = shirt position/role effect +
-player effect; the share is the exponentiated weight divided by the sum of all
-23 weights. We maximize the sum of observed player units times log share, with
-normal prior scales of 2 for positions and 0.75 for players. A zero-total match
-informs the team regression and contributes zero allocation loss. New players
-use their role. Bench shirts share one role because shirt number alone does not
-identify their position. The player effect carries across club and country.
-
-Prediction multiplies team units by lineup share and applies the project scoring
-weights. Include every unpriced player in the lineup. The model expects shirts
-1–23 for each side. It warns and excludes incomplete historical sides and rejects
-incomplete prediction sides. Historical shares use recorded sheets; roster-backed
-round predictions use the announced players, including late withdrawals.
-`predict_components(fixtures)` returns player units before scoring. For a
-retrospective allocation diagnostic, pass `observed_team_units` indexed by
-(match_id, team), calculated by summing `component_units` over recorded players.
-Realized totals are never supplied by the prediction runner.
+Use all 23 players per side, including unpriced players, to calculate shares.
+The fit warns about incomplete historical sheets and skips those sides. Prediction
+requires a complete sheet. Use [the inspection notebook](notebooks/player_share_weights.ipynb)
+to see the fitted team multipliers, player shares and how much they change
+forecasts against the recency-weighted mean.
 
 Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
 spreadsheets used in the squad backtest.

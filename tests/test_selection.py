@@ -1,7 +1,7 @@
 """Validate model settings on earlier tournaments, then test a chosen setting."""
 
 import argparse
-from math import log
+from math import isfinite, log
 from pathlib import Path
 
 import pandas as pd
@@ -24,7 +24,7 @@ VALIDATION_YEARS = [2025]
 TEST_YEAR = 2026
 
 
-def models_to_compare(strengths, component_k, share_tau=None):
+def models_to_compare(strengths, component_k, share_taus=()):
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
@@ -37,12 +37,8 @@ def models_to_compare(strengths, component_k, share_tau=None):
             models[f"Component shrinkage (k={k:g}, {component_k})"] = ComponentShrinkageMean(
                 k=k, k_by_stat=component_k
             )
-    if share_tau is not None:
-        if share_tau <= 0:
-            raise ValueError("--share-tau requires a positive reference scale")
-        models["Player shares without opponent"] = PlayerShareModel(tau=0)
-        models["Player shares with shared tau"] = PlayerShareModel(tau=share_tau)
-        models["Player shares with component tau"] = PlayerShareModel(tau=share_tau, component_tau=True)
+    for tau in share_taus:
+        models[f"Player shares (tau={tau:g})"] = PlayerShareModel(tau=tau)
     return models
 
 
@@ -110,12 +106,14 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--k", nargs="+", type=float, default=[5.0])
     parser.add_argument("--component-k", nargs="+", metavar="STAT=K", default=[])
-    parser.add_argument("--share-tau", type=float, metavar="SCALE",
-                        help="Also compare the three player-share models with this reference opponent scale")
+    parser.add_argument("--share-tau", nargs="+", type=float, default=[], metavar="SCALE",
+                        help="Compare player-share models at these opponent scales (0 disables opposition)")
     parser.add_argument("--single-player-drops", action="store_true")
     args = parser.parse_args()
     if args.stage == "validate" and max(args.validation_years) >= args.test_year:
         parser.error("Validation years must precede the held-out test year")
+    if any(not isfinite(tau) or tau < 0 for tau in args.share_tau):
+        parser.error("--share-tau expects finite, nonnegative scales")
     overrides = {}
     for setting in args.component_k:
         stat, k = setting.split("=")

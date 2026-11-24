@@ -8,7 +8,7 @@ from six_nations_fantasy.evaluation.selection import scored_player_fixtures, pre
 from six_nations_fantasy.models import PlayerShareModel
 from six_nations_fantasy.models._share_regression import TeamRate
 from six_nations_fantasy.models.player_share import component_units
-from six_nations_fantasy.score import POINTS_PER_UNIT, simple_score
+from six_nations_fantasy.score import POINTS_PER_UNIT
 
 
 def history():
@@ -41,7 +41,7 @@ def test_tau_shrinks_opponent_multiplier():
 def test_announced_lineup_allocation_and_scoring():
     dataset = history()
     held = dataset.select_matches([6])
-    model = PlayerShareModel(component_tau=True)
+    model = PlayerShareModel(tau=0, tau_by_stat={"tries": 0.5})
     model.fit(dataset.matches_before(held.matches.date.min()))
     recorded = recorded_lineup(held)
     roster = recorded[["match_id", "player_id", "team", "date", "number", "is_substitute"]].rename(
@@ -49,10 +49,10 @@ def test_announced_lineup_allocation_and_scoring():
     roster = roster.assign(round=1, cost=np.nan)
     fixtures = prediction_lineup(scored_player_fixtures(held, 1, roster)).sample(frac=1, random_state=42)
     assert "actual" not in fixtures
-    assert set(model.opponent_scales_).issubset({0.125, 0.25, 0.5})
+    assert model.opponent_scales["tries"] == 0.5
     units = component_units(held.performances)
-    weights = pd.Series({**POINTS_PER_UNIT, "lost_metre_units": -1})
-    np.testing.assert_allclose(units.mul(weights).sum(axis=1), simple_score(held.performances))
+    assert units["carried_meters"].unique().tolist() == [19, 0]
+    assert list(units.columns) == list(POINTS_PER_UNIT)
     totals = units.groupby([recorded.match_id.to_numpy(), recorded.team.to_numpy()]).sum()
     totals.index.names = ["match_id", "team"]
     oracle = model.predict_components(fixtures, observed_team_units=totals)
@@ -64,11 +64,9 @@ def test_announced_lineup_allocation_and_scoring():
         model.predict(fixtures.iloc[1:])
 
 
-def test_well_supported_opposition_uses_wider_scale():
-    from six_nations_fantasy.models._share_regression import choose_tau
-
-    teams = pd.DataFrame({"team": "A", "competition": "Cup", "home": True,
-                          "opponent": ["B", "C"] * 30})
-    earlier = np.arange(len(teams)) < 40
-    assert choose_tau(teams, np.tile([15, 1], 30), earlier, 0.25) == 0.5
-    assert choose_tau(teams, np.full(60, 4), earlier, 0.25) == 0.25
+    team, player = model.explain_component(fixtures, "carried_meters")
+    assert team.opponent_multiplier.eq(1).all()
+    factors = team.filter(like="_multiplier")
+    np.testing.assert_allclose(team.baseline_units * factors.prod(axis=1), team.expected_units)
+    np.testing.assert_allclose(player.groupby(["match_id", "team"]).share.sum(), 1)
+    np.testing.assert_allclose(player.expected_units, model.predict_components(fixtures).carried_meters)
