@@ -14,6 +14,11 @@ from .position_shrinkage import _positions
 
 def component_units(rows):
     units = pd.DataFrame({stat: scoring_units(rows, stat) for stat in POINTS_PER_UNIT})
+
+    #TODO I don't think this is necessary. I don't believe that there are negative carried_meters entries
+    #TODO I am happy to, in favour of simplicity, forget the metres//10 logic and just use 0.1 multiplier, since
+    # this will not make the difference in prediction
+
     # A player can lose ground. Preserve floor(metres/10) exactly with two counts.
     metres = units["carried_meters"]
     units["lost_metre_units"] = (-metres).clip(lower=0)
@@ -47,6 +52,8 @@ def full_lineups(frame, *, training):
     if rows.empty:
         raise ValueError("No complete team sheets")
     rows["position_role"] = _positions(rows, substitute_status(rows))
+
+    #TODO I don't understand what is going on here and why
     # Group codes index one row per side in the team regression.
     groups = rows.groupby(keys, sort=False).ngroup().to_numpy()
     teams = rows.drop_duplicates(keys)[["match_id", "date", "team", "opponent", "competition", "home"]]
@@ -68,6 +75,8 @@ class PlayerShareModel:
         rows, groups, teams = full_lineups(frame, training=True)
         units = component_units(rows)
         dates = sorted(teams["date"].unique())
+
+        #TODO what is this 0.8 magic number
         earlier = teams["date"].lt(dates[int(0.8 * len(dates))]).to_numpy()
         models, scales = {}, {}
         for stat in units:

@@ -7,6 +7,9 @@ from scipy.sparse import csr_matrix, hstack
 
 
 class Categories:
+    #TODO this docstring is not remotely useful, as it doesn't explain anything about the actual class,
+    # its function and its methods 
+    # TODO what is a "level"? 
     """One indicator per known level. An unseen level contributes zero on the log scale."""
 
     def __init__(self, frame, columns):
@@ -28,6 +31,7 @@ class Categories:
 
 
 def minimize_loss(objective, size):
+    #TODO what are these minimizer settings?
     result = minimize(objective, np.zeros(size), jac=True, method="L-BFGS-B",
                       options={"maxiter": 600, "ftol": 1e-11})
     if not result.success:
@@ -35,18 +39,25 @@ def minimize_loss(objective, size):
     return result.x
 
 
+#TODO document
 class TeamRate:
     def __init__(self, frame, counts, tau):
         # Use the pooled training mean as offset. An unseen competition starts here.
         self.base_rate = counts.mean()
+
+        #TODO are these just arbitrary settings for how certain we are of 
+        # these fit variables?
         scales = {"competition": 2.0, "home": 0.5, "team": 0.5}
         if tau > 0:
             scales["opponent"] = tau
         self.categories = Categories(frame, scales)
+
+        #TODO what is this matrix?
         X = self.categories.matrix(frame)
         precision = self.categories.precisions(scales)
 
         def objective(beta):
+            #TODO what exactly is Poisson negative log likelihood describing here?
             # log(mu) = log(base_rate) + competition + venue + team + opponent.
             # Poisson negative log likelihood, dropping terms independent of beta.
             eta = X @ beta
@@ -62,6 +73,12 @@ class TeamRate:
 
 
 def choose_tau(teams, counts, earlier, shared_tau):
+    #TODO docstrings like this read like AI nonsense. Please use human sentences that
+    # document the function in question, and refer to its usage within this project
+    # whenever it makes sense to do so. Do not just use fancy words after each other 
+    # without reason
+    #TODO in this case, we are apparently making arbitrary choices of tau (e.g. for components) and testing performance. 
+    # so really, we are already choosing hyperparameters (is this true?). I don't know if this is the right place to do so...
     """Regularize the component scale using a chronological predictive likelihood."""
     if not earlier.any() or earlier.all() or counts[earlier].sum() == 0:
         return shared_tau
