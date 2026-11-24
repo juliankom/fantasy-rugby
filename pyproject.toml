@@ -10,6 +10,7 @@ dependencies = [
     "pandas",
     "numpy",
     "scipy",
+    "scikit-learn>=1.4",
     "requests>=2",
     "pyarrow",
     "pulp>=3,<4",

@@ -111,6 +111,26 @@ unpriced players. Squad totals use priced players, captain and supersub
 multipliers, and project-calculated actual points. The percentage compares
 total selected points to the sum of the round-by-round hindsight optima.
 
+#### Random forest
+
+```bash
+python tests/test_selection.py validate --random-forest
+python tests/test_selection.py test --random-forest
+```
+
+The forest predicts a player's fantasy points directly. Each training row contains
+the shirt number and bench status for that match, the number of earlier recorded
+appearances, and averages over the player's last five appearances across competitions:
+fantasy points, minutes, carries, completed tackles and metres carried (where recorded).
+Only appearances before the match day enter these averages. A debutant has zero
+prior appearances and missing averages, so the forest can use the announced role.
+
+For example, the forest can learn whether the same tackle average predicts
+different scores for a starting flanker and a replacement. The first experiment
+uses 100 trees with at least 20 training appearances per leaf. These settings
+and the five-appearance window are starting choices. Compare the forest with
+the recency-weighted mean on player RMSE and, with a roster, realized squad points.
+
 #### Player-share model
 
 Compare a few opponent settings on validation rounds:

@@ -15,7 +15,8 @@ from six_nations_fantasy.evaluation.squads import (
     print_squad, select_squad, single_player_exclusions, squad_solver,
 )
 from six_nations_fantasy.models import (
-    ComponentShrinkageMean, HistoricalMean, PlayerShareModel, PositionShrinkageMean, RecencyWeightedMean,
+    ComponentShrinkageMean, HistoricalMean, PlayerShareModel, PositionShrinkageMean,
+    RandomForestPoints, RecencyWeightedMean,
 )
 from six_nations_fantasy.score import simple_score
 
@@ -24,13 +25,15 @@ VALIDATION_YEARS = [2025]
 TEST_YEAR = 2026
 
 
-def models_to_compare(strengths, component_k, share_taus=()):
+def models_to_compare(strengths, component_k, share_taus=(), *, random_forest=False):
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
             scorer=simple_score, half_life_days=180
         ),
     }
+    if random_forest:
+        models["Random forest"] = RandomForestPoints(scorer=simple_score)
     for k in strengths:
         models[f"Position shrinkage (k={k:g})"] = PositionShrinkageMean(scorer=simple_score, k=k)
         if component_k:
@@ -108,6 +111,8 @@ def main():
     parser.add_argument("--component-k", nargs="+", metavar="STAT=K", default=[])
     parser.add_argument("--share-tau", nargs="+", type=float, default=[], metavar="SCALE",
                         help="Compare player-share models at these opponent scales (0 disables opposition)")
+    parser.add_argument("--random-forest", action="store_true",
+                        help="Include the forest trained on lineup and recent player statistics")
     parser.add_argument("--single-player-drops", action="store_true")
     args = parser.parse_args()
     if args.stage == "validate" and max(args.validation_years) >= args.test_year:
@@ -118,7 +123,7 @@ def main():
     for setting in args.component_k:
         stat, k = setting.split("=")
         overrides[stat] = float(k)
-    models = models_to_compare(args.k, overrides, args.share_tau)
+    models = models_to_compare(args.k, overrides, args.share_tau, random_forest=args.random_forest)
     dataset = load_dataset(args.data_dir)
     years = args.validation_years if args.stage == "validate" else [args.test_year]
     for year in years:
