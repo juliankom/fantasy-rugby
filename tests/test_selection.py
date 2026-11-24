@@ -1,7 +1,7 @@
 """Validate model settings on earlier tournaments, then test a chosen setting."""
 
 import argparse
-from math import log
+from math import isfinite, log
 from pathlib import Path
 
 import pandas as pd
@@ -15,7 +15,7 @@ from six_nations_fantasy.evaluation.squads import (
     print_squad, select_squad, single_player_exclusions, squad_solver,
 )
 from six_nations_fantasy.models import (
-    ComponentShrinkageMean, HistoricalMean, PositionShrinkageMean, RecencyWeightedMean,
+    ComponentShrinkageMean, HistoricalMean, PlayerShareModel, PositionShrinkageMean, RecencyWeightedMean,
 )
 from six_nations_fantasy.score import simple_score
 
@@ -24,7 +24,7 @@ VALIDATION_YEARS = [2025]
 TEST_YEAR = 2026
 
 
-def models_to_compare(strengths, component_k):
+def models_to_compare(strengths, component_k, share_taus=()):
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
@@ -37,6 +37,8 @@ def models_to_compare(strengths, component_k):
             models[f"Component shrinkage (k={k:g}, {component_k})"] = ComponentShrinkageMean(
                 k=k, k_by_stat=component_k
             )
+    for tau in share_taus:
+        models[f"Player shares (tau={tau:g})"] = PlayerShareModel(tau=tau)
     return models
 
 
@@ -104,15 +106,19 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--k", nargs="+", type=float, default=[5.0])
     parser.add_argument("--component-k", nargs="+", metavar="STAT=K", default=[])
+    parser.add_argument("--share-tau", nargs="+", type=float, default=[], metavar="SCALE",
+                        help="Compare player-share models at these opponent scales (0 disables opposition)")
     parser.add_argument("--single-player-drops", action="store_true")
     args = parser.parse_args()
     if args.stage == "validate" and max(args.validation_years) >= args.test_year:
         parser.error("Validation years must precede the held-out test year")
+    if any(not isfinite(tau) or tau < 0 for tau in args.share_tau):
+        parser.error("--share-tau expects finite, nonnegative scales")
     overrides = {}
     for setting in args.component_k:
         stat, k = setting.split("=")
         overrides[stat] = float(k)
-    models = models_to_compare(args.k, overrides)
+    models = models_to_compare(args.k, overrides, args.share_tau)
     dataset = load_dataset(args.data_dir)
     years = args.validation_years if args.stage == "validate" else [args.test_year]
     for year in years:

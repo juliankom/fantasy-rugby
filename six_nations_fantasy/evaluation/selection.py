@@ -3,6 +3,7 @@
 import pandas as pd
 
 from six_nations_fantasy.data.fantasy_fixtures import with_actual_scores
+from six_nations_fantasy.data.lineup import match_context
 from six_nations_fantasy.evaluation.pipeline import recorded_lineup
 from six_nations_fantasy.score import score_performances, simple_score
 
@@ -15,13 +16,13 @@ def scored_player_fixtures(round_matches, round_number, fantasy_roster):
         return lineup.assign(actual=actual.to_numpy())
 
     entries = fantasy_roster.loc[fantasy_roster["round"].eq(round_number)]
-    return with_actual_scores(entries, round_matches)
+    return match_context(with_actual_scores(entries, round_matches), round_matches.matches)
 
 
 def prediction_lineup(scored_fixtures):
     """Pass only player identity and pre-match lineup information to predict()."""
     lineup = scored_fixtures.rename(columns={"shirt_number": "number", "is_sub": "is_substitute"})
-    return lineup.filter(items=["match_id", "player_id", "date", "team", "number", "is_substitute"])
+    return lineup.filter(items=["match_id", "player_id", "date", "team", "opponent", "competition", "home", "number", "is_substitute"])
 
 
 def summarize(rounds):

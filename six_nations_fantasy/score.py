@@ -6,20 +6,25 @@ import numpy as np
 import pandas as pd
 
 
-# Each callable returns the fantasy points earned from one observed component.
+# One scoring unit is one event, except metres which count in blocks of ten.
+POINTS_PER_UNIT = {
+    "tries": 15, "try_assists": 4, "conversions": 2, "penalty_goals": 3,
+    "drop_goals": 5, "defenders_beaten": 2, "carried_meters": 1,
+    "completed_tackles": 1, "turnovers_won": 5, "offloads": 2,
+    "yellow_cards": -5, "red_cards": -8,
+}
+
+
+def scoring_units(rows, stat):
+    return rows[stat] // 10 if stat == "carried_meters" else rows[stat]
+
+
+def _component_scorer(stat, weight):
+    return lambda rows: weight * scoring_units(rows, stat)
+
+
 SCORE_COMPONENTS = {
-    "tries": lambda rows: 15 * rows["tries"],
-    "try_assists": lambda rows: 4 * rows["try_assists"],
-    "conversions": lambda rows: 2 * rows["conversions"],
-    "penalty_goals": lambda rows: 3 * rows["penalty_goals"],
-    "drop_goals": lambda rows: 5 * rows["drop_goals"],
-    "defenders_beaten": lambda rows: 2 * rows["defenders_beaten"],
-    "carried_meters": lambda rows: rows["carried_meters"] // 10,
-    "completed_tackles": lambda rows: rows["completed_tackles"],
-    "turnovers_won": lambda rows: 5 * rows["turnovers_won"],
-    "offloads": lambda rows: 2 * rows["offloads"],
-    "yellow_cards": lambda rows: -5 * rows["yellow_cards"],
-    "red_cards": lambda rows: -8 * rows["red_cards"],
+    stat: _component_scorer(stat, weight) for stat, weight in POINTS_PER_UNIT.items()
 }
 
 

@@ -5,7 +5,7 @@ A project exploring various statistical models to predicting players' performanc
 
 ## Loading and splitting data
 
-Place your local dataset in `data/processed/` or pass its directory to
+Place your local dataset in `data/rebuild/` or pass its directory to
 `load_dataset()`. The loader requires `matches.parquet` and
 `player_performances.parquet`. The squad backtest also uses `players.parquet`.
 Parquet datasets, archives and fixture manifests are ignored by Git and must
@@ -23,7 +23,7 @@ with a validated `match_id` relationship, then partition by match date:
 ```python
 from six_nations_fantasy.data import load_dataset, temporal_split
 
-dataset = load_dataset()  # defaults to data/processed/ at the repository root
+dataset = load_dataset()  # defaults to data/rebuild/ at the repository root
 # Or: dataset = load_dataset('/path/to/processed/data')
 
 splits = temporal_split(
@@ -111,6 +111,67 @@ unpriced players. Squad totals use priced players, captain and supersub
 multipliers, and project-calculated actual points. The percentage compares
 total selected points to the sum of the round-by-round hindsight optima.
 
+#### Player-share model
+
+Compare a few opponent settings on validation rounds:
+
+```bash
+python tests/test_selection.py validate --share-tau 0 0.125 0.25 0.5 --k 20
+```
+
+Each number runs a separate model. Zero leaves out the opponent effect. The fit
+uses the requested scale for every stat. In Python, pass
+`PlayerShareModel(tau=0.25, tau_by_stat={"tries": 0.125})` to override a particular
+stat. Choose scales on validation rounds before using them for test rounds.
+
+The model makes a separate forecast for each scoring stat. It first sums the
+players' stats for each team in each historical match. It fits a Poisson
+regression to those totals. For an England home match against Wales, for example,
+the predicted total is the historical average times four multipliers: Six
+Nations, home, England as the team, and Wales as the opponent.
+
+The regression fits the logarithms of those multipliers. It pulls the logs
+toward zero, which pulls the multipliers toward one. If a log multiplier is
+`b`, the penalty is `b² / (2 × scale²)`. Halving the opponent scale `tau`
+therefore quadruples that penalty. The hand-set scales for competition, home/away
+and team are 2, 0.5 and 0.5. An opponent with no training history gets a
+multiplier of one.
+
+For each stat, take the player's recency-weighted mean count in their announced
+starter or bench role. This uses the same role fallback as the recency baseline.
+Divide the count by the sum across the 23 teammates. For example, 8 expected
+tackles out of 100 gives an 8% share of the team's tackle forecast. Opposite-role
+estimates below zero count as zero. If all 23 estimates are zero, each player
+gets 1/23. The default weekly decay is 0.85, matching the backtest baseline.
+Pass `half_life_days` to change it.
+
+Multiply the share by the predicted team total, then apply the fantasy points
+for that stat. This model predicts raw carried metres at 0.1 points per metre.
+Negative recorded metres count as zero in its training. The backtest still
+scores actual performances with `simple_score()`, which floors each player's
+metres in blocks of ten.
+
+Use all 23 players per side, including unpriced players, to calculate shares.
+The fit warns about incomplete historical sheets and skips those sides. Prediction
+requires a complete sheet. Use [the inspection notebook](notebooks/player_share_weights.ipynb)
+to see the fitted team multipliers, player shares and how much they change
+forecasts against the recency-weighted mean.
+
+To test how much of the error comes from forecasting team volumes, keep the
+fitted player shares and substitute each side's recorded totals:
+
+```bash
+python scripts/compare_share_volumes.py 2026 --tau 0.25
+```
+
+Add `--round 1` to inspect one round. The script refits before each round and
+compares both versions on the same lineups. It reports player RMSE and, when
+a prepared roster exists, realized squad points and percentage of the hindsight
+optimum. Recorded totals include late replacements. When using announced
+rosters, the model still divides those totals among the announced players.
+Actual volumes are only available after the match, so treat this comparison
+as a diagnostic of the two parts of the model.
+
 Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
 spreadsheets used in the squad backtest.
 
@@ -142,8 +203,8 @@ A model implements `fit(history)` and `predict(fixtures)`:
 
 - `fit` receives a historical `RugbyDataset`. Models that learn from fantasy
   points calculate them during fitting.
-- `predict` receives only `match_id`, `player_id`, and `date`, never the actual
-  performance statistics or targets for the match being predicted.
+- `predict` receives player and match identifiers, date, and available lineup and
+  schedule fields (shirt, bench status, team, opponent, competition and home side).
 - `predict` must return one finite numeric `pandas.Series` prediction per input
   row, with the same index. Unknown players use the global mean in the supplied
   baseline models.
