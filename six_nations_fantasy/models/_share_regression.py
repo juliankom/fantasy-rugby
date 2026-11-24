@@ -1,4 +1,4 @@
-"""Fit the two regressions used by the player-share model."""
+"""Fit a Poisson regression to each team statistic."""
 
 import numpy as np
 import pandas as pd
@@ -106,51 +106,3 @@ class TeamRate:
     def multipliers(self, frame):
         factors = self.design.multipliers(frame, self.coefficients)
         return factors.rename(columns=lambda col: f"{col}_multiplier")
-
-
-class Allocation:
-    """Estimate relative player weights from how each team split its observed totals."""
-
-    def __init__(self, rows, team_rows, totals, counts):
-        # These scales allow shirt positions to differ more than two players in
-        # the same position. Each player coefficient applies across positions.
-        self.design = CategoricalDesign(rows, {"position_role": 2.0, "player_id": 0.75})
-        design = self.design.matrix(rows)
-        precision = self.design.precision
-
-        def objective(coefficients):
-            # The multinomial loss is -sum(y_i * log(share_i)), where y_i is
-            # the player's count and shares sum to 1 within each team sheet.
-            log_shares = self.log_shares(design @ coefficients, team_rows)
-            loss = -np.sum(counts * log_shares) + 0.5 * np.sum(precision * coefficients**2)
-            expected = totals[team_rows] * np.exp(log_shares)
-            gradient = design.T @ (expected - counts) + precision * coefficients
-            return loss, gradient
-
-        # At zero coefficients players split the team total equally. Sum a
-        # feature's expected counts as a simple upper bound on its curvature.
-        lineup_sizes = np.bincount(team_rows)
-        initial_counts = (totals / lineup_sizes)[team_rows]
-        curvature = design.T @ initial_counts + precision
-        self.coefficients = (
-            minimize_loss(objective, curvature, "player allocation") if counts.any() else np.zeros_like(precision)
-        )
-
-    @staticmethod
-    def log_shares(log_weights, team_rows):
-        # Subtract the largest log weight on each sheet before exponentiating.
-        # The same factor cancels from every player's numerator and denominator.
-        maximum = np.full(team_rows.max() + 1, -np.inf)
-        np.maximum.at(maximum, team_rows, log_weights)
-        shifted = log_weights - maximum[team_rows]
-        totals = np.bincount(team_rows, np.exp(shifted))
-        return shifted - np.log(totals[team_rows])
-
-    def predict(self, rows, team_rows):
-        log_weights = self.design.matrix(rows) @ self.coefficients
-        return np.exp(self.log_shares(log_weights, team_rows))
-
-    def multipliers(self, rows):
-        return self.design.multipliers(rows, self.coefficients).rename(
-            columns={"position_role": "position_weight", "player_id": "player_multiplier"}
-        )

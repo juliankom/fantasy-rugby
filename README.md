@@ -137,13 +137,13 @@ therefore quadruples that penalty. The hand-set scales for competition, home/awa
 and team are 2, 0.5 and 0.5. An opponent with no training history gets a
 multiplier of one.
 
-A second regression estimates who gets credit for the team's total. Each player
-gets a weight for their shirt position and another for their own playing history.
-Multiply these weights and divide by the sum of the 23 combined weights to get
-the player's share. The fit gives more weight to matches with more events for
-that stat. An unseen player gets their position weight alone. All bench shirts
-use the same position weight. The player multiplier carries across club and
-country.
+For each stat, take the player's recency-weighted mean count in their announced
+starter or bench role. This uses the same role fallback as the recency baseline.
+Divide the count by the sum across the 23 teammates. For example, 8 expected
+tackles out of 100 gives an 8% share of the team's tackle forecast. Opposite-role
+estimates below zero count as zero. If all 23 estimates are zero, each player
+gets 1/23. The default weekly decay is 0.85, matching the backtest baseline.
+Pass `half_life_days` to change it.
 
 Multiply the share by the predicted team total, then apply the fantasy points
 for that stat. This model predicts raw carried metres at 0.1 points per metre.

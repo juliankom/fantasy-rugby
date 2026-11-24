@@ -9,7 +9,8 @@ import pandas as pd
 from six_nations_fantasy.data.lineup import match_context, substitute_status
 from six_nations_fantasy.score import POINTS_PER_UNIT
 
-from ._share_regression import Allocation, TeamRate
+from ._share_regression import TeamRate
+from ._mean import MeanScores
 from .position_shrinkage import _positions
 
 
@@ -61,14 +62,26 @@ def full_lineups(frame, *, training):
     team_rows, sides = pd.factorize(pd.MultiIndex.from_frame(rows[keys]), sort=False)
     columns = ["match_id", "date", "team", "opponent", "competition", "home"]
     teams = rows.drop_duplicates(keys)[columns].set_index(keys).loc[sides].reset_index()
+    rows["is_substitute"] = substitute_status(rows)
     return rows, team_rows, teams
+
+
+def lineup_share(means, team_rows):
+    """Divide each player's expected count by the sum for their match side."""
+    counts = means.clip(lower=0)  # The baseline's opposite-role adjustment can be negative.
+    total = counts.groupby(team_rows).transform("sum")
+    # If nobody has a positive estimate, split the available units equally.
+    return counts.div(total.where(total > 0)).fillna(1 / counts.groupby(team_rows).transform("size"))
 
 
 class PlayerShareModel:
     """Predict each team's scoring stats and divide them among its 23 players."""
 
-    def __init__(self, tau=0.25, *, tau_by_stat: Mapping[str, float] | None = None):
+    def __init__(self, tau=0.25, *, half_life_days=7 * np.log(0.5) / np.log(0.85), tau_by_stat: Mapping[str, float] | None = None):
         """Set opponent shrinkage for all stats, with optional per-stat overrides."""
+        if not np.isfinite(half_life_days) or half_life_days <= 0:
+            raise ValueError("half_life_days must be positive and finite")
+        self.half_life_days = half_life_days
         overrides = dict(tau_by_stat or {})
         unknown = overrides.keys() - POINTS_PER_STAT.keys()
         if unknown:
@@ -82,6 +95,8 @@ class PlayerShareModel:
         frame = frame.assign(date=frame["match_id"].map(history.matches.set_index("match_id")["date"]))
         rows, team_rows, teams = full_lineups(frame, training=True)
         units = component_units(rows)
+        age_days = (rows["date"].max() - rows["date"]).dt.days
+        match_weights = 0.5 ** (age_days / self.half_life_days)
         models = {}
         for stat, tau in self.opponent_scales.items():
             counts = units[stat].to_numpy(dtype=float)
@@ -89,10 +104,9 @@ class PlayerShareModel:
             totals = np.bincount(team_rows, weights=counts)
             try:
                 rate = TeamRate(teams, totals, tau)
-                allocation = Allocation(rows, team_rows, totals, counts)
             except RuntimeError as exc:
                 raise RuntimeError(f"Share model fit failed for {stat} (tau={tau:g}): {exc}") from exc
-            models[stat] = rate, allocation
+            models[stat] = rate, MeanScores(rows, units[stat], match_weights)
         self.models_ = models
 
     def _prediction_lineups(self, fixtures):
@@ -111,7 +125,7 @@ class PlayerShareModel:
         predicted = {}
         for stat, (rate, allocation) in self.models_.items():
             totals = rate.predict(teams) if observed_team_units is None else observed[stat].to_numpy()
-            predicted[stat] = totals[team_rows] * allocation.predict(rows, team_rows)
+            predicted[stat] = totals[team_rows] * lineup_share(allocation.predict(rows), team_rows)
         return pd.DataFrame(predicted, index=rows.index)
 
     def explain_component(self, fixtures, stat):
@@ -125,10 +139,8 @@ class PlayerShareModel:
             baseline_units=rate.base_rate, expected_units=rate.predict(teams)
         )
         player_forecast = rows[["match_id", "team", "player_id", "number", "position_role"]].copy()
-        weights = allocation.multipliers(rows)
-        for column in weights:
-            player_forecast[column] = weights[column].to_numpy()
-        player_forecast["share"] = allocation.predict(rows, team_rows)
+        player_forecast["recency_mean"] = allocation.predict(rows).clip(lower=0)
+        player_forecast["share"] = lineup_share(player_forecast["recency_mean"], team_rows)
         player_forecast["expected_units"] = (
             team_forecast["expected_units"].to_numpy()[team_rows] * player_forecast["share"]
         )
