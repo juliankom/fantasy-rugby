@@ -157,6 +157,21 @@ requires a complete sheet. Use [the inspection notebook](notebooks/player_share_
 to see the fitted team multipliers, player shares and how much they change
 forecasts against the recency-weighted mean.
 
+To test how much of the error comes from forecasting team volumes, keep the
+fitted player shares and substitute each side's recorded totals:
+
+```bash
+python scripts/compare_share_volumes.py 2026 --tau 0.25
+```
+
+Add `--round 1` to inspect one round. The script refits before each round and
+compares both versions on the same lineups. It reports player RMSE and, when
+a prepared roster exists, realized squad points and percentage of the hindsight
+optimum. Recorded totals include late replacements. When using announced
+rosters, the model still divides those totals among the announced players.
+Actual volumes are only available after the match, so treat this comparison
+as a diagnostic of the two parts of the model.
+
 Thanks to Reddit user **u/thekai1992** for creating the per-round fantasy
 spreadsheets used in the squad backtest.
 
