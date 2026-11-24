@@ -28,7 +28,7 @@ def models_to_compare(strengths, component_k, share_taus=()):
     models = {
         "Historical mean": HistoricalMean(scorer=simple_score),
         "Recency-weighted mean": RecencyWeightedMean(
-            scorer=simple_score, half_life_days=7 * log(0.5) / log(0.85)
+            scorer=simple_score, half_life_days=180
         ),
     }
     for k in strengths:
@@ -38,7 +38,7 @@ def models_to_compare(strengths, component_k, share_taus=()):
                 k=k, k_by_stat=component_k
             )
     for tau in share_taus:
-        models[f"Player shares (tau={tau:g})"] = PlayerShareModel(tau=tau)
+        models[f"Player shares (tau={tau:g})"] = PlayerShareModel(tau=tau, half_life_days=180)
     return models
 
 
