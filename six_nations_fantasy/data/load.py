@@ -7,7 +7,7 @@ import pandas as pd
 from .dataset import RugbyDataset
 
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "rebuild"
+DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "rebuild_extended"
 
 
 # Competition IDs assigned by notebooks/scraping/rugbypass_urls.ipynb.
