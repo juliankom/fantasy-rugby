@@ -327,3 +327,41 @@ and every player performance with:
 ```bash
 RUGBYPASS_LIVE=1 python -m pytest -s -q tests/unit/test_rugbypass.py -k live_england_wales
 ```
+
+### Who scores a team's tries?
+
+From an editable install, run `python scripts/compare_try_forecasts.py --year 2025`.
+Use `--data-dir` to select a different set of match and player Parquets. Prices
+are unnecessary. Before each Six Nations round the script trains on earlier
+matches across all competitions. It compares the same recorded lineups, using
+shirts 1–23 and tries credited to individual players. The existing team model
+supplies one expected try total per side for all three forecasts.
+
+* **Shirt only** estimates the scoring rate for each shirt and multiplies by its
+  historical average minutes. This distinguishes the replacement hooker from
+  other bench shirts when teams follow the usual numbering.
+* **Recency** uses the player-share backtest's 180-day, role-aware mean of tries
+  per appearance. A player's past team strength can affect this average.
+* **Adjusted player** counts each player's tries and estimates their chances
+  to score as their team's credited tries times their fraction of the match
+  played. This approximates when the tries happened. Add 50 such opportunities
+  at the upcoming shirt's rate, then multiply the resulting rate by that
+  shirt's expected minutes. A debutant therefore starts at the shirt estimate.
+  Each method divides its estimates by their lineup sum to obtain shares.
+
+The default adjusted and shirt estimates use all prior history at equal weight.
+Compare alternatives on earlier tournaments with `--prior-opportunities 100`
+or `--half-life-days 365`. These are experimental settings.
+
+**Loss per try** averages minus the natural log of the share assigned to each
+credited scorer. Lower is better. For this metric alone, every method mixes
+99% of its forecast with 1% split equally over the lineup. The raw zero-share
+column counts tries that would otherwise yield infinite loss. Count RMSE uses
+the original expected try counts and includes players who scored zero.
+Starter and bench rows use each player's share of the full side's tries.
+
+To see whether the adjusted forecast changes fantasy squads, run
+`python tests/test_selection.py test --adjusted-tries` with a prepared roster.
+This forecasts non-try points with the ordinary recency mean and adds 15 times
+the adjusted expected try count. Use the per-round squad scores to compare it
+with the recency mean on the same priced players.

@@ -17,6 +17,7 @@ from six_nations_fantasy.evaluation.squads import (
 from six_nations_fantasy.models import (
     ComponentShrinkageMean, HistoricalMean, PlayerShareModel, PositionShrinkageMean, RecencyWeightedMean,
 )
+from six_nations_fantasy.models.try_forecasts import RecencyWithAdjustedTries
 from six_nations_fantasy.score import simple_score
 
 
@@ -106,6 +107,8 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--k", nargs="+", type=float, default=[5.0])
     parser.add_argument("--component-k", nargs="+", metavar="STAT=K", default=[])
+    parser.add_argument("--adjusted-tries", action="store_true",
+                        help="Compare recency mean with its try component replaced")
     parser.add_argument("--share-tau", nargs="+", type=float, default=[], metavar="SCALE",
                         help="Compare player-share models at these opponent scales (0 disables opposition)")
     parser.add_argument("--single-player-drops", action="store_true")
@@ -119,6 +122,8 @@ def main():
         stat, k = setting.split("=")
         overrides[stat] = float(k)
     models = models_to_compare(args.k, overrides, args.share_tau)
+    if args.adjusted_tries:
+        models["Recency with adjusted tries"] = RecencyWithAdjustedTries()
     dataset = load_dataset(args.data_dir)
     years = args.validation_years if args.stage == "validate" else [args.test_year]
     for year in years:
