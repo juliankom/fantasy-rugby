@@ -35,14 +35,14 @@ def test_default_directory_is_source_checkout_data_directory():
     from six_nations_fantasy.data import load as load_module
 
     assert load_module.DATA_DIR == (
-        Path(load_module.__file__).resolve().parents[2] / "data" / "rebuild"
+        Path(load_module.__file__).resolve().parents[2] / "data" / "default"
     )
 
 
 def test_default_directory_is_independent_of_working_directory(tmp_path, monkeypatch):
     from six_nations_fantasy.data import load as load_module
 
-    processed = tmp_path / "data" / "rebuild"
+    processed = tmp_path / "data" / "default"
     processed.mkdir(parents=True)
     (processed / "matches.parquet").touch()
     (processed / "player_performances.parquet").touch()

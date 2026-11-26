@@ -4,6 +4,7 @@ from math import log
 
 import pandas as pd
 from six_nations_fantasy.data import load_dataset
+from six_nations_fantasy.data.load import DATA_DIR
 from six_nations_fantasy.evaluation import evaluate_holdout
 from six_nations_fantasy.models import HistoricalMean, RecencyWeightedMean
 from six_nations_fantasy.score import simple_score
@@ -26,7 +27,7 @@ def main() -> None:
         ),
     }
 
-    players = pd.read_parquet("data/rebuild/players.parquet")
+    players = pd.read_parquet(DATA_DIR / "players.parquet")
     for name, model in models.items():
         result = evaluate_holdout(model, training, tournament, scorer=simple_score)
         print(
