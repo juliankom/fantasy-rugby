@@ -57,7 +57,7 @@ def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_pla
     solver = squad_solver() if fantasy_roster is not None else None
     comparisons = []
     results = []
-    for round_number, schedule in tournament_rounds(dataset.matches, year):
+    for round_number, schedule in tournament_rounds(dataset.matches, year, price_free=fantasy_roster is None):
         round_matches = dataset.select_matches(schedule["match_id"])
         scored_fixtures = scored_player_fixtures(round_matches, round_number, fantasy_roster)
         if scored_fixtures.empty:  # A historical roster may cover only some rounds.
@@ -92,7 +92,8 @@ def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_pla
         for label, selected in picks.items():
             comparison = compare_price_free_picks(selected, picks[RECENCY])
             comparisons.append(dict(year=year, round=round_number, model=label, **comparison))
-    print_tournament_results(year, results)
+    if results:
+        print_tournament_results(year, results)
     return comparisons
 
 
