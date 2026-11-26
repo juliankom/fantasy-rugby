@@ -28,6 +28,8 @@ def scrape_urls(urls, directory):
                               "home_score", "away_score"):
                     if fixture[field] != result.match[field]:
                         raise ValueError(f"Manifest and match disagree on {field}")
+                if "date" in fixture and pd.Timestamp(fixture["date"]).date() != result.match["date"]:
+                    raise ValueError("Manifest and match disagree on date")
             except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
                 failures.append(dict(match_id=key, url=fixture.url, error=str(exc)))
                 continue

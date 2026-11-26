@@ -327,3 +327,25 @@ and every player performance with:
 ```bash
 RUGBYPASS_LIVE=1 python -m pytest -s -q tests/unit/test_rugbypass.py -k live_england_wales
 ```
+
+### Add international tests to a local dataset
+
+With RugbyPass's permission, run the incremental update from the repository root.
+
+```bash
+python -m six_nations_fantasy.scraping.international_update
+```
+
+By default it checks 2021 through the current year for completed senior men's
+tests involving England, France, Ireland, Italy, Scotland or Wales. It checks
+the Internationals listing and each side's calendar. When a calendar link is
+stale, it looks for a match-centre record with the same date, opponents and score.
+
+It skips fixtures already in the default dataset directory and writes the new scrape to
+`data/international_additions`. See `urls.parquet` for the attempted fixtures,
+`unresolved_urls.parquet` for calendar matches without a verified URL and
+`failures.parquet` for verified URLs whose stats could not be scraped.
+The combined match, team, player and failure tables go to
+`data/rebuild_with_internationals`. Use `--years 2024 2025` to limit discovery,
+`--base`, `--batch` and `--output` to choose directories, or `--reuse-batch`
+to merge a saved batch without fetching again.
