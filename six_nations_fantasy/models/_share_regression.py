@@ -70,7 +70,7 @@ def minimize_loss(objective, curvature, regression):
 class TeamRate:
     """Predict one stat total for one side of a match using a Poisson regression."""
 
-    def __init__(self, frame, counts, tau):
+    def __init__(self, frame, counts, tau, *, continuous_scales=None):
         self.base_rate = counts.mean()
         # These are hand-set standard deviations of log multipliers. Competition
         # gets more room to vary than team and home/away because its prior is wider.
@@ -78,8 +78,12 @@ class TeamRate:
         if tau > 0:
             prior_scales["opponent"] = tau
         self.design = CategoricalDesign(frame, prior_scales)
-        design = self.design.matrix(frame)
-        precision = self.design.precision
+        self.continuous_scales = dict(continuous_scales or {})
+        scales = np.array(list(self.continuous_scales.values()), dtype=float)
+        if not np.isfinite(scales).all() or (scales <= 0).any():
+            raise ValueError("Continuous prior scales must be finite and positive")
+        design = self._matrix(frame)
+        precision = np.concatenate([self.design.precision, 1 / scales**2])
 
         def objective(coefficients):
             # Each row's log multiplier is the sum of its active coefficients.
@@ -93,16 +97,27 @@ class TeamRate:
             gradient = design.T @ (expected - counts) + precision * coefficients
             return loss, gradient
 
-        # At zero coefficients every team starts at base_rate. With binary
-        # features the Poisson curvature per coefficient is its total expected count.
-        curvature = self.base_rate * np.asarray(design.sum(axis=0)).ravel() + precision
+        # Diagonal of the Poisson Hessian at zero coefficients.
+        curvature = self.base_rate * np.asarray(design.power(2).sum(axis=0)).ravel() + precision
         self.coefficients = (
             minimize_loss(objective, curvature, "team total") if self.base_rate else np.zeros_like(precision)
         )
 
+    def _matrix(self, frame):
+        categories = self.design.matrix(frame)
+        if not self.continuous_scales:
+            return categories
+        values = frame[list(self.continuous_scales)].to_numpy(dtype=float)
+        if not np.isfinite(values).all():
+            raise ValueError("Continuous predictors must be finite")
+        return hstack([categories, csr_matrix(values)], format="csr")
+
     def predict(self, frame):
-        return self.base_rate * np.exp(self.design.matrix(frame) @ self.coefficients)
+        return self.base_rate * np.exp(self._matrix(frame) @ self.coefficients)
 
     def multipliers(self, frame):
         factors = self.design.multipliers(frame, self.coefficients)
+        for column, coefficient in zip(self.continuous_scales,
+                                       self.coefficients[len(self.design.precision):]):
+            factors[column] = np.exp(frame[column] * coefficient)
         return factors.rename(columns=lambda col: f"{col}_multiplier")
