@@ -4,6 +4,7 @@ import argparse
 from math import isfinite
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from six_nations_fantasy.data import load_dataset
@@ -13,6 +14,7 @@ from six_nations_fantasy.evaluation.pipeline import fit_predict
 from six_nations_fantasy.evaluation.selection import (
     compare_price_free_picks, prediction_lineup, price_free_picks, scored_player_fixtures, summarize,
 )
+from six_nations_fantasy.evaluation.validation import plot_calibration, subset_scores
 from six_nations_fantasy.evaluation.squads import (
     print_squad, select_squad, single_player_exclusions, squad_solver,
 )
@@ -23,14 +25,14 @@ from six_nations_fantasy.score import simple_score
 
 
 VALIDATION_YEARS = [2023, 2024, 2025]
-RECENCY = "Recency-weighted mean"
+BASELINE = "Historical mean"
 TEST_YEAR = 2026
 
 
 def models_to_compare(strengths, component_k, share_taus=()):
     models = {
-        "Historical mean": HistoricalMean(scorer=simple_score),
-        RECENCY: RecencyWeightedMean(
+        BASELINE: HistoricalMean(scorer=simple_score),
+        "Recency-weighted mean": RecencyWeightedMean(
             scorer=simple_score, half_life_days=180
         ),
     }
@@ -56,6 +58,8 @@ def score_squad(scored_fixtures, objective, solver):
 def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_player_drops=False):
     solver = squad_solver() if fantasy_roster is not None else None
     comparisons = []
+    subset_rounds = []
+    selected_starters = []
     results = []
     for round_number, schedule in tournament_rounds(dataset.matches, year, price_free=fantasy_roster is None):
         round_matches = dataset.select_matches(schedule["match_id"])
@@ -69,6 +73,7 @@ def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_pla
         print(f"\n{year} Six Nations round {round_number} | training on {len(training.matches)} "
               f"matches from all competitions before {round_start:%Y-%m-%d}")
         picks = {}
+        forecasts = {}
         optimum = None
         if fantasy_roster is None:
             print("Price-free selection from recorded lineups")
@@ -86,15 +91,21 @@ def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_pla
             if fantasy_roster is not None:
                 _, points = score_squad(scored_fixtures.assign(predicted=predicted), "predicted", solver)
             else:
+                forecasts[label] = predicted
                 picks[label] = price_free_picks(scored_fixtures, predicted)
             results.append(dict(round=round_number, model=label, players=len(fixtures),
                                 squared_error=squared.sum(), squad_points=points, optimum=optimum))
+        if picks:
+            rng = np.random.default_rng([year, round_number])
+            subset_rounds.append(subset_scores(scored_fixtures, forecasts, rng))
         for label, selected in picks.items():
-            comparison = compare_price_free_picks(selected, picks[RECENCY])
+            selected_starters.append(selected.loc[selected.position.ne("Bench"),
+                                                 ["position", "predicted", "actual"]].assign(model=label))
+            comparison = compare_price_free_picks(selected, picks[BASELINE])
             comparisons.append(dict(year=year, round=round_number, model=label, **comparison))
     if results:
         print_tournament_results(year, results)
-    return comparisons
+    return comparisons, subset_rounds, selected_starters
 
 
 def print_tournament_results(year, results):
@@ -121,6 +132,7 @@ def main():
     parser.add_argument("--share-tau", nargs="+", type=float, default=[], metavar="SCALE",
                         help="Compare player-share models at these opponent scales (0 disables opposition)")
     parser.add_argument("--single-player-drops", action="store_true")
+    parser.add_argument("--calibration-plot", type=Path, default=Path("validation_calibration.png"))
     args = parser.parse_args()
     if args.stage == "validate" and max(args.validation_years) >= args.test_year:
         parser.error("Validation years must precede the held-out test year")
@@ -134,20 +146,35 @@ def main():
     dataset = load_dataset(args.data_dir)
     years = args.validation_years if args.stage == "validate" else [args.test_year]
     comparisons = []
+    subset_rounds = []
+    selected_starters = []
     for year in years:
         roster_path = fixture_path(args.data_dir, year)
         if args.stage == "test" and not roster_path.exists():
             parser.error(f"Squad testing requires a prepared fantasy roster: {roster_path}")
         fantasy_roster = pd.read_parquet(roster_path) if args.stage == "test" else None
-        comparisons.extend(evaluate_on_six_nations(
+        rows, subsets, starters = evaluate_on_six_nations(
             dataset, year, models, fantasy_roster, single_player_drops=args.single_player_drops
-        ))
+        )
+        comparisons.extend(rows)
+        subset_rounds.extend(subsets)
+        selected_starters.extend(starters)
     if comparisons:
         rounds = pd.DataFrame(comparisons).set_index(["year", "round", "model"])
-        print("\nPrice-free selection by round (gain and changed picks versus recency)")
+        print("\nPrice-free selection by round (gain and changed picks versus historical mean)")
         print(rounds.to_string())
         print("\nPrice-free totals across all validation rounds")
         print(rounds.groupby(level="model", sort=False).sum().to_string())
+        scores = sum(subset_rounds)
+        gains = scores.subtract(scores[BASELINE], axis="index")
+        summary = gains.quantile([.025, .5, .975]).T
+        summary.columns = ["2.5%", "median", "97.5%"]
+        summary["% wins"] = 100 * gains.gt(0).mean()
+        summary["% ties"] = 100 * gains.eq(0).mean()
+        print("\nShared player subsets: total XV gain versus historical mean")
+        print(summary.to_string(float_format="{:.1f}".format))
+        plot_calibration(pd.concat(selected_starters), args.calibration_plot)
+        print(f"Selected XV calibration: {args.calibration_plot}")
 
 
 if __name__ == "__main__":

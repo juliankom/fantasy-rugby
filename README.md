@@ -88,9 +88,20 @@ roster exists. Late replacements can therefore differ from the announced squad.
 Alongside player RMSE, each model ranks starters by predicted points within their
 starting shirt group to fill the usual XV slots, then picks one bench player.
 Ties use ascending player ID. The tables show unmultiplied realized XV and bench
-points separately, gains over recency and the number of different picks, per round
+points separately, gains over historical mean and the number of different picks, per round
 and across the requested years. Budget, country limits and captaincy apply only
 in the priced squad test. Use `--validation-years 2024 2025` to select seasons.
+
+Validation also reports the spread of total XV gains over historical mean across
+1,000 shared player-subset draws. Each draw keeps 75% of each round’s starters
+in each position (rounded up, with enough players to fill the slots). Draws are
+reproducible. The percentiles describe sensitivity to player availability on the
+observed fixtures. Wins and ties are reported separately.
+
+The selected XV scatter plots (`--calibration-plot PATH`, default
+`validation_calibration.png`) use the full candidate pool. Each panel shows one
+model’s selected starters by position, the identity line, a fitted line where
+estimable, and mean actual versus mean predicted points in forecast quartiles.
 
 To test full squads, prepare the test year's Google Sheets CSV export once.
 The generator expects the same columns and position labels as the bundled
