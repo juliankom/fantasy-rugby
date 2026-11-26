@@ -64,3 +64,18 @@ def test_training_expands_with_completed_matches_from_all_competitions(round_sta
     dataset = RugbyDataset(matches, matches[["match_id"]])
     training = dataset.matches_before(pd.Timestamp(round_start))
     assert training.performances.match_id.tolist() == training_ids
+
+
+@pytest.mark.parametrize("labels, expected", [
+    (["Round 1", "Round 3"], [1, 3]),
+    ([None, None], [1, 2]),
+])
+def test_incomplete_validation_uses_available_weekends(labels, expected):
+    matches = pd.DataFrame({
+        "competition": "Six Nations", "date": pd.to_datetime(["2024-02-03", "2024-02-24"]),
+        "extra_info": labels,
+    })
+    with pytest.warns(UserWarning, match="2024"):
+        assert list(dict(tournament_rounds(matches, 2024, price_free=True))) == expected
+    with pytest.warns(UserWarning, match="found 0 match weekends"):
+        assert list(tournament_rounds(matches, 2023, price_free=True)) == []

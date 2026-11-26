@@ -9,6 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pandas",
     "numpy",
+    "matplotlib",
     "scipy",
     "requests>=2",
     "beautifulsoup4>=4",
