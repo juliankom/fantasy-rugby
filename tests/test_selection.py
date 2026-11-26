@@ -99,9 +99,14 @@ def evaluate_on_six_nations(dataset, year, models, fantasy_roster, *, single_pla
             rng = np.random.default_rng([year, round_number])
             subset_rounds.append(subset_scores(scored_fixtures, forecasts, rng))
         for label, selected in picks.items():
+<<<<<<< HEAD
             selected_starters.append(selected.loc[selected.position.ne("Bench"),
                                                  ["position", "predicted", "actual"]].assign(model=label))
             comparison = compare_price_free_picks(selected, picks[BASELINE])
+=======
+            # we choose historical mean as the baseline
+            comparison = compare_price_free_picks(selected, picks["Historical mean"])
+>>>>>>> cfcebeb (change baseline to historical mean)
             comparisons.append(dict(year=year, round=round_number, model=label, **comparison))
     if results:
         print_tournament_results(year, results)
