@@ -5,7 +5,7 @@ A project exploring various statistical models to predicting players' performanc
 
 ## Loading and splitting data
 
-Place your local dataset in `data/rebuild/` or pass its directory to
+Place your local dataset in `data/default/` or pass its directory to
 `load_dataset()`. The loader requires `matches.parquet` and
 `player_performances.parquet`. The squad backtest also uses `players.parquet`.
 Parquet datasets, archives and fixture manifests are ignored by Git and must
@@ -23,7 +23,7 @@ with a validated `match_id` relationship, then partition by match date:
 ```python
 from six_nations_fantasy.data import load_dataset, temporal_split
 
-dataset = load_dataset()  # defaults to data/rebuild/ at the repository root
+dataset = load_dataset()  # defaults to data/default/ at the repository root
 # Or: dataset = load_dataset('/path/to/processed/data')
 
 splits = temporal_split(
@@ -70,7 +70,7 @@ python -m pytest
 
 Run `python tests/main.py` from the source checkout to compare the historical
 mean and recency-weighted mean on the 2026 Six Nations. The runner loads
-`data/rebuild/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
+`data/default/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
 ### Validate and test squad selection
 
 From an editable install, run validation first. The default validation year is
@@ -95,7 +95,7 @@ python scripts/prepare_fixtures.py 2026 tests/six_nations_2026_fantasy_prices.cs
 
 Use the same command with 2024 or 2025 and the corresponding export. Supply
 whole rounds for comparable squad scores. The generator writes
-`data/rebuild/six_nations_<year>_fixtures.parquet` with player IDs, match IDs,
+`data/default/six_nations_<year>_fixtures.parquet` with player IDs, match IDs,
 prices, fantasy positions and announced roles. If the export covers only
 some rounds, evaluation uses those rounds.
 
@@ -303,11 +303,11 @@ python -m six_nations_fantasy.scraping
 ```
 
 This refreshes `data/scraping/urls.parquet`, prints fixture counts by season
-and competition, and scrapes those URLs into a new `data/rebuild/` directory.
+and competition, and scrapes those URLs into a new `data/default/` directory.
 To reuse the saved URLs and choose a fresh output directory:
 
 ```bash
-python -m six_nations_fantasy.scraping --reuse-manifest --output data/rebuild-2
+python -m six_nations_fantasy.scraping --reuse-manifest --output data/scrape_output
 ```
 
 Use `--manifest PATH` to select another URL table. The command exits with
@@ -327,3 +327,25 @@ and every player performance with:
 ```bash
 RUGBYPASS_LIVE=1 python -m pytest -s -q tests/unit/test_rugbypass.py -k live_england_wales
 ```
+
+### Add international tests to a local dataset
+
+With RugbyPass's permission, run the incremental update from the repository root.
+
+```bash
+python -m six_nations_fantasy.scraping.international_update
+```
+
+By default it checks 2021 through the current year for completed senior men's
+tests involving England, France, Ireland, Italy, Scotland or Wales. It checks
+the Internationals listing and each side's calendar. When a calendar link is
+stale, it looks for a match-centre record with the same date, opponents and score.
+
+It skips fixtures already in `data/default` and writes the new scrape to
+`data/international_additions`. See `urls.parquet` for the attempted fixtures,
+`unresolved_urls.parquet` for calendar matches without a verified URL and
+`failures.parquet` for verified URLs whose stats could not be scraped.
+The combined match, team, player and failure tables go to
+`data/rebuild_with_internationals`. Use `--years 2024 2025` to limit discovery,
+`--base`, `--batch` and `--output` to choose directories, or `--reuse-batch`
+to merge a saved batch without fetching again.

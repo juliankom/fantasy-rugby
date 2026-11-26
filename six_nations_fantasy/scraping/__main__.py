@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 
 import pandas as pd
 
+from ..data.load import DATA_DIR
 from .batch import scrape_urls
 from .fixtures import discover_urls
 
@@ -16,7 +17,7 @@ def main():
                         help="Fixture URL table (default: %(default)s)")
     parser.add_argument("--reuse-manifest", action="store_true",
                         help="Read the saved URL table and skip fixture discovery")
-    parser.add_argument("--output", type=Path, default=Path("data/rebuild"),
+    parser.add_argument("--output", type=Path, default=DATA_DIR,
                         help="New dataset directory (default: %(default)s)")
     args = parser.parse_args()
 
