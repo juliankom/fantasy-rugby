@@ -73,8 +73,7 @@ mean and recency-weighted mean on the 2026 Six Nations. The runner loads
 `data/default/` by default and prints MAE, RMSE, bias, and the highest-rated players for both models.
 ### Validate and test squad selection
 
-From an editable install, run validation first. The default validation year is
-2025. Before each round, refit each model on every available match from every competition
+From an editable install, run validation first. Validation defaults to the 2023, 2024 and 2025 Six Nations. Before each round, refit each model on every available match from every competition
 dated before the round's opening fixture. For example, training for 2026 round 2
 includes earlier seasons, round 1, and any club matches played before round 2.
 Only the evaluated fixtures are restricted to that year's Six Nations. Keep the hyperparameters
@@ -84,8 +83,16 @@ chosen on validation fixed throughout the test tournament. Compare model definit
 python tests/test_selection.py validate --k 5 15 20
 ```
 
-Validation without a fantasy roster reports player RMSE on recorded lineups.
-To also score squads, prepare each year's Google Sheets CSV export once.
+Validation uses recorded match sheets for every round, even when a partial priced
+roster exists. Late replacements can therefore differ from the announced squad.
+Alongside player RMSE, each model ranks starters by predicted points within their
+starting shirt group to fill the usual XV slots, then picks one bench player.
+Ties use ascending player ID. The tables show unmultiplied realized XV and bench
+points separately, gains over recency and the number of different picks, per round
+and across the requested years. Budget, country limits and captaincy apply only
+in the priced squad test. Use `--validation-years 2024 2025` to select seasons.
+
+To test full squads, prepare the test year's Google Sheets CSV export once.
 The generator expects the same columns and position labels as the bundled
 2026 CSV. Pass the year and CSV path, for example:
 
